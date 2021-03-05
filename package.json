@@ -5,7 +5,6 @@
   "description": "BookStore-Ecomme\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[Crce Project",
   "main": "server,js\u001b[D\u001b[.\u001b[C\u001b[C",
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
     "start": "nodemon --watch backend --exec node --experimental-modules backend/server.js"
   },
   "author": "Agam Sahu",
@@ -14,6 +13,7 @@
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "moment": "^2.29.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

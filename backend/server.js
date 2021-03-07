@@ -226,6 +226,7 @@ const transfranklin = new Schema({
   var camsn = mongoose.model('cams_nav', navcams, 'cams_nav');  
   var resdata="";
   var data="";
+var i=0;
 
 app.get("/api/gettranscams", function (req, res) {
     var model = mongoose.model('trans_cams', transcams, 'trans_cams');

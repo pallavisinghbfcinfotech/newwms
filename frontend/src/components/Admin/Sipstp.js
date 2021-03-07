@@ -38,7 +38,7 @@ class Example extends Component {
       $(".loader").css("display", "block");
       $("#example1").css("display", "none");
     $.ajax({
-       url: "http://localhost:3001/api/getsipstpall",
+       url: "/api/getsipstpall",
        type: "POST",
        data:{month:month,year:year},
         success: function (res1) {
@@ -60,7 +60,7 @@ class Example extends Component {
     });
     if(e.target.value == "no"){
       $.ajax({
-        url: "http://localhost:3001/api/getapplicant1",
+        url: "/api/getapplicant1",
         type: "GET",
          success: function (res2) {
           this.setState({ options: res2 });
@@ -85,7 +85,7 @@ class Example extends Component {
     var month = sel.split('-')[1];
     var year = sel.split('-')[0];
     $.ajax({
-      url: "http://localhost:3001/api/getsipstpuserwise",
+      url: "/api/getsipstpuserwise",
       type: "POST",
       data:{month:month,year:year,pan:pan,name:name},
        success: function (res3) {
@@ -108,7 +108,7 @@ handlechange1(){
     $("#example1").css("display", "none");
 
     $.ajax({
-      url: "http://localhost:3001/api/getsipstpall",
+      url: "/api/getsipstpall",
       type: "POST",
       data:{month:month,year:year},
        success: function (res1) {
@@ -127,7 +127,7 @@ handlechange1(){
   }else if(this.state.rvalue == "no"){
    // var user = document.getElementById("user").value;
     $.ajax({
-      url: "http://localhost:3001/api/getsipstpuserwise",
+      url: "/api/getsipstpuserwise",
       type: "POST",
       data:{month:month,year:year,pan:this.state.pan,name:this.state.name},
        success: function (res3) {
@@ -147,7 +147,7 @@ handlechange1(){
     var month = sel.split('-')[0];
     var year = sel.split('-')[1];
     $.ajax({
-      url: "http://localhost:3001/api/getsipstpall",
+      url: "/api/getsipstpall",
       type: "POST",
       data:{month:month,year:year},
        success: function (res1) {
@@ -160,7 +160,7 @@ handlechange1(){
       }
     });
     $.ajax({
-      url: "http://localhost:3001/api/getapplicant1",
+      url: "/api/getapplicant1",
       type: "GET",
        success: function (res2) {
         this.setState({ options: res2 });

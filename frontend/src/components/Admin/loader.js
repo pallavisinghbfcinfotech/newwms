@@ -1,4 +1,4 @@
-import react from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import kuchhbhi from '../../images/imgpsh_fullsize_anim.gif';
 export default function Loader(){

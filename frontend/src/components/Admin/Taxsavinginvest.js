@@ -39,7 +39,7 @@ class Taxsavinginvest extends Component {
      $("#example1").css("display", "none");
 
     $.ajax({
-       url: "http://localhost:3001/api/gettaxsaving",
+       url: "/api/gettaxsaving",
        type: "POST",
        data:{fromyear:fromyear,toyear:toyear},
         success: function (res1) {
@@ -60,7 +60,7 @@ class Taxsavinginvest extends Component {
     });
     if(e.target.value === "no"){
       $.ajax({
-        url: "http://localhost:3001/api/getapplicant1",
+        url: "/api/getapplicant1",
         type: "GET",
          success: function (res2) {
           this.setState({ options: res2 });
@@ -85,7 +85,7 @@ class Taxsavinginvest extends Component {
      var fromyear = yer.split('-')[0];
      var toyear = yer.split('-')[1];
       $.ajax({
-      url: "http://localhost:3001/api/gettaxsavinguserwise",
+      url: "/api/gettaxsavinguserwise",
       type: "POST",
       data:{fromyear:fromyear,toyear:toyear,pan:pan,name:name},
        success: function (res3) {
@@ -106,7 +106,7 @@ changeyear = (e) =>{
     $(".loader").css("display", "block");
     $("#example1").css("display", "none");
     $.ajax({
-      url: "http://localhost:3001/api/gettaxsaving",
+      url: "/api/gettaxsaving",
       type: "POST",
       data:{fromyear:fromyear,toyear:toyear},
        success: function (res1) {
@@ -122,7 +122,7 @@ changeyear = (e) =>{
     });   
   }else{
     $.ajax({
-      url: "http://localhost:3001/api/gettaxsavinguserwise",
+      url: "/api/gettaxsavinguserwise",
       type: "POST",
       data:{fromyear:fromyear,toyear:toyear,pan:this.state.pan,name:this.state.name},
        success: function (res3) {
@@ -140,7 +140,7 @@ changeyear = (e) =>{
     var fromyear = yer.split('-')[0];
     var toyear = yer.split('-')[1];
     $.ajax({
-      url: "http://localhost:3001/api/gettaxsaving",
+      url: "/api/gettaxsaving",
       type: "POST",
       data:{fromyear:fromyear,toyear:toyear},
        success: function (res1) {
@@ -153,7 +153,7 @@ changeyear = (e) =>{
       }
     });
     $.ajax({
-      url: "http://localhost:3001/api/getapplicant1",
+      url: "/api/getapplicant1",
       type: "GET",
        success: function (res2) {
         this.setState({ options: res2 });

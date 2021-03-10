@@ -38,19 +38,9 @@ function Nav() {
         }
       }
     }
- 
-    // prepare columns list from headers
-    //const columns = headers.map(c => ({
-  //    name: c,
-  //    selector: c,
-  //  }));
- 
-    //setData(list);
-    //setColumns(columns);
-    //console.log(list);
     
     
-    Axios.post('http://localhost:3001/api/savecamsnav',
+    Axios.post('/api/savecamsnav',
     list ,
     {mode: 'cors'},
     {headers:
@@ -59,7 +49,6 @@ function Nav() {
         'Access-Control-Allow-Credentials' : 'true',
         'Access-Control-Max-Age' :'3000',
         'Access-Control-Allow-Headers' : ' Origin, Content-Type, X-Auth-Token, Accept, X-Requested-With',
-       // 'Content-Type': 'application/json, charset=utf-8',
         'Content-Type':'application/x-www-form-urlencoded',
       }
     }).then((result) => {  

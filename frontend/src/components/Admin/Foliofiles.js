@@ -3,8 +3,6 @@ import * as XLSX from 'xlsx';
 import Axios from "axios";
 
 
-//var createReactClass = require('create-react-class');
-
 function Foliofiles()  { 
   
   const [columns, setColumns] = useState([]);
@@ -48,7 +46,7 @@ function Foliofiles()  {
     setData(list);
     setColumns(columns);
 
-    Axios.post('http://localhost:3001/api/savefoliocams',
+    Axios.post('/api/savefoliocams',
     list ,
     {mode: 'cors'},
     {headers:
@@ -106,7 +104,7 @@ function Foliofiles()  {
     setData(list);
     setColumns(columns);
 
-    Axios.post('http://localhost:3001/api/savefoliokarvy',
+    Axios.post('/api/savefoliokarvy',
     list ,
     {mode: 'cors'},
     {headers:
@@ -164,7 +162,7 @@ function Foliofiles()  {
     setData(list);
     setColumns(columns);
 
-    Axios.post('http://localhost:3001/api/savefoliofranklin',
+    Axios.post('/api/savefoliofranklin',
     list ,
     {mode: 'cors'},
     {headers:

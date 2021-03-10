@@ -25,20 +25,18 @@ class Portfolio extends Component {
       }
 
       getportfolio = (e) =>{
-        alert("sxdbhabvg");
-   window.open("http://localhost:3000/Portfoliodetail?scheme="+e.SCHEME+"&pan="+e.PAN, "_blank") //to open new page
-        // var win = window.open("http://localhost:3000/Portfoliodetail", '_blank');
-        // var sel = e.target.value;
-  //       var newtab="";
-  //  //     window.open('http://www.facebook.com/sharer.php?s=100&p[title]=Fb Share&p[summary]=Facebook share popup&p[url]=javascript:fbShare("http://jsfiddle.net/stichoza/EYxTJ/")&p[images][0]="http://goo.gl/dS52U"', 'sharer', 'toolbar=0,status=0,width=600,height=400');
-  //       var newtab = window.open("http://localhost:3000/Portfoliodetail", "anotherWindow", "width=600,height=300");  
-        //newtab.document.write("<p> This is 'anotherWindow'. It is 300px wide and 150px tall new window! </p>"); 
-      }
+     var baseurl = window.location.href
+        var domain = baseurl.split('/');
+
+    var portfoliourl = domain[domain.length - 2]+"/Portfoliodetail?scheme="+e.SCHEME+"&pan="+e.PAN;
+    window.open(portfoliourl, "_blank") //to open new page
+         
+ }
       
       changeApplicant = (e) =>{
         var sel = e.target.value;
         $.ajax({
-            url: "http://localhost:3001/api/getpan",
+            url: "/api/getpan",
             type: "GET",
             data:{pan: e.target.value},
              success: function (res4) {
@@ -48,22 +46,12 @@ class Portfolio extends Component {
               console.log(jqXHR);         
             }
           });     
-        // $.ajax({
-        //   url: "http://localhost:3001/api/getportfolio",
-        //   type: "POST",
-        //   data:{pan: e.target.value},
-        //    success: function (res3) {
-        //     this.setState({ data3: res3 });
-        //   }.bind(this),
-        //   error: function(jqXHR) {
-        //     console.log(jqXHR);         
-        //   }
-        // }); 
+
         var fullSchemeHtml = "";
         
         var sch="";
         $.ajax({
-          url: "http://localhost:3001/api/getportfolioscheme",
+          url: "/api/getportfolioscheme",
           type: "POST",
           data:{pan: e.target.value},
            success: function (res) {
@@ -74,15 +62,10 @@ class Portfolio extends Component {
               var sch_name = res[i].SCHEME;
              // fullSchemeHtml += "<tr><td>djsdgshjghjsg</td></tr>";
               $.ajax({
-                url: "http://localhost:3001/api/getschemeportfoliodetail",
+                url: "/api/getschemeportfoliodetail",
                 type: "POST",
                 data:{scheme:res[i].SCHEME,pan:res[i].PAN},
                  success: function (res2) {
-                  // this.setState({ data2: res2.data });
-                  // {this.state.data2.map((item, index) => (
-                  //   //unit = item.UNITS+unit  
-                  //   console.log(this.state.data2)
-                  // ))}
                   fullSchemeHtml += "<tr>"
                   var unit = 0;var balance=0;var amount = 0;var amt =0;var cnav=0;var currentval=0;var gain=0; var absreturn=0;var days = 0; var date1 = ""; var date2 = ""; var totaldays = 0;
                   var t =0;var cagr=0;var avgDays=0;var rootval=0;var nval=0;var mathpo=0;
@@ -95,10 +78,8 @@ class Portfolio extends Component {
                       unit = res2.data[j].UNITS
                       amount = res2.data[j].AMOUNT
                     }
-                    if(res2.data[j].SCHEME == res2.data[0].SCHEME){
-                     
-                      balance = parseFloat(unit)+parseFloat(balance)
-                      
+                    if(res2.data[j].SCHEME == res2.data[0].SCHEME){                     
+                      balance = parseFloat(unit)+parseFloat(balance)                      
                       amt = parseFloat(amount)+parseFloat(amt)
                       cnav = res2.data[j].cnav[0]
                       currentval = cnav*balance
@@ -112,22 +93,10 @@ class Portfolio extends Component {
                       var yy=d.getFullYear();
                       var newdate=mm+"/"+dd+"/"+yy;
                       
-                      //console.log(res2.data[j].TD_TRDT)
                       date1 = new Date(newdate);    
                       date2 = new Date();  
-                      //calculate time difference  
-                     // var time_difference = date2.getTime() - date1.getTime() ;  
-                     days = moment(date2).diff(moment(date1), 'days');
-                      //days = Math.floor(( Date.parse(date2) - Date.parse(date1) ) / 86400000); 
-                      //calculate days difference by dividing total milliseconds in a day  
-                     // days = time_difference / (1000 * 60 * 60 * 24);
+                      days = moment(date2).diff(moment(date1), 'days');
                       totaldays = parseFloat(days) + parseFloat(totaldays);
-                      // if(res2.data[j].SCHEME == "Mirae Asset Large Cap Fund - Regular Growth Plan"){
-                      // console.log(totaldays);
-                      // console.log(date1);
-                      // console.log(date);
-                      // }
-                      //avgDays = Math.round(parseFloat(totaldays)/parseFloat(res2.data.length))-1;
                       avgDays = Math.round(parseFloat(totaldays)/parseFloat(res2.data.length));
                       t = parseFloat(avgDays)/365;
                       rootval= 1/parseFloat(t);
@@ -138,10 +107,14 @@ class Portfolio extends Component {
                     
                   }
                  
-
+                   var baseurl = window.location.href
+                   var domain = baseurl.split('/');
+                  
+                     
                   var scheme_name_data = res2.data[0].SCHEME;
                   scheme_name_data = scheme_name_data.replace(/\s+/g, '%20');
-                    fullSchemeHtml += "<td><a href='http://localhost:3000/Portfoliodetail?scheme="+scheme_name_data+"&pan="+res2.data[0].PAN+"' target='_blank'>"+res2.data[0].SCHEME+"</a></td><td>"+res2.data[0].FOLIO+"</td><td>"+balance.toFixed(3)+"</td><td>"+Math.round(amt)+"</td><td>"+cnav+"</td><td>"+Math.round(currentval)+"</td><td></td><td>"+gain.toFixed(4)+"</td><td>"+Math.round(avgDays)+"</td><td>"+absreturn.toFixed(4)+"</td><td>"+cagr.toFixed(4)+"</td></tr>";
+                    var portfoliourl = "http://"+domain[domain.length - 2]+"/Portfoliodetail?scheme="+scheme_name_data+"&pan="+res2.data[0].PAN;
+                    fullSchemeHtml += "<td><a href='"+portfoliourl+"' target='_blank'>"+res2.data[0].SCHEME+"</a></td><td>"+res2.data[0].FOLIO+"</td><td>"+balance.toFixed(3)+"</td><td>"+Math.round(amt)+"</td><td>"+cnav+"</td><td>"+Math.round(currentval)+"</td><td></td><td>"+gain.toFixed(4)+"</td><td>"+Math.round(avgDays)+"</td><td>"+absreturn.toFixed(4)+"</td><td>"+cagr.toFixed(4)+"</td></tr>";
                   $(".randerData").html(fullSchemeHtml)
                   
                  }.bind(this),
@@ -149,33 +122,6 @@ class Portfolio extends Component {
                   console.log(jqXHR);         
                 }
                 })
-
-
-              // axios.post('http://localhost:3001/api/getschemeportfoliodetail',{scheme:res[i].SCHEME,pan:res[i].PAN})
-              // .then(response => {
-              //    this.setState({data3: response.data.data})
-                  
-                  // for(var j = 0; j< this.state.data3.length;j++){
-                  //   if(this.state.data3[j].SCHEME ==  sch_name){
-                  //     //unit = this.state.data3[j].UNITS+unit
-                  //     console.log(this.state.data3[j].SCHEME)
-                  //   }
-                  // }
-                  
-                  // {this.state.data3.map((item, index) => (
-                  //   <div>sch =item.SCHEME
-                  //   {(item.SCHEME == sch_name) ? (
-                  //     <div>{ unit = item.UNITS+item.UNITS }
-                  //     </div>
-                  //    ):(<div></div>) 
-                  //    }
-                    
-                  //   </div>
-                    
-                  //   ))}
-                    
-                  
-              //})
               
              }
 
@@ -195,7 +141,7 @@ class Portfolio extends Component {
   componentDidMount(){
     document.title = "WMS | Folio Detail"
     $.ajax({
-        url: "http://localhost:3001/api/getapplicant",
+        url: "/api/getapplicant",
         type: "GET",
          success: function (res1) {
           this.setState({ data1: res1 });
@@ -205,7 +151,7 @@ class Portfolio extends Component {
         }
       });
       $.ajax({
-        url: "http://localhost:3001/api/getschemetype",
+        url: "/api/getschemetype",
         type: "GET",
          success: function (res2) {
           this.setState({ data2: res2 });

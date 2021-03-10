@@ -38,7 +38,7 @@ class Transaction  extends Component {
     $(".loader").css("display", "block");
     $("#example1").css("display", "none");
     $.ajax({
-       url: "http://localhost:3001/api/gettransactionall",
+       url: "/api/gettransactionall",
        type: "POST",
        data:{month:month,year:year},
         success: function (res1) {
@@ -58,7 +58,7 @@ class Transaction  extends Component {
     });
     if(e.target.value === "no"){
       $.ajax({
-        url: "http://localhost:3001/api/getapplicant1",
+        url: "/api/getapplicant1",
         type: "GET",
          success: function (res2) {
           this.setState({ options: res2 });
@@ -82,12 +82,9 @@ class Transaction  extends Component {
     var sel = document.getElementById("getcalender").value;
     var month = sel.split('-')[1];
     var year = sel.split('-')[0];
-    // alert(name)
-    // alert(pan)
-    // alert(month)
-    // alert(year)
+
     $.ajax({
-      url: "http://localhost:3001/api/gettransactionuserwise",
+      url: "/api/gettransactionuserwise",
       type: "POST",
       data:{month:month,year:year,pan:pan,name:name},
        success: function (res3) {
@@ -110,7 +107,7 @@ handlechange1(){
   $(".loader").css("display", "block");
   $("#example1").css("display", "none");
    $.ajax({
-     url: "http://localhost:3001/api/gettransactionall",
+     url: "/api/gettransactionall",
      type: "POST",
      data:{month:month,year:year},
       success: function (res1) {
@@ -126,7 +123,7 @@ handlechange1(){
    });   
  }else if(this.state.rvalue === "no"){
    $.ajax({
-     url: "http://localhost:3001/api/gettransactionuserwise",
+     url: "/api/gettransactionuserwise",
      type: "POST",
      data:{month:month,year:year,pan:this.state.pan,name:this.state.name},
       success: function (res3) {
@@ -145,7 +142,7 @@ handlechange1(){
     var month = sel.split('-')[0];
     var year = sel.split('-')[1];
     $.ajax({
-      url: "http://localhost:3001/api/gettransactionall",
+      url: "/api/gettransactionall",
       type: "POST",
       data:{month:month,year:year},
        success: function (res1) {
@@ -158,7 +155,7 @@ handlechange1(){
       }
     });
     $.ajax({
-      url: "http://localhost:3001/api/getapplicant1",
+      url: "/api/getapplicant1",
       type: "GET",
        success: function (res2) {
         this.setState({ options: res2 });

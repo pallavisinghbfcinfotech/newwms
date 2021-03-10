@@ -5,8 +5,6 @@ import Select from 'react-select';
 import '../../../node_modules/aos/dist/aos.css';
 
 
-//var createReactClass = require('create-react-class');
-
 class Addbook extends Component { 
   constructor(props) {
     super(props);
@@ -29,21 +27,13 @@ class Addbook extends Component {
 changeScheme = (e) =>{
   var sel = e.target.value;
   var folioval = this.state.secdrp;
-  //alert(e)
-//alert(this.state.secdrp)
   $.ajax({
-    url: "http://localhost:3001/api/getfoliodetailweb",
+    url: "/api/getfoliodetailweb",
     type: "POST",
     data:{scheme:sel,folio:folioval},
      success: function (res4) {
       this.setState({ data4: res4.data });
       $("#detail").show();
-      // var foliodetail = "";
-      
-      // {this.state.data4.map((item, index) => (
-      //   foliodetail +="<div className='card-body box-profile'><h3 className='profile-username text-center'>"+item.INVNAME+"</h3><ul className='list-group list-group-unbordered mb-3'><li className='list-group-item'><b>Units</b> <a className='float-right'>"+(item.UNITS).toFixed(2)+"</a></li><li className='list-group-item'><b>Current Value</b> <a className='float-right'>"+(item._id.cnav * item.UNITS).toFixed(2)+"</a></li><li className='list-group-item'><b>Bank</b> <a className='float-right'>"+item.BANK_NAME+"</a></li><li className='list-group-item'><b>Account No.</b> <a className='float-right'>"+item.AC_NO+"</a></li><li className='list-group-item'><b>Joint 1</b> <a className='float-right'>"+item.JTNAME1+"</a></li><li className='list-group-item'><b>Joint 2</b> <a className='float-right'>"+item.JTNAME2+"</a></li><li className='list-group-item'><b>Nominee</b> <a className='float-right'>"+item.NOMINEE+"</a></li></ul></div>" 
-      // ))}
-      // $("#detail").html(foliodetail);
     }.bind(this),
     error: function(jqXHR) {
       console.log(jqXHR);         
@@ -55,7 +45,7 @@ changeFolio = (e) =>{
   var sel = e.target.value;
   this.setState({secdrp:sel})
   $.ajax({
-    url: "http://localhost:3001/api/getscheme",
+    url: "/api/getscheme",
     type: "GET",
     data:{folio:sel},
      success: function (res3) {
@@ -77,18 +67,14 @@ changeFolio = (e) =>{
 changeApplicant = (selectedOption) =>{ 
   this.setState({ selectedOption });
    var optionElement = selectedOption.value
-   var name =  optionElement.split('/')[0];
-   
+   var name =  optionElement.split('/')[0];  
    var pan =  optionElement.split('/')[1];
-   //alert(pan)
    this.setState({
     pan:pan,
     name: name
   })
- // alert(name)
- // alert(pan)
     $.ajax({
-      url: "http://localhost:3001/api/getfolio",
+      url: "/api/getfolio",
       type: "GET",
       data:{pan:pan},
        success: function (res2) {
@@ -112,7 +98,7 @@ changeApplicant = (selectedOption) =>{
   componentDidMount(){
     document.title = "WMS | Folio Detail"
     $.ajax({
-      url: "http://localhost:3001/api/getapplicant1",
+      url: "/api/getapplicant1",
       type: "GET",
        success: function (res1) {
         this.setState({ options: res1 });

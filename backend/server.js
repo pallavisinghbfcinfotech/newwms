@@ -2059,15 +2059,15 @@ app.post("/api/getschemeportfoliodetail", function (req, res) {
     //     {$group :{_id :  {INV_NAME:"$INV_NAME",BANK_NAME:"$BANK_NAME",AC_NO:"$AC_NO",NOM_NAME:"$NOM_NAME",JNT_NAME1:"$JNT_NAME1",JNT_NAME2:"$JNT_NAME2"} }}, 
     //     {$project:{_id:0,INVNAME:"$_id.INV_NAME", BANK_NAME:"$_id.BANK_NAME",AC_NO:"$_id.AC_NO",NOMINEE:"$_id.NOM_NAME",JTNAME1:"$_id.JNT_NAME1",JTNAME2:"$_id.JNT_NAME2"}}
     // ]    
-    const pipeline1=[  //trans_karvy    "TD_TRTYPE":{$not: /^SINR.*/}
-            {$match : {"FUNDDESC":req.body.scheme,"PAN1": req.body.pan  }}, 
-            {$group :{_id : {PAN1:"$PAN1",TD_ACNO:"$TD_ACNO",FUNDDESC:"$FUNDDESC",TD_TRTYPE:"$TD_TRTYPE",TD_TRDT:"$TD_TRDT",TRDESC:"$TRDESC",INVNAME:"$INVNAME",SCHEMEISIN:"$SCHEMEISIN",cnav:"$nav.NetAssetValue"},TD_UNITS:{$sum:"$TD_UNITS"}, TD_AMT:{$sum:"$TD_AMT"} }},
-         //   {$group :{_id:{PAN1:"$_id.PAN1",TD_ACNO:"$_id.TD_ACNO",FUNDDESC:"$_id.FUNDDESC",TD_TRTYPE:"$_id.TD_TRTYPE",TD_TRDT:"$_id.TD_TRDT", TRDESC:"$_id.TRDESC", INVNAME:"$_id.INVNAME",SCHEMEISIN:"$_id.SCHEMEISIN",cnav:"$nav.NetAssetValue"}, TD_UNITS:{$sum:"$TD_UNITS"},TD_AMT:{$sum:"$TD_AMT"} }},
-            {$lookup: { from: 'cams_nav',localField: '_id.SCHEMEISIN',foreignField: 'ISINDivPayoutISINGrowth',as: 'nav' } },
-          //  { $unwind: "$nav"},
-            {$project:  {_id:0,PAN:"$_id.PAN1",FOLIO:"$_id.TD_ACNO",SCHEME:"$_id.FUNDDESC",NATURE:"$_id.TD_TRTYPE", TD_TRDT:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, TRDESC:"$_id.TRDESC", INVNAME:"$_id.INVNAME",SCHEMEISIN:"$_id.SCHEMEISIN", cnav:"$nav.NetAssetValue"  , UNITS:{$sum:"$TD_UNITS"},AMOUNT:{$sum:"$TD_AMT"} }   },
-            //{$sort : {TD_TRDT : -1}}
-        ] 
+   const pipeline1 = [  //trans_karvy    "TD_TRTYPE":{$not: /^SINR.*/}
+        { $match: { "FUNDDESC": req.body.scheme, "PAN1": req.body.pan } },
+        { $group: { _id: { PAN1: "$PAN1", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_TRTYPE: "$TD_TRTYPE", TD_TRDT: "$TD_TRDT", TRDESC: "$TRDESC", INVNAME: "$INVNAME", SCHEMEISIN: "$SCHEMEISIN", cnav: "$nav.NetAssetValue",navdate:"$nav.Date" }, TD_UNITS: { $sum: "$TD_UNITS" }, TD_AMT: { $sum: "$TD_AMT" } } },
+        //   {$group :{_id:{PAN1:"$_id.PAN1",TD_ACNO:"$_id.TD_ACNO",FUNDDESC:"$_id.FUNDDESC",TD_TRTYPE:"$_id.TD_TRTYPE",TD_TRDT:"$_id.TD_TRDT", TRDESC:"$_id.TRDESC", INVNAME:"$_id.INVNAME",SCHEMEISIN:"$_id.SCHEMEISIN",cnav:"$nav.NetAssetValue"}, TD_UNITS:{$sum:"$TD_UNITS"},TD_AMT:{$sum:"$TD_AMT"} }},
+        { $lookup: { from: 'cams_nav', localField: '_id.SCHEMEISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+        //  { $unwind: "$nav"},
+        { $project: { _id: 0, PAN: "$_id.PAN1", FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", NATURE: "$_id.TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, TRDESC: "$_id.TRDESC", INVNAME: "$_id.INVNAME", SCHEMEISIN: "$_id.SCHEMEISIN", cnav: "$nav.NetAssetValue",navdate: "$nav.Date" , UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } } },
+        //{$sort : {TD_TRDT : -1}}
+    ]
     //     const pipeline2=[  //trans_franklin
     //         {$match : {"FOLIO_NO":req.body.folio,"ISIN":req.body.isin}}, 
     //         {$group :{_id : {INVESTOR_2:"$INVESTOR_2",ISIN:"$ISIN",NOMINEE1:"$NOMINEE1",PBANK_NAME:"$PBANK_NAME",PERSONAL23:"$PERSONAL23",JOINT_NAM2:"$JOINT_NAM2",JOINT_NAM1:"$JOINT_NAM1",cnav:"$nav.NetAssetValue"},UNITS:{$sum:"$UNITS"}, AMOUNT:{$sum:"$AMOUNT"} }},

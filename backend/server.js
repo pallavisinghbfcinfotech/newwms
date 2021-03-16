@@ -244,7 +244,36 @@ app.get("/api/gettranscams", function (req, res) {
     });
 })
 
-
+app.post("/api/getsearchname", function (req, res) {
+  //  var name = req.body.name;
+    const pipeline1 = [  //trans_karvy
+        { $match:{  INVNAME:{$regex : `^${req.body.name}.*` , $options: 'si' } } },
+        { $group: { _id: { INVNAME: { "$toUpper": ["$INVNAME"] } ,PAN1:"$PAN1"} } },
+        { $project: { _id: 0, INVNAME:{ "$toUpper": ["$_id.INVNAME"] }, PAN:"$_id.PAN1" } }
+    ]
+    var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');
+     transk.aggregate(pipeline1, (err, data) => {
+               if ( data != 0 ) {
+                    if (err) {
+                        res.send(err);
+                    }
+                    else {
+                        //console.log(data)
+                        
+                        var removeduplicates = data.map(JSON.stringify)
+                        .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                        .filter(function (item, index, arr) {
+                            return arr.indexOf(item, index + 1) === -1;
+                        }) // check if there is any occurence of the item in whole array
+                        .reverse()
+                        .map(JSON.parse);
+                        var datacon = Array.from(new Set(removeduplicates));
+                        res.send(datacon);
+                        return datacon;
+                    }
+                }
+     });
+})
 
 app.post("/api/getsipstpuserwise", function (req, res) {
     var mon = parseInt(req.body.month);

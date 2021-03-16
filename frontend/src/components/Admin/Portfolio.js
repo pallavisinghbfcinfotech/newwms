@@ -21,24 +21,58 @@ class Portfolio extends Component {
           data3: [],
           data4: [],
           data5: [],
+          navdate: [],
+          searchname:[],
         };
       }
 
       getportfolio = (e) =>{
-     var baseurl = window.location.href
+        var baseurl = window.location.href
         var domain = baseurl.split('/');
-
-    var portfoliourl = domain[domain.length - 2]+"/Portfoliodetail?scheme="+e.SCHEME+"&pan="+e.PAN;
-    window.open(portfoliourl, "_blank") //to open new page
-         
- }
-      
-      changeApplicant = (e) =>{
-        var sel = e.target.value;
+        var portfoliourl = domain[domain.length - 2]+"/Portfoliodetail?scheme="+e.SCHEME+"&pan="+e.PAN;
+        window.open(portfoliourl, "_blank") //to open new page
+     }
+    
+    suggestionBox = (e) =>{
+        $(".inputdata").show();
+        var inputValue = $(".searchname").val();
+       // console.log(inputValue)
         $.ajax({
-            url: "/api/getpan",
+          url: "http://localhost:3001/api/getsearchname",
+          type: "POST",
+          data:{name: inputValue},
+          success: function (res4) {
+             //console.log(res4.data);
+            this.setState({ searchname: res4 });
+            
+          }.bind(this),
+          error: function(jqXHR) {
+            console.log(jqXHR);         
+          }
+        });    
+    }
+
+    // getKeyData1 = (e) => {
+    //   var selectedvalue = e.target.innerText;
+    //   var name = selectedvalue.split('/')[0];
+    //   var pan = selectedvalue.split('/')[1];
+    //    //alert(e.target.innerText);
+    //   // alert(pan);
+    // }
+    
+    changeApplicant = (e) =>{
+     
+        var selectedvalue = e.target.innerText;
+        var name = selectedvalue.split('/')[0];
+        var pan = selectedvalue.split('/')[1];
+
+        $(".searchname").val(selectedvalue);
+        $(".inputdata").hide();
+        //var sel = e.target.value;
+        $.ajax({
+            url: "http://localhost:3001/api/getpan",
             type: "GET",
-            data:{pan: e.target.value},
+            data:{pan: pan},
              success: function (res4) {
               this.setState({ data4: res4 });
             }.bind(this),
@@ -46,29 +80,25 @@ class Portfolio extends Component {
               console.log(jqXHR);         
             }
           });     
-
         var fullSchemeHtml = "";
-        
         var sch="";
         $.ajax({
-          url: "/api/getportfolioscheme",
+          url: "http://localhost:3001/api/getportfolioscheme",
           type: "POST",
-          data:{pan: e.target.value},
+          data:{pan: pan},
            success: function (res) {
-            //console.log(res)
              for(var i = 0; i< res.length;i++){
-              // $("#scheme").html(res[i].SCHEME);
-              
               var sch_name = res[i].SCHEME;
-             // fullSchemeHtml += "<tr><td>djsdgshjghjsg</td></tr>";
               $.ajax({
-                url: "/api/getschemeportfoliodetail",
+                url: "http://localhost:3001/api/getschemeportfoliodetail",
                 type: "POST",
                 data:{scheme:res[i].SCHEME,pan:res[i].PAN},
                  success: function (res2) {
+                  
                   fullSchemeHtml += "<tr>"
                   var unit = 0;var balance=0;var amount = 0;var amt =0;var cnav=0;var currentval=0;var gain=0; var absreturn=0;var days = 0; var date1 = ""; var date2 = ""; var totaldays = 0;
                   var t =0;var cagr=0;var avgDays=0;var rootval=0;var nval=0;var mathpo=0;
+                  var isin="";var newnavdate="";
                   for(var j = 0; j<res2.data.length; j++){
 
                     if(res2.data[j].NATURE == 'RED' || res2.data[j].NATURE == 'LTOP'){
@@ -78,42 +108,57 @@ class Portfolio extends Component {
                       unit = res2.data[j].UNITS
                       amount = res2.data[j].AMOUNT
                     }
-                    if(res2.data[j].SCHEME == res2.data[0].SCHEME){                     
-                      balance = parseFloat(unit)+parseFloat(balance)                      
-                      amt = parseFloat(amount)+parseFloat(amt)
-                      cnav = res2.data[j].cnav[0]
-                      currentval = cnav*balance
-                      gain= currentval-amt
-                      absreturn = ((parseFloat(currentval)-parseFloat(amt))/parseFloat(amt))*100
+                    if(res2.data[j].SCHEME == res2.data[0].SCHEME){
+                         //  console.log("newnavdate=",res2.data[j].navdate)         
+                          balance = parseFloat(unit)+parseFloat(balance)       
+                          amt = parseFloat(amount)+parseFloat(amt)
+                          cnav = res2.data[j].cnav[0]
+                          currentval = cnav*balance
+                          gain= currentval-amt
+                          absreturn = ((parseFloat(currentval)-parseFloat(amt))/parseFloat(amt))*100
 
-                      var date= res2.data[j].TD_TRDT;
-                      var d=new Date(date.split("-").reverse().join("-"));
-                      var dd=d.getDate();
-                      var mm=d.getMonth()+1;
-                      var yy=d.getFullYear();
-                      var newdate=mm+"/"+dd+"/"+yy;
-                      
-                      date1 = new Date(newdate);    
-                      date2 = new Date();  
-                      days = moment(date2).diff(moment(date1), 'days');
-                      totaldays = parseFloat(days) + parseFloat(totaldays);
-                      avgDays = Math.round(parseFloat(totaldays)/parseFloat(res2.data.length));
-                      t = parseFloat(avgDays)/365;
-                      rootval= 1/parseFloat(t);
-                      nval = parseFloat(currentval)/parseFloat(amt)
-                      mathpo = Math.pow(parseFloat(nval) , parseFloat(rootval) )
-                      cagr = ( parseFloat(mathpo)-1)* 100;
-                    }
-                    
+                          var date= res2.data[j].TD_TRDT;
+                          var navdate = res2.data[j].navdate;
+                          // console.log("date",date)
+                          // console.log("navdate",navdate)
+
+                          var d=new Date(date.split("-").reverse().join("-"));
+                          var dd=d.getDate();
+                          var mm=d.getMonth()+1;
+                          var yy=d.getFullYear();
+                          var newdate=mm+"/"+dd+"/"+yy;
+
+                          
+                          var navd=new Date(navdate);
+                          // console.log(navd);
+                          var navdd=navd.getDate();
+                          var navmm=navd.getMonth()+1;
+                          var navyy=navd.getFullYear();
+                          var newnavdate=navmm+"/"+navdd+"/"+navyy;
+                          date1 = new Date(newdate);    
+                          date2 = new Date(newnavdate);    
+                        days = moment(date2).diff(moment(date1), 'days');
+                      //console.log(days)
+                          totaldays = parseFloat(days) + parseFloat(totaldays);
+                        
+                          avgDays = parseFloat(totaldays)/parseFloat(res2.data.length);
+                          t = parseFloat(avgDays)/365;
+                          rootval= 1/parseFloat(t);
+                          nval = parseFloat(currentval)/parseFloat(amt)
+                          mathpo = Math.pow(parseFloat(nval) , parseFloat(rootval) )
+                          cagr = ( parseFloat(mathpo)-1)* 100;
+                        // }
+                      // })
+                    } 
                   }
                  
-                   var baseurl = window.location.href
-                   var domain = baseurl.split('/');
-                  
-                     
+                  var baseurl = window.location.href
+                  var domain = baseurl.split('/');
+          
+             
                   var scheme_name_data = res2.data[0].SCHEME;
                   scheme_name_data = scheme_name_data.replace(/\s+/g, '%20');
-                    var portfoliourl = "http://"+domain[domain.length - 2]+"/Portfoliodetail?scheme="+scheme_name_data+"&pan="+res2.data[0].PAN;
+                  var portfoliourl = "http://"+domain[domain.length - 2]+"/Portfoliodetail?scheme="+scheme_name_data+"&pan="+res2.data[0].PAN;
                     fullSchemeHtml += "<td><a href='"+portfoliourl+"' target='_blank'>"+res2.data[0].SCHEME+"</a></td><td>"+res2.data[0].FOLIO+"</td><td>"+balance.toFixed(3)+"</td><td>"+Math.round(amt)+"</td><td>"+cnav+"</td><td>"+Math.round(currentval)+"</td><td></td><td>"+gain.toFixed(4)+"</td><td>"+Math.round(avgDays)+"</td><td>"+absreturn.toFixed(4)+"</td><td>"+cagr.toFixed(4)+"</td></tr>";
                   $(".randerData").html(fullSchemeHtml)
                   
@@ -122,6 +167,33 @@ class Portfolio extends Component {
                   console.log(jqXHR);         
                 }
                 })
+
+
+              // axios.post('http://localhost:3001/api/getschemeportfoliodetail',{scheme:res[i].SCHEME,pan:res[i].PAN})
+              // .then(response => {
+              //    this.setState({data3: response.data.data})
+                  
+                  // for(var j = 0; j< this.state.data3.length;j++){
+                  //   if(this.state.data3[j].SCHEME ==  sch_name){
+                  //     //unit = this.state.data3[j].UNITS+unit
+                  //     console.log(this.state.data3[j].SCHEME)
+                  //   }
+                  // }
+                  
+                  // {this.state.data3.map((item, index) => (
+                  //   <div>sch =item.SCHEME
+                  //   {(item.SCHEME == sch_name) ? (
+                  //     <div>{ unit = item.UNITS+item.UNITS }
+                  //     </div>
+                  //    ):(<div></div>) 
+                  //    }
+                    
+                  //   </div>
+                    
+                  //   ))}
+                    
+                  
+              //})
               
              }
 
@@ -141,7 +213,7 @@ class Portfolio extends Component {
   componentDidMount(){
     document.title = "WMS | Folio Detail"
     $.ajax({
-        url: "/api/getapplicant",
+        url: "http://localhost:3001/api/getapplicant",
         type: "GET",
          success: function (res1) {
           this.setState({ data1: res1 });
@@ -151,7 +223,7 @@ class Portfolio extends Component {
         }
       });
       $.ajax({
-        url: "/api/getschemetype",
+        url: "http://localhost:3001/api/getschemetype",
         type: "GET",
          success: function (res2) {
           this.setState({ data2: res2 });
@@ -160,6 +232,8 @@ class Portfolio extends Component {
           console.log(jqXHR);          
         }
       });
+
+      $(".inputdata").hide();
   }
   render(){
    var balance = 0;
@@ -178,6 +252,27 @@ class Portfolio extends Component {
       .hide-bal{
         display:none;
       }
+      .search-data{
+        list-style:none;
+        padding:10px;
+        border:1px solid #eee;
+        height:200px;
+        overflow-y: auto;
+        background-color:white;
+        position:absolute;
+        width:332px;
+      }
+      .search-data li {
+        list-style: none;
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+        cursor:pointer;
+        
+      }
+        .search-data li:hover{
+          background-color:#eee;
+        }
+
       `}
       </style>
     <div className="content-wrapper">
@@ -210,13 +305,29 @@ class Portfolio extends Component {
                                 <div className="col-md-4 offset-md-1">
                                     <div className="form-group">
                                         <label>Applicant :</label>
-                                        <select className="form-control" id="applicant" onChange={this.changeApplicant}>
+
+                                        <input type="text" name="searchname" onKeyUp={this.suggestionBox} className="form-control searchname" autoComplete="off" />
+                                        <div className="inputdata">
+                                            <ul className="search-data">
+                                              {this.state.searchname.map((item, index) => (
+                                                <li onClick={this.changeApplicant} >{item.INVNAME}/{item.PAN}</li> 
+                                                ))}
+                                                {/* <li onClick={this.getKeyData}>Test</li>
+                                                <li onClick={this.getKeyData}>Test2</li>
+                                                <li onClick={this.getKeyData}>Test3</li>
+                                                <li onClick={this.getKeyData}>Test4</li>
+                                                <li onClick={this.getKeyData}>Test5</li> */}
+                                            </ul>
+                                          </div>
+
+
+                                        {/* <select className="form-control" id="applicant" onChange={this.changeApplicant}>
                                             <option value>Select Applicant</option>
                                 {this.state.data1.map((item, index) => (
                                     <option value={item.PAN}>{item.INVNAME}/{item.PAN}</option>
                                   
                                 ))}
-                                </select>
+                                </select> */}
                                     </div>
                                 </div>
                                 <div className="col-md-4 offset-md-1">

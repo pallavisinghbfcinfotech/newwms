@@ -38,7 +38,7 @@ class Portfolio extends Component {
         var inputValue = $(".searchname").val();
        // console.log(inputValue)
         $.ajax({
-          url: "http://localhost:3001/api/getsearchname",
+          url: "/api/getsearchname",
           type: "POST",
           data:{name: inputValue},
           success: function (res4) {
@@ -70,7 +70,7 @@ class Portfolio extends Component {
         $(".inputdata").hide();
         //var sel = e.target.value;
         $.ajax({
-            url: "http://localhost:3001/api/getpan",
+            url: "/api/getpan",
             type: "GET",
             data:{pan: pan},
              success: function (res4) {
@@ -83,14 +83,14 @@ class Portfolio extends Component {
         var fullSchemeHtml = "";
         var sch="";
         $.ajax({
-          url: "http://localhost:3001/api/getportfolioscheme",
+          url: "/api/getportfolioscheme",
           type: "POST",
           data:{pan: pan},
            success: function (res) {
              for(var i = 0; i< res.length;i++){
               var sch_name = res[i].SCHEME;
               $.ajax({
-                url: "http://localhost:3001/api/getschemeportfoliodetail",
+                url: "/api/getschemeportfoliodetail",
                 type: "POST",
                 data:{scheme:res[i].SCHEME,pan:res[i].PAN},
                  success: function (res2) {
@@ -213,7 +213,7 @@ class Portfolio extends Component {
   componentDidMount(){
     document.title = "WMS | Folio Detail"
     $.ajax({
-        url: "http://localhost:3001/api/getapplicant",
+        url: "/api/getapplicant",
         type: "GET",
          success: function (res1) {
           this.setState({ data1: res1 });
@@ -223,7 +223,7 @@ class Portfolio extends Component {
         }
       });
       $.ajax({
-        url: "http://localhost:3001/api/getschemetype",
+        url: "/api/getschemetype",
         type: "GET",
          success: function (res2) {
           this.setState({ data2: res2 });

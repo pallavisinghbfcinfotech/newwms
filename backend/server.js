@@ -1541,43 +1541,43 @@ app.post("/api/getportfolio", function (req, res) {
          });
     })
 
-  app.get("/api/getpan", function (req, res) {  
-    const pipeline = [  //trans_cams
-        {"$match" : {PAN:req.query.pan}}, 
-         {"$group" : {_id : {PAN:"$PAN", INV_NAME:{"$toUpper":["$INV_NAME"]} } }}, 
-         {"$project" : {_id:0, PAN:"$_id.PAN", INV_NAME:{"$toUpper":["$_id.INV_NAME"]} }}
-    ]   
-    const pipeline1 = [  //trans_karvy
-        {"$match" : {PAN1:req.query.pan}}, 
-        {"$group" : {_id : {PAN1:"$PAN1", INVNAME:{"$toUpper":["$INVNAME"] }} }}, 
-        {"$project" : {_id:0, PAN:"$_id.PAN1", INV_NAME:{"$toUpper":["$_id.INVNAME"] }}}
-    ]   
-    const pipeline2 = [   //trans_franklin
-        {"$match" : {IT_PAN_NO1:req.query.pan}}, 
-         {"$group" : {_id : {IT_PAN_NO1:"$IT_PAN_NO1", INVESTOR_2:{"$toUpper":["$INVESTOR_2"] } }}}, 
-         {"$project" : {_id:0, PAN:"$_id.IT_PAN_NO1", INV_NAME:{"$toUpper":["$_id.INVESTOR_2"] }}}
-    ]    
-    var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
-    var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');    
-    var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');          
-         transc.aggregate(pipeline, (err, data) => {
-            transk.aggregate(pipeline1, (err, data1) => {
-                transf.aggregate(pipeline2, (err, data2) => {
-                    if(data2.length != 0 || data1.length != 0 || data.length != 0 ){
-                        if (err) {
-                            res.send(err);
-                        }
-                        else {
-                            let merged = [];
-                           merged = data1.map((item, i) => Object.assign({}, item, data2.map((items, j) => Object.assign({}, items, data[j]))));
-                            res.send(merged);
-                            return merged;
-                        }
-                     }
-                });
-            });
-        });
-})
+//   app.get("/api/getpan", function (req, res) {  
+//     const pipeline = [  //trans_cams
+//         {"$match" : {PAN:req.query.pan}}, 
+//          {"$group" : {_id : {PAN:"$PAN", INV_NAME:{"$toUpper":["$INV_NAME"]} } }}, 
+//          {"$project" : {_id:0, PAN:"$_id.PAN", INV_NAME:{"$toUpper":["$_id.INV_NAME"]} }}
+//     ]   
+//     const pipeline1 = [  //trans_karvy
+//         {"$match" : {PAN1:req.query.pan}}, 
+//         {"$group" : {_id : {PAN1:"$PAN1", INVNAME:{"$toUpper":["$INVNAME"] }} }}, 
+//         {"$project" : {_id:0, PAN:"$_id.PAN1", INV_NAME:{"$toUpper":["$_id.INVNAME"] }}}
+//     ]   
+//     const pipeline2 = [   //trans_franklin
+//         {"$match" : {IT_PAN_NO1:req.query.pan}}, 
+//          {"$group" : {_id : {IT_PAN_NO1:"$IT_PAN_NO1", INVESTOR_2:{"$toUpper":["$INVESTOR_2"] } }}}, 
+//          {"$project" : {_id:0, PAN:"$_id.IT_PAN_NO1", INV_NAME:{"$toUpper":["$_id.INVESTOR_2"] }}}
+//     ]    
+//     var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
+//     var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');    
+//     var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');          
+//          transc.aggregate(pipeline, (err, data) => {
+//             transk.aggregate(pipeline1, (err, data1) => {
+//                 transf.aggregate(pipeline2, (err, data2) => {
+//                     if(data2.length != 0 || data1.length != 0 || data.length != 0 ){
+//                         if (err) {
+//                             res.send(err);
+//                         }
+//                         else {
+//                             let merged = [];
+//                            merged = data1.map((item, i) => Object.assign({}, item, data2.map((items, j) => Object.assign({}, items, data[j]))));
+//                             res.send(merged);
+//                             return merged;
+//                         }
+//                      }
+//                 });
+//             });
+//         });
+// })
 
 app.post("/api/getportfolioscheme", function (req, res) {  
     const pipeline = [  //trans_cams

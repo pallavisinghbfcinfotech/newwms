@@ -52,34 +52,16 @@ class Portfolio extends Component {
         });    
     }
 
-    // getKeyData1 = (e) => {
-    //   var selectedvalue = e.target.innerText;
-    //   var name = selectedvalue.split('/')[0];
-    //   var pan = selectedvalue.split('/')[1];
-    //    //alert(e.target.innerText);
-    //   // alert(pan);
-    // }
-    
     changeApplicant = (e) =>{
      
         var selectedvalue = e.target.innerText;
         var name = selectedvalue.split('/')[0];
         var pan = selectedvalue.split('/')[1];
-
+        var userdetail = "<b>"+name+"/"+"["+pan+"]"+"</b>";
+        $(".namepan").html(userdetail);
         $(".searchname").val(selectedvalue);
         $(".inputdata").hide();
-        //var sel = e.target.value;
-        $.ajax({
-            url: "/api/getpan",
-            type: "GET",
-            data:{pan: pan},
-             success: function (res4) {
-              this.setState({ data4: res4 });
-            }.bind(this),
-            error: function(jqXHR) {
-              console.log(jqXHR);         
-            }
-          });     
+          
         var fullSchemeHtml = "";
         var sch="";
         $.ajax({
@@ -167,34 +149,6 @@ class Portfolio extends Component {
                   console.log(jqXHR);         
                 }
                 })
-
-
-              // axios.post('http://localhost:3001/api/getschemeportfoliodetail',{scheme:res[i].SCHEME,pan:res[i].PAN})
-              // .then(response => {
-              //    this.setState({data3: response.data.data})
-                  
-                  // for(var j = 0; j< this.state.data3.length;j++){
-                  //   if(this.state.data3[j].SCHEME ==  sch_name){
-                  //     //unit = this.state.data3[j].UNITS+unit
-                  //     console.log(this.state.data3[j].SCHEME)
-                  //   }
-                  // }
-                  
-                  // {this.state.data3.map((item, index) => (
-                  //   <div>sch =item.SCHEME
-                  //   {(item.SCHEME == sch_name) ? (
-                  //     <div>{ unit = item.UNITS+item.UNITS }
-                  //     </div>
-                  //    ):(<div></div>) 
-                  //    }
-                    
-                  //   </div>
-                    
-                  //   ))}
-                    
-                  
-              //})
-              
              }
 
 
@@ -202,10 +156,7 @@ class Portfolio extends Component {
           }.bind(this),
           error: function(jqXHR) {
             console.log(jqXHR);         
-          }
-
-          
-          
+          }    
         });  
 
     }
@@ -312,11 +263,6 @@ class Portfolio extends Component {
                                               {this.state.searchname.map((item, index) => (
                                                 <li onClick={this.changeApplicant} >{item.INVNAME}/{item.PAN}</li> 
                                                 ))}
-                                                {/* <li onClick={this.getKeyData}>Test</li>
-                                                <li onClick={this.getKeyData}>Test2</li>
-                                                <li onClick={this.getKeyData}>Test3</li>
-                                                <li onClick={this.getKeyData}>Test4</li>
-                                                <li onClick={this.getKeyData}>Test5</li> */}
                                             </ul>
                                           </div>
 
@@ -363,9 +309,7 @@ class Portfolio extends Component {
                                 </thead>
                                 <tbody>
                                         <tr>
-                                            <td>{this.state.data4.map((item, index) => (
-                                                <b>{item.INV_NAME} [Pan: {item.PAN}]</b>
-                                                ))}
+                                            <td  class="namepan">
                                                 </td>
                                         </tr>
                                         </tbody> 

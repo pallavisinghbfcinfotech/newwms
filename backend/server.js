@@ -389,7 +389,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                         resdata = {
                             status: 200,
                             message: 'Successfull',
-                            data: transfdata
+                            data: frankdata
                         }
                     } else {
                         resdata = {

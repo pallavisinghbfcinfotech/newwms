@@ -78,11 +78,13 @@ class Sipstp extends Component {
   suggestionBox = (e) =>{
     $(".inputdata").show();
     var inputValue = $(".searchname").val();
+   // console.log(inputValue)
     $.ajax({
       url: "/api/getsearchname",
       type: "POST",
       data:{name: inputValue},
       success: function (res4) {
+         //console.log(res4.data);
         this.setState({ searchname: res4 });
         
       }.bind(this),
@@ -117,12 +119,14 @@ class Sipstp extends Component {
         this.setState({
           data3: res3.data,
           msg3: res3.message});
-          $(".loader").css("display", "none");
-          $("#example1").css("display", "block");
           if(res3.message === "Data not found"){
             $("#showmsg").show();
             $("#showmsg").html(res3.message);
-           }        
+           }
+          $(".loader").css("display", "none");
+          $("#example1").css("display", "block");
+         
+          
       }.bind(this),
       error: function(jqXHR) {
         console.log(jqXHR);          
@@ -134,8 +138,10 @@ handlechange1(){
     var month = sel.split('-')[1];
     var year = sel.split('-')[0];
   if(this.state.rvalue == "yes"){
+
     $(".loader").css("display", "block");
     $("#example1").css("display", "none");
+
     $.ajax({
       url: "/api/getsipstpall",
       type: "POST",
@@ -144,8 +150,10 @@ handlechange1(){
         this.setState({
            data1: res1.data,
            msg: res1.message});
+
            $(".loader").css("display", "none");
            $("#example1").css("display", "block");
+
       }.bind(this),
       error: function(jqXHR) {
         console.log(jqXHR);         

@@ -24,8 +24,7 @@ class Transaction  extends Component {
       defaultValue:"",
       year:'',
       mon:'',
-      options:'',
-      selectedOption: null,
+      searchname:[],
     };
   }
   onChanger1(e) {
@@ -53,15 +52,17 @@ class Transaction  extends Component {
      });
  }
   onChanger2(e) {
+    $(".inputdata").hide();
+
     this.setState({
       rvalue: e.target.value    
     });
     if(e.target.value === "no"){
       $.ajax({
-        url: "/api/getapplicant1",
+        url: "/api/getapplicant",
         type: "GET",
          success: function (res2) {
-          this.setState({ options: res2 });
+          this.setState({ searchname: res2 });
         }.bind(this),
         error: function(jqXHR) {
           console.log(jqXHR);          
@@ -70,11 +71,33 @@ class Transaction  extends Component {
     }
   }
   
-     changeApplicant = (selectedOption) =>{ 
-      this.setState({ selectedOption });
-      var optionElement = selectedOption.value;
-      var name =  optionElement.split('/')[0];
-      var pan =  optionElement.split('/')[1];
+  suggestionBox = (e) =>{
+    $(".inputdata").show();
+    var inputValue = $(".searchname").val();
+    $.ajax({
+      url: "/api/getsearchname",
+      type: "POST",
+      data:{name: inputValue},
+      success: function (res4) {
+        this.setState({ searchname: res4 });        
+      }.bind(this),
+      error: function(jqXHR) {
+        console.log(jqXHR);         
+      }
+    });    
+}
+
+changeApplicant = (e) =>{ 
+  $(".inputdata").hide();
+  $("#showmsg").hide();
+  $("#clientdata").hide();
+  $(".loader").css("display", "block");
+    $("#example1").css("display", "none");
+  var selectedvalue = e.target.innerText;
+  var name = selectedvalue.split('/')[0];
+  var pan = selectedvalue.split('/')[1];
+  $(".searchname").val(selectedvalue);
+  $(".inputdata").hide();
     this.setState({
       pan:pan,
       name: name
@@ -91,6 +114,13 @@ class Transaction  extends Component {
         this.setState({
           data3: res3.data,
           msg3: res3.message});
+          if(this.state.msg3 === "Data not found"){
+            $("#showmsg").html(this.state.msg3);
+            $("#showmsg").show();
+           
+           }
+          $(".loader").css("display", "none");
+          $("#example1").css("display", "block");
       }.bind(this),
       error: function(jqXHR) {
         console.log(jqXHR);          
@@ -122,6 +152,7 @@ handlechange1(){
      }
    });   
  }else if(this.state.rvalue === "no"){
+  $("#clientdata").hide();
    $.ajax({
      url: "/api/gettransactionuserwise",
      type: "POST",
@@ -130,6 +161,10 @@ handlechange1(){
        this.setState({
          data3: res3.data,
          msg3: res3.message});
+         if(res3.message === "Data not found"){
+          $("#showmsg").html(res3.message);
+          $("#clientdata").hide();
+         }
      }.bind(this)
    });
  }else{
@@ -137,7 +172,7 @@ handlechange1(){
  }
 }
   componentDidMount(){
-    document.title = "WMS | Folio Detail"
+    document.title = "WMS | Transaction Detail"
     var sel = document.getElementById("getcalender").value;
     var month = sel.split('-')[0];
     var year = sel.split('-')[1];
@@ -155,10 +190,10 @@ handlechange1(){
       }
     });
     $.ajax({
-      url: "/api/getapplicant1",
+      url: "/api/getapplicant",
       type: "GET",
        success: function (res2) {
-        this.setState({ options: res2 });
+        this.setState({ searchname: res2 });
       }.bind(this),
       error: function(jqXHR) {
         console.log(jqXHR);          
@@ -166,8 +201,7 @@ handlechange1(){
     });
   }
   
-  render() {   
-    const { selectedOption,options } = this.state;   
+  render() {    
     return (  
       <>
       <style jsx>
@@ -184,6 +218,33 @@ handlechange1(){
       .table-fix-height{
         height:500px;
       }
+      .hide-bal{
+        display:none;
+      }
+      .search-data{
+        list-style:none;
+        padding:10px;
+        border:1px solid #eee;
+        height:auto;
+        overflow-y: auto;
+        background-color:white;
+        position:absolute !important;
+        width:auto;
+        min-width:1040px;
+        max-width:1040px;
+        max-height:200px;
+        z-index:9999;
+      }
+      .search-data li {
+        list-style: none;
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+        cursor:pointer;
+        
+      }
+        .search-data li:hover{
+          background-color:#eee;
+        }
       `}
         </style>
       <div className="content-wrapper">
@@ -333,18 +394,15 @@ handlechange1(){
                         <div className="col-md-12">
                           <div className="form-group">
                             <label>Applicant</label>
-                            {/* <select className="form-control" onChange={this.changeApplicant} id="user">
-                              <option>Select Applicant</option>
-                              {this.state.data2.map((item, index) => (
-                                      <option data-pan={item.PAN} data-name={item.INVNAME} value={item.PAN}>{item.INVNAME}/{item.PAN}</option>  
-                                ))}
-                             </select> */}
-
-<Select
-        value={selectedOption}
-        onChange={this.changeApplicant}
-        options={options} 
-      />
+                            <input type="text" name="searchname" onKeyUp={this.suggestionBox} className="form-control searchname" autoComplete="off" />
+                                        <div className="inputdata">
+                                            <ul className="search-data">
+                                              {this.state.searchname.map((item, index) => (
+                                                <li onClick={this.changeApplicant} >{item.INVNAME}/{item.PAN}</li> 
+                                                ))}
+                                               
+                                            </ul>
+                                          </div>
                           </div>
                         </div>
                         </div>
@@ -353,7 +411,7 @@ handlechange1(){
                         <div> 
 			 
        { (this.state.msg3==='Successfull')? (
-                      <div className="card">
+                      <div  id="clientdata" className="card">
                         <div className="card-header bg-primary">
                           <h3 className="card-title"></h3>
                           <div className="card-tools">
@@ -415,7 +473,8 @@ handlechange1(){
                       </div>
                         ):  (<div align="center"  className="col-sm-10">
                           <br/>
-                        <h6>Data Not Found</h6>
+                          <h6 id="showmsg"></h6>
+                        {/* <h6>Data Not Found</h6> */}
                       </div>)}
 			 
 	  </div>

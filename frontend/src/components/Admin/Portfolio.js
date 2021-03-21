@@ -19,7 +19,7 @@ class Portfolio extends Component {
           data1: [],
           data2: [],
           data3: [],
-          data4: [],
+         // data4: [],
           data5: [],
           navdate: [],
           searchname:[],
@@ -36,13 +36,11 @@ class Portfolio extends Component {
     suggestionBox = (e) =>{
         $(".inputdata").show();
         var inputValue = $(".searchname").val();
-       // console.log(inputValue)
         $.ajax({
           url: "/api/getsearchname",
           type: "POST",
           data:{name: inputValue},
           success: function (res4) {
-             //console.log(res4.data);
             this.setState({ searchname: res4 });
             
           }.bind(this),
@@ -70,11 +68,10 @@ class Portfolio extends Component {
           data:{pan: pan},
            success: function (res) {
              for(var i = 0; i< res.length;i++){
-              var sch_name = res[i].SCHEME;
               $.ajax({
                 url: "/api/getschemeportfoliodetail",
                 type: "POST",
-                data:{scheme:res[i].SCHEME,pan:res[i].PAN},
+                data:{scheme:res[i].SCHEME,pan:res[i].PAN,folio:res[i].FOLIO},
                  success: function (res2) {
                   
                   fullSchemeHtml += "<tr>"
@@ -83,27 +80,29 @@ class Portfolio extends Component {
                   var isin="";var newnavdate="";
                   for(var j = 0; j<res2.data.length; j++){
 
-                    if(res2.data[j].NATURE == 'RED' || res2.data[j].NATURE == 'LTOP'){
-                      unit = "-"+res2.data[j].UNITS
-                      amount = "-"+res2.data[j].AMOUNT
-                    }else{
-                      unit = res2.data[j].UNITS
-                      amount = res2.data[j].AMOUNT
-                    }
-                    if(res2.data[j].SCHEME == res2.data[0].SCHEME){
-                         //  console.log("newnavdate=",res2.data[j].navdate)         
-                          balance = parseFloat(unit)+parseFloat(balance)       
+                    if(res2.data[j].SCHEME === res2.data[0].SCHEME){
+                      if(res2.data[j].NATURE === 'RED' || res2.data[j].NATURE === 'LTOP' || res2.data[j].NATURE === 'LTOF' || res2.data[j].NATURE === 'IPOR'|| res2.data[j].NATURE === 'FUL' || res2.data[j].NATURE === 'STPO'){
+                        unit = "-"+res2.data[j].UNITS
+                        amount = "-"+res2.data[j].AMOUNT
+                      }else{
+                        unit = res2.data[j].UNITS
+                        amount = res2.data[j].AMOUNT
+                      }       
+                          balance = parseFloat(unit)+parseFloat(balance)    
+
+                          
+                          
                           amt = parseFloat(amount)+parseFloat(amt)
                           cnav = res2.data[j].cnav[0]
                           currentval = cnav*balance
                           gain= currentval-amt
                           absreturn = ((parseFloat(currentval)-parseFloat(amt))/parseFloat(amt))*100
-
+                          if(balance == 0  && balance == 0.000 && unit == 0.000 && unit == 0){
+                            amt = 0;
+                          }
                           var date= res2.data[j].TD_TRDT;
                           var navdate = res2.data[j].navdate;
-                          // console.log("date",date)
-                          // console.log("navdate",navdate)
-
+                          
                           var d=new Date(date.split("-").reverse().join("-"));
                           var dd=d.getDate();
                           var mm=d.getMonth()+1;
@@ -112,7 +111,6 @@ class Portfolio extends Component {
 
                           
                           var navd=new Date(navdate);
-                          // console.log(navd);
                           var navdd=navd.getDate();
                           var navmm=navd.getMonth()+1;
                           var navyy=navd.getFullYear();
@@ -120,7 +118,6 @@ class Portfolio extends Component {
                           date1 = new Date(newdate);    
                           date2 = new Date(newnavdate);    
                         days = moment(date2).diff(moment(date1), 'days');
-                      //console.log(days)
                           totaldays = parseFloat(days) + parseFloat(totaldays);
                         
                           avgDays = parseFloat(totaldays)/parseFloat(res2.data.length);
@@ -136,19 +133,23 @@ class Portfolio extends Component {
                  
                   var baseurl = window.location.href
                   var domain = baseurl.split('/');
-          
-             
-                  var scheme_name_data = res2.data[0].SCHEME;
+                  
+                    var scheme_name_data = res2.data[0].SCHEME;
                   scheme_name_data = scheme_name_data.replace(/\s+/g, '%20');
-                  var portfoliourl = "http://"+domain[domain.length - 2]+"/Portfoliodetail?scheme="+scheme_name_data+"&pan="+res2.data[0].PAN;
-                    fullSchemeHtml += "<td><a href='"+portfoliourl+"' target='_blank'>"+res2.data[0].SCHEME+"</a></td><td>"+res2.data[0].FOLIO+"</td><td>"+balance.toFixed(3)+"</td><td>"+Math.round(amt)+"</td><td>"+cnav+"</td><td>"+Math.round(currentval)+"</td><td></td><td>"+gain.toFixed(4)+"</td><td>"+Math.round(avgDays)+"</td><td>"+absreturn.toFixed(4)+"</td><td>"+cagr.toFixed(4)+"</td></tr>";
-                  $(".randerData").html(fullSchemeHtml)
+                  var portfoliourl = "http://"+domain[domain.length - 2]+"/Portfoliodetail?scheme="+scheme_name_data+"&pan="+pan+"&folio="+res2.data[0].FOLIO+"&isin="+res2.data[0].ISIN;
+                  if(balance > 0.01 && balance != 0 && balance != 0.000){
+                  
+                 
+                    fullSchemeHtml += "<td><a href='"+portfoliourl+"' target='_blank'>"+res2.data[0].SCHEME+"</a></td><td>"+res2.data[0].FOLIO+"</td><td>"+balance.toFixed(3)+"</td><td>"+Math.round(amt)+"</td><td>"+cnav+"</td><td>"+Math.round(currentval)+"</td><td></td><td>"+gain.toFixed(4)+"</td><td>"+Math.round(avgDays)+"</td><td>"+absreturn.toFixed(4)+"</td><td>"+cagr.toFixed(2)+"</td></tr>";
+                    $(".randerData").html(fullSchemeHtml)
+                  }
+                 
                   
                  }.bind(this),
                  error: function(jqXHR) {
                   console.log(jqXHR);         
                 }
-                })
+                })              
              }
 
 
@@ -162,7 +163,7 @@ class Portfolio extends Component {
     }
 
   componentDidMount(){
-    document.title = "WMS | Folio Detail"
+    document.title = "WMS | Portfolio Detail"
     $.ajax({
         url: "/api/getapplicant",
         type: "GET",
@@ -204,14 +205,18 @@ class Portfolio extends Component {
         display:none;
       }
       .search-data{
-        list-style:none;
-        padding:10px;
-        border:1px solid #eee;
-        height:200px;
+        list-style: none;
+        padding: 10px;
+        border: 1px solid #eee;
+        height: auto;
         overflow-y: auto;
-        background-color:white;
-        position:absolute;
-        width:332px;
+        background-color: white;
+        position: absolute;
+        max-width: 486px;
+        max-height: 200px;
+        min-width:333px;
+        z-index: 9;
+        width: auto;
       }
       .search-data li {
         list-style: none;
@@ -263,17 +268,9 @@ class Portfolio extends Component {
                                               {this.state.searchname.map((item, index) => (
                                                 <li onClick={this.changeApplicant} >{item.INVNAME}/{item.PAN}</li> 
                                                 ))}
+                                               
                                             </ul>
                                           </div>
-
-
-                                        {/* <select className="form-control" id="applicant" onChange={this.changeApplicant}>
-                                            <option value>Select Applicant</option>
-                                {this.state.data1.map((item, index) => (
-                                    <option value={item.PAN}>{item.INVNAME}/{item.PAN}</option>
-                                  
-                                ))}
-                                </select> */}
                                     </div>
                                 </div>
                                 <div className="col-md-4 offset-md-1">
@@ -309,8 +306,7 @@ class Portfolio extends Component {
                                 </thead>
                                 <tbody>
                                         <tr>
-                                            <td  class="namepan">
-                                                </td>
+                                            <td class="namepan"> </td>
                                         </tr>
                                         </tbody> 
                                         <tbody class="randerData"> 

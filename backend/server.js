@@ -306,7 +306,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
     var transc = mongoose.model('trans_cams', transcams, 'trans_cams');
     var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');
     var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');
-    if (req.body.pan === null || req.body.pan === '' || req.body.pan === "Please Provide") {
+  if (req.body.pan === null || req.body.pan === '' || req.body.pan === "Please Provide" || req.body.pan === "Not An Assessee") {
         const pipeline = [  ///trans_cams
             { $group: { _id: { INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR",  FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
             { $project: { _id: 0, INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR",  FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, month: { $month: ('$_id.TRADDATE') }, year: { $year: ('$_id.TRADDATE') } } },

@@ -113,6 +113,13 @@ class Dividend extends Component {
         this.setState({
           data3: res3.data,
           msg3: res3.message});
+	        $(".loader").css("display", "none");
+          $("#example1").css("display", "block");
+          if(res3.message === "Data not found"){
+            $("#showmsg").show();
+            $("#showmsg").html(res3.message);
+           }
+          
       }.bind(this),
       error: function(jqXHR) {
         console.log(jqXHR);          

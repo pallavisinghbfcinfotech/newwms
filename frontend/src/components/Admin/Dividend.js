@@ -9,7 +9,7 @@ class Dividend extends Component {
   
   constructor(props) {
     super(props);
-    this.changeApplicant1 = this.changeApplicant1.bind(this);
+    this.changeApplicant = this.changeApplicant.bind(this);
     this.onChanger1 = this.onChanger1.bind(this);
     this.onChanger2 = this.onChanger2.bind(this);
 
@@ -24,8 +24,7 @@ class Dividend extends Component {
       defaultValue:"",
       year:'',
       mon:'',
-      options:'',
-      selectedOption: null,
+      searchname:[],
     };
   }
   onChanger1(e) {
@@ -55,15 +54,16 @@ class Dividend extends Component {
      });
  }
   onChanger2(e) {
+    $(".searchname").hide();
     this.setState({
       rvalue: e.target.value    
     });
     if(e.target.value === "no"){
       $.ajax({
-        url: "/api/getapplicant1",
+        url: "/api/getapplicant",
         type: "GET",
          success: function (res2) {
-          this.setState({ options: res2 });
+          this.setState({ searchname: res2 });
         }.bind(this),
         error: function(jqXHR) {
           console.log(jqXHR);          
@@ -72,12 +72,32 @@ class Dividend extends Component {
     }
   }
 
-  changeApplicant1 = (selectedOption) =>{ 
-    this.setState({ selectedOption });
-    // var index = e.target.selectedIndex;
-     var optionElement = selectedOption.value
-     var name =  optionElement.split('/')[0];
-     var pan =  optionElement.split('/')[1];
+  suggestionBox = (e) =>{
+    $(".inputdata").show();
+    var inputValue = $(".searchname").val();
+    $.ajax({
+      url: "/api/getsearchname",
+      type: "POST",
+      data:{name: inputValue},
+      success: function (res4) {
+        this.setState({ searchname: res4 });        
+      }.bind(this),
+      error: function(jqXHR) {
+        console.log(jqXHR);         
+      }
+    });    
+}
+
+  changeApplicant = (e) =>{ 
+    $("#showmsg").hide();
+    $("#clientdata").hide();
+    $(".loader").css("display", "block");
+      $("#example1").css("display", "none");
+    var selectedvalue = e.target.innerText;
+    var name = selectedvalue.split('/')[0];
+    var pan = selectedvalue.split('/')[1];
+    $(".searchname").val(selectedvalue);
+    $(".inputdata").hide();
      this.setState({
       pan:pan,
       name: name
@@ -145,19 +165,19 @@ changeyear = (e) =>{
     var toyear = yer.split('-')[1];
     
     $.ajax({
-      url: "/api/getapplicant1",
+      url: "/api/getapplicant",
       type: "GET",
        success: function (res2) {
-        this.setState({ options: res2 });
+        this.setState({ searchname: res2 });
       }.bind(this),
       error: function(jqXHR) {
         console.log(jqXHR);          
       }
     });
+  //}
   }
   
   render() {      
-    const { selectedOption,options } = this.state;
     return (  
       <>
       <style jsx>
@@ -174,6 +194,33 @@ changeyear = (e) =>{
       .table-fix-height{
         height:500px;
       }
+      .hide-bal{
+        display:none;
+      }
+      .search-data{
+        list-style:none;
+        padding:10px;
+        border:1px solid #eee;
+        height:auto;
+        overflow-y: auto;
+        background-color:white;
+        position:absolute !important;
+        width:auto;
+        min-width:1040px;
+        max-width:1040px;
+        max-height:200px;
+        z-index:9999;
+      }
+      .search-data li {
+        list-style: none;
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+        cursor:pointer;
+        
+      }
+        .search-data li:hover{
+          background-color:#eee;
+        }
       `}
         </style>
       <div className="content-wrapper">
@@ -236,14 +283,6 @@ changeyear = (e) =>{
                         </label>
                       </div>
                     </div>
-                        {/* <div className="form-check-inline">
-                          <input type="radio" id="yes" name="kstatus" defaultValue="yes" onClick={this.onChangekstatus}  />
-                          <label htmlFor="yes">ALL</label>&nbsp;   <br/>
-                        </div> */}
-                        {/* <div className="form-check-inline">
-                          <input type="radio" id="no" name="kstatus" defaultValue="no" onClick={this.onChangekstatus}/>
-                          <label htmlFor="no">Userwise</label>
-                        </div>  */}
                       </div>
                     </div>
 
@@ -289,17 +328,10 @@ changeyear = (e) =>{
                                     <td>{item.SCHEME}</td>
                                     <td>{item.AMOUNT}</td>
                                     <td>{item.TRXN_NATURE}</td>
-                                    {/* {(item.TRXN_NATURE.match(new RegExp(`${"Gross Dividend"}`))) ? (
-                                     <td>Dividend Payout</td> ) : (item.TRXN_NATURE.match(new RegExp(`${"Dividend Paid"}`))) ? (
-                                      <td>Dividend Paid</td> ) : (item.TRXN_NATURE.match(new RegExp(`${"Dividend Re"}`))) ? (
-                                        <td>Div. Reinvest</td> ) : (
-                                        <td>Dividend</td> ) } */}
                                 </tr>
                             
-                            ))}
-                                
-                              </tbody>
-                              
+                            ))} 
+                              </tbody>                  
                           </table>
                           
                         </div>
@@ -320,18 +352,15 @@ changeyear = (e) =>{
                         <div className="col-md-12">
                          <div className="form-group">
                             <label>Applicant</label>
-                            <Select
-        value={selectedOption}
-        onChange={this.changeApplicant1}
-        options={options} 
-      />
-
-                            {/* <select className="form-control" onChange={this.changeApplicant} id="user"  >
-                              <option>Select Applicant</option>
-                              {this.state.data2.map((item, index) => (
-                                     <option data-pan={item.PAN} data-name={item.INVNAME} value={item.PAN}>{item.INVNAME}/{item.PAN}</option>  
-                                ))}
-                             </select> */}
+                              <input type="text" name="searchname" onKeyUp={this.suggestionBox} className="form-control searchname" autoComplete="off" />
+                                        <div className="inputdata">
+                                            <ul className="search-data">
+                                              {this.state.searchname.map((item, index) => (
+                                                <li onClick={this.changeApplicant} >{item.INVNAME}/{item.PAN}</li> 
+                                                ))}
+                                               
+                                            </ul>
+                                          </div>
                           </div>
                         </div>
                         </div>
@@ -394,7 +423,7 @@ changeyear = (e) =>{
                       </div>
                         ):  (<div align="center"  className="col-sm-10">
                           <br/>
-                        <h6>Data Not Found</h6>
+                        <h6 id="showmsg"></h6>
                       </div>)}
 			 
 	  </div>

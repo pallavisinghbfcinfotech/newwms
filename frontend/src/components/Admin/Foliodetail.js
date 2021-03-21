@@ -5,10 +5,10 @@ import Select from 'react-select';
 import '../../../node_modules/aos/dist/aos.css';
 
 
-class Addbook extends Component { 
+class Foliodetail extends Component { 
   constructor(props) {
     super(props);
-    //this.changeApplicant = this.changeApplicant.bind(this);
+    this.changeApplicant = this.changeApplicant.bind(this);
     this.state = {
       error: null,
       isLoaded: false,
@@ -17,7 +17,7 @@ class Addbook extends Component {
       data3:[],
       data4:[],
       secdrp:'',
-      options:'',
+      searchname:[],
       selectedOption: null,
     };
   }
@@ -27,6 +27,7 @@ class Addbook extends Component {
 changeScheme = (e) =>{
   var sel = e.target.value;
   var folioval = this.state.secdrp;
+
   $.ajax({
     url: "/api/getfoliodetailweb",
     type: "POST",
@@ -39,6 +40,22 @@ changeScheme = (e) =>{
       console.log(jqXHR);         
     }
   });   
+}
+
+suggestionBox = (e) =>{
+  $(".inputdata").show();
+  var inputValue = $(".searchname").val();
+  $.ajax({
+    url: "/api/getsearchname",
+    type: "POST",
+    data:{name: inputValue},
+    success: function (res4) {
+      this.setState({ searchname: res4 });      
+    }.bind(this),
+    error: function(jqXHR) {
+      console.log(jqXHR);         
+    }
+  });    
 }
 
 changeFolio = (e) =>{
@@ -64,11 +81,12 @@ changeFolio = (e) =>{
   });   
 }
 
-changeApplicant = (selectedOption) =>{ 
-  this.setState({ selectedOption });
-   var optionElement = selectedOption.value
-   var name =  optionElement.split('/')[0];  
-   var pan =  optionElement.split('/')[1];
+changeApplicant = (e) =>{ 
+  var selectedvalue = e.target.innerText;
+  var name = selectedvalue.split('/')[0];
+  var pan = selectedvalue.split('/')[1];
+  $(".searchname").val(selectedvalue);
+  $(".inputdata").hide();
    this.setState({
     pan:pan,
     name: name
@@ -98,10 +116,10 @@ changeApplicant = (selectedOption) =>{
   componentDidMount(){
     document.title = "WMS | Folio Detail"
     $.ajax({
-      url: "/api/getapplicant1",
+      url: "/api/getapplicant",
       type: "GET",
        success: function (res1) {
-        this.setState({ options: res1 });
+        this.setState({ searchname: res1 });
       }.bind(this),
       error: function(jqXHR) {
         console.log(jqXHR);          
@@ -109,7 +127,6 @@ changeApplicant = (selectedOption) =>{
     });
   }
   render(){
-    const { selectedOption,options } = this.state; 
   return (  
     <>
     <style jsx>
@@ -117,6 +134,32 @@ changeApplicant = (selectedOption) =>{
       .list-group-item:hover{
         border:none!important;
       }
+      
+      .search-data{
+        list-style:none;
+        padding:10px;
+        border:1px solid #eee;
+        height:auto;
+        overflow-y: auto;
+        background-color:white;
+        position:absolute;
+        max-width:490px;
+        max-height:200px;
+        min-width:490px;
+        z-index: 9;
+        width:auto;
+      }
+      .search-data li {
+        list-style: none;
+        padding: 6px 10px;
+        border-bottom: 1px solid #eee;
+        cursor:pointer;
+      
+        
+      }
+        .search-data li:hover{
+          background-color:#eee;
+        }
       `}
       </style>
     <div className="content-wrapper">
@@ -156,18 +199,16 @@ changeApplicant = (selectedOption) =>{
                         <div className="col-md-12">
                           <div className="form-group">
                             <label>Applicant</label>
-                            {/* <select className="form-control"  onChange={this.changeApplicant}>
-                              <option value={""}>Select Applicant</option>
-                              {this.state.data1.map((item, index) => (
-                                    <option value={item.PAN}>{item.INVNAME}/{item.PAN}</option> 
-                                  
-                                ))}
-                             </select> */}
-                               <Select
-        value={selectedOption}
-        onChange={this.changeApplicant}
-        options={options} 
-      />
+                     
+       <input type="text" name="searchname" onKeyUp={this.suggestionBox} className="form-control searchname" autoComplete="off" />
+                                        <div className="inputdata">
+                                            <ul className="search-data">
+                                              {this.state.searchname.map((item, index) => (
+                                                <li onClick={this.changeApplicant} >{item.INVNAME}/{item.PAN}</li> 
+                                                ))}
+                                               
+                                            </ul>
+                                          </div>
                           </div>
                         </div>
                         <div className="col-md-12">
@@ -233,7 +274,7 @@ changeApplicant = (selectedOption) =>{
                           <b>Joint 1</b> <a className="float-right">{item.JTNAME1}</a>
                         </li> )}
                        
-                        {(item.JTNAME1 === "" ) ? (
+                        {(item.JTNAME2 === "" ) ? (
                         <div></div>
                         
                         ) : (
@@ -268,4 +309,4 @@ changeApplicant = (selectedOption) =>{
  }
 };
 
-export default Addbook;
+export default Foliodetail;

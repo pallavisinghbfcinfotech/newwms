@@ -3,8 +3,6 @@ import { Component } from "react";
 import $ from 'jquery';
 import axios from 'axios';
 
-//var createReactClass = require('create-react-class');
-
 class Portfoliodetail extends Component { 
   constructor(props) {
     super(props);
@@ -15,36 +13,22 @@ class Portfoliodetail extends Component {
     };
   }
   componentDidMount(){
-    document.title = "WMS | Folio Detail"
+    document.title = "WMS | Portfolio Detail"
     const query = new URLSearchParams(this.props.location.search);
     const scheme = query.get('scheme')
-    const pan = query.get('pan')
-    // alert(scheme)
-    // alert(pan)
-    // $.ajax({
-    //     url: "http://localhost:3001/api/getschemedetail",
-    //     type: "POST",
-    //     data:{scheme:scheme,pan:pan},
-    //      success: function (res) {
-    //       this.setState({ data1: res.data });
-    //     }.bind(this),
-    //     error: function(jqXHR) {
-    //       console.log(jqXHR);         
-    //     }
-    //   });   
-
-    axios.post('http://localhost:3001/api/getschemedetail',{scheme:scheme,pan:pan})
+    const pan = query.get('pan');
+    const folio = query.get('folio');
+    const isin = query.get('isin');
+    axios.post('/api/getschemedetail',{scheme:scheme,pan:pan,folio:folio})
             .then(response => {
-              //console.log(response);
                 this.setState({data1: response.data.data, isFetching: false})
             })
             .catch(e => {
                 console.log(e);
                 this.setState({...this.state, isFetching: false});
             });
-    axios.post('http://localhost:3001/api/getschemepersonaldetail',{scheme:scheme,pan:pan})
+    axios.post('/api/getschemepersonaldetail',{scheme:scheme,pan:pan,folio:folio})
             .then(resp => {
-              //console.log(response);
                 this.setState({data2: resp.data, isFetching: false})
             })
             .catch(e => {
@@ -132,7 +116,7 @@ class Portfoliodetail extends Component {
                  <th></th>
                  <td></td>
                  <th>Bank</th>
-                 <td>{item.BNAME} [{item.BNKACNO}]</td>
+                 <td>{item.BNAME} {[item.BNKACNO]}</td>
                 </tr>
                 </tbody>
              ) ) }
@@ -160,10 +144,10 @@ class Portfoliodetail extends Component {
               
             {this.state.data1.map((item, index) => ( 
                <tbody >
-                 {( item.NATURE =='RED')? (
+                 {( item.NATURE =='RED' || item.NATURE =='FUL')? (
                 <div class="hide-bal">{(unit = "-"+item.UNITS)}
                 </div>
-                ):(item.NATURE =='LTOP')? (
+                ):(item.NATURE =='LTOP' || item.NATURE =='LTOF' || item.NATURE =='STPO')? (
                   <div class="hide-bal">{(unit = "-"+item.UNITS)}
                   </div>
                   ):(

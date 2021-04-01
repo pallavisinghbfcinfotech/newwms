@@ -1533,36 +1533,29 @@ app.post("/api/getportfolioscheme", function (req, res) {
 })
 
     app.get("/api/getfolio", function (req, res) {
-          var transc = mongoose.model('trans_cams', transcams, 'trans_cams'); 
-          var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');  
-          var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');             
-                // transc.find({"INV_NAME":req.query.name}).distinct("FOLIO_NO", function (err, data) {
-                //   transk.find({"INVNAME":req.query.name}).distinct("TD_ACNO", function (err, data1) {
-                //     transf.find({"INVESTOR_2":req.query.name}).distinct("FOLIO_NO", function (err, data2) {
-                        transc.find({"PAN":req.query.pan}).distinct("FOLIO_NO", function (err, data) {
-                          transk.find({"PAN1":req.query.pan}).distinct("TD_ACNO", function (err, data1) {
-                            transf.find({"IT_PAN_NO1":req.query.pan}).distinct("FOLIO_NO", function (err, data2) {
-                    if (err) {
-                        res.send(err);
-                    }
-                    else {
-                            var datacon = data2.concat(data1.concat(data))
-                            var removeduplicates = Array.from(new Set(datacon));
-                            datacon = removeduplicates.map(JSON.stringify)
-                                        .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                                        .filter(function(item, index, arr) {
-                                        return arr.indexOf(item, index + 1) === -1;
-                                        }) // check if there is any occurence of the item in whole array
-                                        .reverse()
-                                        .map(JSON.parse);
-                                       // datacon = datacon.sort();
-                                res.send(datacon);
-                                return datacon;
-                        }
-                    });
-                 });
-               });
-   })
+       transc.find({"PAN":req.query.pan,"INV_NAME":{$regex : `^${req.query.name}.*` , $options: 'si' }}).distinct("FOLIO_NO", function (err, camsdata){
+            transk.find({"PAN1":req.query.pan,"INVNAME":{$regex : `^${req.query.name}.*` , $options: 'si' }}).distinct("TD_ACNO", function (err, karvydata){
+                 transf.find({"IT_PAN_NO1":req.query.pan,"INVESTOR_2":{$regex : `^${req.query.name}.*` , $options: 'si' }}).distinct("FOLIO_NO", function (err, frankdata) {
+                if (err) {
+                    res.send(err);
+                }
+                else {
+                    var datacon = frankdata.concat(karvydata.concat(camsdata))
+                    var removeduplicates = Array.from(new Set(datacon));
+                    datacon = removeduplicates.map(JSON.stringify)
+                        .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                        .filter(function (item, index, arr) {
+                            return arr.indexOf(item, index + 1) === -1;
+                        }) // check if there is any occurence of the item in whole array
+                        .reverse()
+                        .map(JSON.parse);
+                    res.send(datacon);
+                    return datacon;
+                }
+            });
+        });
+    });
+})
     app.get("/api/getscheme", function (req, res) {
         var transc = mongoose.model('trans_cams', transcams, 'trans_cams');             
         var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');    

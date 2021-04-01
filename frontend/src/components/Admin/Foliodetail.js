@@ -9,6 +9,7 @@ class Foliodetail extends Component {
   constructor(props) {
     super(props);
     this.changeApplicant = this.changeApplicant.bind(this);
+    this.changeScheme = this.changeScheme.bind(this);
     this.state = {
       error: null,
       isLoaded: false,
@@ -19,6 +20,7 @@ class Foliodetail extends Component {
       secdrp:'',
       searchname:[],
       selectedOption: null,
+      index:0
     };
   }
 
@@ -27,7 +29,6 @@ class Foliodetail extends Component {
 changeScheme = (e) =>{
   var sel = e.target.value;
   var folioval = this.state.secdrp;
-
   $.ajax({
     url: "/api/getfoliodetailweb",
     type: "POST",
@@ -50,7 +51,8 @@ suggestionBox = (e) =>{
     type: "POST",
     data:{name: inputValue},
     success: function (res4) {
-      this.setState({ searchname: res4 });      
+      this.setState({ searchname: res4 });
+      
     }.bind(this),
     error: function(jqXHR) {
       console.log(jqXHR);         
@@ -67,10 +69,11 @@ changeFolio = (e) =>{
     data:{folio:sel},
      success: function (res3) {
       this.setState({ data3: res3 });
+      //alert(res3)
       var schemename = "<option value=''>Select Scheme</option>";
       var foliodetail = "";
       {this.state.data3.map((item, index) => (
-        schemename += "<option value='"+item+"'>"+item+"</option>"   
+        schemename += '<option value="'+item+'">'+item+'</option>'  
       ))}
       $("#scheme").html(schemename);
       $("#detail").hide();
@@ -85,16 +88,20 @@ changeApplicant = (e) =>{
   var selectedvalue = e.target.innerText;
   var name = selectedvalue.split('/')[0];
   var pan = selectedvalue.split('/')[1];
+ // var userdetail = "<b>"+name+"/"+"["+pan+"]"+"</b>";
+ // $(".namepan").html(userdetail);
   $(".searchname").val(selectedvalue);
   $(".inputdata").hide();
+
    this.setState({
     pan:pan,
     name: name
   })
+
     $.ajax({
       url: "/api/getfolio",
       type: "GET",
-      data:{pan:pan},
+      data:{pan:pan,name:name},
        success: function (res2) {
         this.setState({ data2: res2 });
         var folionumber = "<option value=''>Select Folio No.</option>";
@@ -127,6 +134,10 @@ changeApplicant = (e) =>{
     });
   }
   render(){
+    var balance = 0;
+    var unit = 0;
+    var currentNav= 0;
+    var index=0;
   return (  
     <>
     <style jsx>
@@ -134,7 +145,9 @@ changeApplicant = (e) =>{
       .list-group-item:hover{
         border:none!important;
       }
-      
+      .hide-bal{
+        display:none;
+      }
       .search-data{
         list-style:none;
         padding:10px;
@@ -250,12 +263,14 @@ changeApplicant = (e) =>{
                   </div>
                   {/* /.card-header */}
                   <div className="card card-primary card-outline" id="detail">
+                 {/* {console.log(this.state.data4.length)} */}
                   {this.state.data4.map((item, index) => (
                     <div className="card-body box-profile">
                       <h3 className="profile-username text-center">{item.INVNAME}</h3>
                       <ul className="list-group list-group-unbordered mb-3">         
                         <li className="list-group-item">
-                          <b>Units</b> <a className="float-right">{(item.UNITS).toFixed(2)}</a>
+                       
+                          <b>Units</b> <a className="float-right">{(item.UNITS).toFixed(4)}</a>
                         </li>
                         <li className="list-group-item">
                           <b>Current Value</b> <a className="float-right">{(item.cnav * item.UNITS).toFixed(2)}</a>

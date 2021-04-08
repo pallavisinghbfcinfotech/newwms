@@ -266,6 +266,62 @@ app.get("/api/gettranscams", function (req, res) {
         }
     });
 })
+
+app.post("/api/getsearchfoliodetail", function (req, res) {
+                        var pipeline="";var trans='';var rta="";
+                        if(req.body.rta === "CAMS"){
+                            pipeline = [  //trans_cams
+                                { $match:{  FOLIO_NO:req.body.folio } },
+                                { $group: { _id: { PAN:"$PAN",INV_NAME:"$INV_NAME", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", SCHEME_TYP: "$SCHEME_TYP",AC_NO: "$AC_NO",BANK_NAME: "$BANK_NAME" } } },
+                                { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+                                { $unwind: "$detail" },
+                                { $project: { _id: 0, PAN:"$_id.PAN",INVNAME:"$_id.INV_NAME", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME" ,TYPE:"$_id.SCHEME_TYP",ACCOUNTNO: "$_id.AC_NO",BANK: "$_id.BANK_NAME" ,MODEOFHOLD:"$detail.HOLDING_NA",NOMINEE:"$detail.NOM_NAME",EMAIL:"$detail.EMAIL" } },
+                            ]
+                            trans = mongoose.model('trans_cams', transcams, 'trans_cams');
+                        }else if(req.body.rta === "KARVY"){
+                            pipeline = [  //trans_karvy
+                                { $match:{  TD_ACNO:req.body.folio} },
+                                { $group: { _id: { PAN1:"$PAN1",INVNAME:"$INVNAME", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", ASSETTYPE: "$ASSETTYPE",AC_NO: "$AC_NO"  } } },
+                                { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
+                                { $unwind: "$detail" },
+                                { $project: { _id: 0, PAN:"$_id.PAN1",INVNAME:"$_id.INVNAME", FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC",TYPE:"$_id.ASSETTYPE" ,ACCOUNTNO: "$detail.BNKACNO",BANK: "$detail.BNAME" ,BANKTYPE:"$detail.BNKACTYPE",MODEOFHOLD:"$detail.MODEOFHOLD",NOMINEE:"$detail.NOMINEE",EMAIL:"$detail.EMAIL" } },
+                            ]
+                            trans = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');
+                        }else{
+                            pipeline = [  //trans_franklin
+                                { $match:{  FOLIO_NO:req.body.folio } },
+                                { $group: { _id: { IT_PAN_NO1:"$IT_PAN_NO1",INVESTOR_2:"$INVESTOR_2", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", AMOUNT: "$AMOUNT", PLAN_TYPE: "$PLAN_TYPE",PERSONAL23: "$PERSONAL23",PBANK_NAME: "$PBANK_NAME" ,ACCOUNT_25:"$ACCOUNT_25",HOLDING_19:"$HOLDING_19",NOMINEE1:"$NOMINEE1",EMAIL:"$EMAIL"  } } },
+                                { $project: { _id: 0, PAN:"$_id.IT_PAN_NO1",INVNAME:"$_id.INVESTOR_2", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1",TYPE:"$_id.PLAN_TYPE",ACCOUNTNO: "$_id.PERSONAL23",BANK: "$_id.PBANK_NAME" ,BANKTYPE:"$_id.ACCOUNT_25",MODEOFHOLD:"$_id.HOLDING_19",NOMINEE:"$_id.NOMINEE1",EMAIL:"$_id.EMAIL" } },
+                            ]
+                            trans = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');
+                        }
+                        trans.aggregate(pipeline, (err, data) => {
+                        if(data != 0 ){
+                                resdata = {
+                                    status: 200,
+                                    message: 'Successfull',
+                                    data: data
+                                }
+                            } else {
+                                resdata = {
+                                    status: 400,
+                                    message: 'Data not found',
+                                }
+                            }
+                            var removeduplicates = data.map(JSON.stringify)
+                            .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                            .filter(function (item, index, arr) {
+                                return arr.indexOf(item, index + 1) === -1;
+                            }) // check if there is any occurence of the item in whole array
+                            .reverse()
+                            .map(JSON.parse);
+                            var datacon = Array.from(new Set(removeduplicates));
+                            resdata.data = datacon;
+                          res.send(resdata);
+                          return resdata;
+                        });      
+  })
+
 app.post("/api/getsearchdatamanagement", function (req, res) {
 
     var searchvalue="";

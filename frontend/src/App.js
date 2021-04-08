@@ -14,6 +14,8 @@ import Nav from "./components/Admin/Nav";
 import Transactionfeed from "./components/Admin/Transactionfeed";
 import Login from "./components/Login";
 import Home from "./Home";
+import Transactiondetail from "./components/Admin/Transaction-detail";
+import Datafoliodetail from "./components/Admin/Datafolio-detail";
 import AdminNavBar from "./Adminnav";
 import Sidebar from "./Adminsidebar";
 import { Switch, Route, Redirect } from "react-router-dom";
@@ -39,6 +41,8 @@ const App = () => {
         <Route exact path="/Transactionfeed" component={Transactionfeed} />
         <Route exact path="/Signup" component={Signup} />
         <Route exact path="/Login" component={Login} />
+        <Route exact path="/Transaction-detail" component={Transactiondetail} />
+        <Route exact path="/Datafolio-detail" component={Datafoliodetail} />
         <Redirect to = "/" />
         Transactionfeed
       </Switch>

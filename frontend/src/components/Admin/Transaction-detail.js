@@ -85,7 +85,7 @@ class Transactiondetail extends Component {
 	}
 
   render(){
-   const { schemedetail } = this.state ;
+   //const { schemedetail } = this.state ;
    var balance = 0;
    var unit = 0;
    var currentNav= 0;
@@ -132,7 +132,7 @@ class Transactiondetail extends Component {
         width: 100
       },    
     ],
-    rows: schemedetail.map(item => {
+    rows: this.state.schemedetail.map(item => {
       if(item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO'){
         <div class="hide-bal">{unit = "-"+item.UNITS}</div>
       }else{

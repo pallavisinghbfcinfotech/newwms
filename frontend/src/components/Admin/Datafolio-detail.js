@@ -19,7 +19,9 @@ class Datafoliodetail extends Component {
     const query = new URLSearchParams(this.props.location.search);  
     const folio = query.get('folio');
     const rta = query.get('rta');
-    axios.post('/api/getsearchfoliodetail',{folio:folio,rta:rta})
+     const lastItem = window.location.href.substring(window.location.href.lastIndexOf('/') + 1)
+    const scheme= lastItem.replace(/%20/g, " ");
+    axios.post('/api/getsearchfoliodetail',{folio:folio,rta:rta,scheme:scheme})
             .then(resp => {
                 this.setState({personaldetail: resp.data.data, isFetching: false})
             })

@@ -133,7 +133,7 @@ class Transactiondetail extends Component {
       }     
     ],
     rows: schemedetail.map(item => {
-      if(item.NATURE =='RED' || item.NATURE =='FUL' || item.NATURE =='LTOP' || item.NATURE =='LTOF' || item.NATURE =='STPO'){
+      if(item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO'){
         <div class="hide-bal">{unit = "-"+item.UNITS}</div>
       }else{
         <div class="hide-bal">{unit = item.UNITS}</div>

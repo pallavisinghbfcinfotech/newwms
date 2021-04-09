@@ -282,7 +282,7 @@ app.post("/api/Removedata",function(req,res){
            });
    })
 
-app.post("/api/getschemedetail11", function (req, res) {
+app.post("/api/gettransschemedetail", function (req, res) {
 	try{
 const pipeline1 = [  //trans_karvy    
     { $match: { FUNDDESC: req.body.scheme, PAN1: req.body.pan ,TD_ACNO:req.body.folio } },

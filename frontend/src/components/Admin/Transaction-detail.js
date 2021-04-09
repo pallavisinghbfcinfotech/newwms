@@ -21,12 +21,16 @@ class Transactiondetail extends Component {
   }
  
   componentDidMount(){
-   document.title = "WMS | Transaction Detail"
+
+    document.title = "WMS | Transaction Detail"
     const query = new URLSearchParams(this.props.location.search);  
-    const scheme = query.get('scheme');
     const pan = query.get('pan');
     const folio = query.get('folio');
     const isin = query.get('isin');
+    
+
+   const lastItem = window.location.href.substring(window.location.href.lastIndexOf('/') + 1)
+    const scheme= lastItem.replace(/%20/g, " ");
     this.setState({
       pan:pan,
       folio:folio,
@@ -34,8 +38,7 @@ class Transactiondetail extends Component {
     })
     axios.post('/api/getschemedetail11',{pan:pan,folio:folio,scheme:scheme})
             .then(response => {
-              console.log(scheme)
-                this.setState({schemedetail: response.data.data, isFetching: false})
+                 this.setState({schemedetail: response.data.data, isFetching: false})
             })
             .catch(e => {
                 console.log(e);
@@ -63,10 +66,8 @@ class Transactiondetail extends Component {
             window.location.reload();
             if(response.status === 200) {
               			document.getElementById('msg').innerHTML = '<span style="color:green;">Products deleted successfully</span>';
-              	
                   }
-          	}
-           
+          	}  
           }); 
         }
       }
@@ -74,11 +75,9 @@ class Transactiondetail extends Component {
 		if(e.target.checked) {
 			let arr = this.state.checkedBoxes;
 			arr.push(item._id);
-			
 			this.setState = { checkedBoxes: arr};
 		} else {			
 			let items = this.state.checkedBoxes.splice(this.state.checkedBoxes.indexOf(item._id), 1);
-			
 			this.setState = {
 				checkedBoxes: items
 			}
@@ -134,13 +133,14 @@ class Transactiondetail extends Component {
       }     
     ],
     rows: schemedetail.map(item => {
-        {( item.NATURE =='RED' || item.NATURE =='FUL' || item.NATURE =='LTOP' || item.NATURE =='LTOF' || item.NATURE =='STPO')? (
-            <div class="hide-bal">{(unit = "-"+item.UNITS)}</div>
-              ):(
-            <div class="hide-bal">{(unit = item.UNITS)}</div>
-            )}
+      if(item.NATURE =='RED' || item.NATURE =='FUL' || item.NATURE =='LTOP' || item.NATURE =='LTOF' || item.NATURE =='STPO'){
+        <div class="hide-bal">{unit = "-"+item.UNITS}</div>
+      }else{
+        <div class="hide-bal">{unit = item.UNITS}</div>
+      }
+        
             <div class="hide-bal">
-             {(balance = parseFloat(unit)+parseFloat(balance))}
+            { balance = parseFloat(unit)+parseFloat(balance)}
             </div>
       return {
         CHECK:<input type="checkbox"  className="selectsingle" value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,

@@ -267,6 +267,21 @@ app.get("/api/gettranscams", function (req, res) {
     });
 })
 
+app.post("/api/Removedata",function(req,res){ 
+     transk.remove({ _id: req.body.id }, function(err) {
+               if(err){
+                   res.send(err);
+               }
+               else{  
+                resdata = {
+                    status: 200,
+                    message: 'Deleted',
+                    }
+                      res.send(resdata);           
+                  }
+           });
+   })
+
 app.post("/api/getschemedetail11", function (req, res) {
 const pipeline1 = [  //trans_karvy    
     { $match: { FUNDDESC: req.body.scheme, PAN1: req.body.pan ,TD_ACNO:req.body.folio } },

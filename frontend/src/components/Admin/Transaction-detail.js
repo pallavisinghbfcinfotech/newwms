@@ -36,7 +36,7 @@ class Transactiondetail extends Component {
       folio:folio,
       scheme:scheme
     })
-    axios.post('/api/getschemedetail11',{pan:pan,folio:folio,scheme:scheme})
+    axios.post('/api/gettransschemedetail',{pan:pan,folio:folio,scheme:scheme})
             .then(response => {
                  this.setState({schemedetail: response.data.data, isFetching: false})
             })

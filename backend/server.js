@@ -283,6 +283,7 @@ app.post("/api/Removedata",function(req,res){
    })
 
 app.post("/api/getschemedetail11", function (req, res) {
+	try{
 const pipeline1 = [  //trans_karvy    
     { $match: { FUNDDESC: req.body.scheme, PAN1: req.body.pan ,TD_ACNO:req.body.folio } },
    { $project: { _id:1,PAN: "$PAN1", FUNDDESC:"$FUNDDESC",TD_NAV: "$TD_NAV", NATURE: "$TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$TD_TRDT" } }, TRDESC: "$TRDESC", INVNAME: "$INVNAME",  UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } ,RTA:"KARVY" } },
@@ -359,6 +360,9 @@ transk.aggregate(pipeline1, (err, karvydata) => {
 });
 }); 
 })
+	} catch (err) {
+        console.log(e)
+    }
 })
 
 app.post("/api/getsearchfoliodetail", function (req, res) {

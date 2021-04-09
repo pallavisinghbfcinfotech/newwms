@@ -125,12 +125,12 @@ class Transactiondetail extends Component {
         label: 'BALANCE',
         field: 'Balance',
         width: 100
-      } ,
+      },
       {
         label: 'RTA',
         field: 'RTA',
         width: 100
-      }     
+      },    
     ],
     rows: schemedetail.map(item => {
       if(item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO'){

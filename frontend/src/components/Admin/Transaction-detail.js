@@ -121,7 +121,7 @@ class Transactiondetail extends Component {
         width: 100
       }, 
       {
-        label: 'NATURE',
+        label: 'TRXN TYPE',
         field: 'NATURE',
         width: 100
       }, 

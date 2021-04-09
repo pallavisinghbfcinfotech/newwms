@@ -38,9 +38,6 @@ class Datamanagement extends Component {
 
   render(){
     const { searchdata } = this.state ;
-    // var baseurl = window.location.href
-    // var domain = baseurl.split('/');
-    // // var url = "http://"+domain[domain.length - 2]+"/Transaction-detail"
     var schemeurl = "Transaction-detail";
     var foliourl = "Datafolio-detail";
     const data = {
@@ -85,8 +82,8 @@ class Datamanagement extends Component {
     rows: searchdata.map(item => {
       return {
         CHECK:<input type="checkbox" value={item.FOLIO} />,
-        FOLIO: <a href={foliourl+"?folio="+item.FOLIO+"&rta="+item.RTA} target='_blank'>{item.FOLIO}</a>,
-        SCHEME: <a href={schemeurl+"?pan="+item.PAN+"&folio="+item.FOLIO+"&scheme="+item.SCHEME} target='_blank'>{item.SCHEME}</a>,
+        FOLIO: <a href={foliourl+"?folio="+item.FOLIO+"&rta="+item.RTA+'&scheme=/'+item.SCHEME} target='_blank'>{item.FOLIO}</a>,
+        SCHEME: <a href={schemeurl+"?pan="+item.PAN+"&folio="+item.FOLIO+"&scheme=/"+item.SCHEME} target='_blank'>{item.SCHEME}</a>,
         // SCHEME: <Link to={"Transaction-detail?scheme="+item.SCHEME+"&pan="+item.PAN+"&folio="+item.FOLIO} > {item.SCHEME} </Link>,
         INVNAME: item.INVNAME,
         PAN: item.PAN,

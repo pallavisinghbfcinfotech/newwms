@@ -285,7 +285,7 @@ app.post("/api/Removedata",function(req,res){
 app.post("/api/getschemedetail11", function (req, res) {
 const pipeline1 = [  //trans_karvy    
     { $match: { FUNDDESC: req.body.scheme, PAN1: req.body.pan ,TD_ACNO:req.body.folio } },
-    { $project: { _id:1,PAN: "$PAN1", FUNDDESC:"$FUNDDESC",TD_NAV: "$TD_NAV", NATURE: "$TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$TD_TRDT" } }, TRDESC: "$TRDESC", INVNAME: "$INVNAME",  UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } ,RTA:"KARVY" } },
+   { $project: { _id:1,PAN: "$PAN1", FUNDDESC:"$FUNDDESC",TD_NAV: "$TD_NAV", NATURE: "$TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$TD_TRDT" } }, TRDESC: "$TRDESC", INVNAME: "$INVNAME",  UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } ,RTA:"KARVY" } },
     {$sort : {TD_TRDT : -1}}
 ]
 const pipeline2=[  //trans_franklin
@@ -352,6 +352,7 @@ transk.aggregate(pipeline1, (err, karvydata) => {
             datacon[i]['NATURE'] = "Purchase";
         }
     }        
+    // resdata.data = datacon;
     resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime())
     res.json(resdata);
     return resdata;

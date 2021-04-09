@@ -20,22 +20,8 @@ class Transactiondetail extends Component {
       this.toggleCheckbox = this.toggleCheckbox.bind(this);
   }
  
-  
-// onChangeCheckBox(event) {
-//   var check = document.getElementById('check');
-//   //alert(event.target.id)
-//   if(event.target.checked) {
-//       this.actionButtonRef.disabled = "";  
-//   }
-//   else {
-//       this.actionButtonRef.disabled = "disabled";
-      
-//   }
-// }  
-
   componentDidMount(){
-  //  $("#delbtn").prop('disabled', true); //disable 
-    document.title = "WMS | Transaction Detail"
+   document.title = "WMS | Transaction Detail"
     const query = new URLSearchParams(this.props.location.search);  
     const scheme = query.get('scheme');
     const pan = query.get('pan');
@@ -48,13 +34,12 @@ class Transactiondetail extends Component {
     })
     axios.post('/api/getschemedetail11',{pan:pan,folio:folio,scheme:scheme})
             .then(response => {
-              //this.setState({...this.state, isFetching: false});
               console.log(scheme)
                 this.setState({schemedetail: response.data.data, isFetching: false})
             })
             .catch(e => {
                 console.log(e);
-               // this.setState({...this.state, isFetching: false});
+                this.setState({...this.state, isFetching: false});
             });
     axios.post('/api/getschemepersonaldetail',{pan:pan,folio:folio,scheme:scheme})
             .then(resp => {
@@ -62,7 +47,7 @@ class Transactiondetail extends Component {
             })
             .catch(e => {
                 console.log(e);
-             //   this.setState({...this.state, isFetching: false});
+                this.setState({...this.state, isFetching: false});
             });
    
     
@@ -83,7 +68,6 @@ class Transactiondetail extends Component {
           	}
            
           }); 
-          //this.updateschemedetail();
         }
       }
   toggleCheckbox = (e, item) => {		
@@ -100,15 +84,6 @@ class Transactiondetail extends Component {
 			}
 		}		
 	}
-  // updateschemedetail = () => {		
-  //   axios.post('/api/getschemedetail11',{scheme:this.state.scheme,pan:this.state.pan,folio:this.state.folio})
-  //   .then(response => {
-  //       this.setState({schemedetail: response.data.data, isFetching: false})
-  //   })
-  //   .catch(e => {
-  //       console.log(e);
-  //    });
-	// }
 
   render(){
    const { schemedetail } = this.state ;
@@ -128,7 +103,7 @@ class Transactiondetail extends Component {
         width: 100
       }, 
       {
-        label: 'TRANS TYPE',
+        label: 'NATURE',
         field: 'NATURE',
         width: 100
       }, 
@@ -158,7 +133,7 @@ class Transactiondetail extends Component {
         width: 100
       }     
     ],
-    rows: schemedetail.map((item,index)=> {
+    rows: schemedetail.map(item => {
         {( item.NATURE =='RED' || item.NATURE =='FUL' || item.NATURE =='LTOP' || item.NATURE =='LTOF' || item.NATURE =='STPO')? (
             <div class="hide-bal">{(unit = "-"+item.UNITS)}</div>
               ):(
@@ -168,7 +143,7 @@ class Transactiondetail extends Component {
              {(balance = parseFloat(unit)+parseFloat(balance))}
             </div>
       return {
-        CHECK:<input type="checkbox" key={index} className="selectsingle" value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
+        CHECK:<input type="checkbox"  className="selectsingle" value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
         DATE: item.TD_TRDT,
         NATURE: item.NATURE,
         AMOUNT: item.AMOUNT,

@@ -89,6 +89,27 @@ class Transactiondetail extends Component {
    var balance = 0;
    var unit = 0;
    var currentNav= 0;
+	  const schemedetail = this.state.schemedetail.map(item => {
+    if(item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' ||item.NATURE ==='STPO'){
+      <div class="hide-bal">{unit = "-"+item.UNITS}</div>
+    }else{
+      <div class="hide-bal">{unit = item.UNITS}</div>
+    }
+      
+          <div class="hide-bal">
+          { balance = parseFloat(unit)+parseFloat(balance)}
+          </div>
+    return {
+      CHECK:<input type="checkbox"  className="selectsingle" value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
+      DATE: item.TD_TRDT,
+      NATURE: item.NATURE,
+      AMOUNT: item.AMOUNT,
+      NAV: item.TD_NAV,
+      Units: unit,
+      Balance: balance.toFixed(4),
+      RTA:item.RTA,
+    }
+  })
    const data = {
     columns: [
       {
@@ -132,27 +153,7 @@ class Transactiondetail extends Component {
         width: 100
       },    
     ],
-    rows: this.state.schemedetail.map(item => {
-      if(item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO'){
-        <div class="hide-bal">{unit = "-"+item.UNITS}</div>
-      }else{
-        <div class="hide-bal">{unit = item.UNITS}</div>
-      }
-        
-            <div class="hide-bal">
-            { balance = parseFloat(unit)+parseFloat(balance)}
-            </div>
-      return {
-        CHECK:<input type="checkbox"  className="selectsingle" value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
-        DATE: item.TD_TRDT,
-        NATURE: item.NATURE,
-        AMOUNT: item.AMOUNT,
-        NAV: item.TD_NAV,
-        Units: unit,
-        Balance: balance.toFixed(4),
-        RTA:item.RTA,
-      }
-    })
+    rows: schemedetail
     
   };
 

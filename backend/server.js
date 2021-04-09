@@ -1617,6 +1617,14 @@ app.post("/api/getschemepersonaldetail", function (req, res) {
                 }
                 else {
                     var datacon = frankdata.concat(karvydata.concat(camsdata))
+                    var removeduplicates = datacon.map(JSON.stringify)
+                    .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                    .filter(function (item, index, arr) {
+                        return arr.indexOf(item, index + 1) === -1;
+                    }) // check if there is any occurence of the item in whole array
+                    .reverse()
+                    .map(JSON.parse);
+                     datacon = Array.from(new Set(removeduplicates));
                     res.send(datacon);
                     return datacon;
                 }

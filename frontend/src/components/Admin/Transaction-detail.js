@@ -91,14 +91,12 @@ class Transactiondetail extends Component {
    var currentNav= 0;
 	  const schemedetail = this.state.schemedetail.map(item => {
     if(item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' ||item.NATURE ==='STPO'){
-      <div class="hide-bal">{unit = "-"+item.UNITS}</div>
+   unit = "-"+item.UNITS;
     }else{
-      <div class="hide-bal">{unit = item.UNITS}</div>
+      unit = item.UNITS;
     }
       
-          <div class="hide-bal">
-          { balance = parseFloat(unit)+parseFloat(balance)}
-          </div>
+           balance = parseFloat(unit)+parseFloat(balance);
     return {
       CHECK:<input type="checkbox"  className="selectsingle" value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
       DATE: item.TD_TRDT,

@@ -268,13 +268,15 @@ changeApplicant = (e) =>{
                     <div className="card-body box-profile">
                       <h3 className="profile-username text-center">{item.INVNAME}</h3>
                       <ul className="list-group list-group-unbordered mb-3">         
-                        <li className="list-group-item">
-                       
+                        <li className="list-group-item">        
                           <b>Units</b> <a className="float-right">{(item.UNITS).toFixed(4)}</a>
                         </li>
-                        <li className="list-group-item">
+                        {(item.cnav === "" && item.UNITS === "" || item.AMOUNT === null) ? (
+                        <div> Nav not found</div>
+                        ) : (
+                          <li className="list-group-item">
                           <b>Current Value</b> <a className="float-right">{(item.cnav * item.UNITS).toFixed(2)}</a>
-                        </li>
+                        </li>)}
                         <li className="list-group-item">
                           <b>Bank</b> <a className="float-right">{item.BANK_NAME}</a>
                         </li>

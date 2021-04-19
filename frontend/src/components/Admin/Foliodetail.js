@@ -29,10 +29,10 @@ class Foliodetail extends Component {
 changeScheme = (e) =>{
   var sel = e.target.value;
   var folioval = this.state.secdrp;
-  $.ajax({
+   $.ajax({
     url: "/api/getfoliodetailweb",
     type: "POST",
-    data:{scheme:sel,folio:folioval},
+    data:{scheme:sel,folio:folioval,pan:this.state.pan},
      success: function (res4) {
       this.setState({ data4: res4.data });
       $("#detail").show();
@@ -69,7 +69,6 @@ changeFolio = (e) =>{
     data:{folio:sel},
      success: function (res3) {
       this.setState({ data3: res3 });
-      //alert(res3)
       var schemename = "<option value=''>Select Scheme</option>";
       var foliodetail = "";
       {this.state.data3.map((item, index) => (
@@ -267,16 +266,24 @@ changeApplicant = (e) =>{
                   {this.state.data4.map((item, index) => (
                     <div className="card-body box-profile">
                       <h3 className="profile-username text-center">{item.INVNAME}</h3>
-                      <ul className="list-group list-group-unbordered mb-3">         
-                        <li className="list-group-item">        
-                          <b>Units</b> <a className="float-right">{(item.UNITS).toFixed(4)}</a>
+                      <ul className="list-group list-group-unbordered mb-3">  
+                             
+                        <li className="list-group-item">
+                       
+                          <b>Units</b> <a className="float-right">{(item.UNITS).toFixed(3)}</a>
                         </li>
+
                         {(item.cnav === "" && item.UNITS === "" || item.AMOUNT === null) ? (
                         <div> Nav not found</div>
+                        
                         ) : (
                           <li className="list-group-item">
                           <b>Current Value</b> <a className="float-right">{(item.cnav * item.UNITS).toFixed(2)}</a>
                         </li>)}
+
+
+
+                       
                         <li className="list-group-item">
                           <b>Bank</b> <a className="float-right">{item.BANK_NAME}</a>
                         </li>

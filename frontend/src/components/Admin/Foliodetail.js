@@ -266,12 +266,14 @@ changeApplicant = (e) =>{
                   {this.state.data4.map((item, index) => (
                     <div className="card-body box-profile">
                       <h3 className="profile-username text-center">{item.INVNAME}</h3>
-                      <ul className="list-group list-group-unbordered mb-3">  
-                             
-                        <li className="list-group-item">
-                       
+                     <ul className="list-group list-group-unbordered mb-3">  
+                      {(item.UNITS === "" || item.UNITS === null || item.UNITS === 0 || item.UNITS === NaN) ? (
+                        
+                        <div> <b>Units</b> <a className="float-right">{0}</a></div>
+                        ) : (
+                           <li className="list-group-item">
                           <b>Units</b> <a className="float-right">{(item.UNITS).toFixed(3)}</a>
-                        </li>
+                        </li> )}
 
                         {(item.cnav === "" && item.UNITS === "" || item.AMOUNT === null) ? (
                         <div> Nav not found</div>

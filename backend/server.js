@@ -2215,11 +2215,11 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                 as: "products"
             }
         },
-         { $unwind: "$products" },
+        // { $unwind: "$products" },
          { $lookup: { from: 'cams_nav', localField: 'products.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
-         { $unwind: "$nav" },
+        // { $unwind: "$nav" },
          { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
-         { $unwind: "$detail" },
+       //  { $unwind: "$detail" },
          { $project: { _id: 0, FOLIO:"$_id.FOLIO_NO",INVNAME: "$_id.INV_NAME",SCHEME:"$_id.SCHEME",NATURE: "$_id.TRXN_TYPE_",TD_TRDT:"$_id.TRADDATE",ISIN: "$products.ISIN",NOMINEE: "$detail.NOM_NAME", BANK_NAME: "$_id.BANK_NAME", AC_NO: "$_id.AC_NO",JTNAME2: "$detail.JNT_NAME2", JTNAME1: "$detail.JNT_NAME1", cnav: "$nav.NetAssetValue",  UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
     ]
 
@@ -2250,9 +2250,9 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                 as: "nav"
             }
         },
-        { $unwind: "$nav" },
+       // { $unwind: "$nav" },
         { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
-        { $unwind: "$detail" },
+       // { $unwind: "$detail" },
         { $project: { _id: 0, FOLIO:"$_id.TD_ACNO",INVNAME: "$_id.INVNAME",SCHEME:"$_id.FUNDDESC",NATURE: "$_id.TD_TRTYPE",TD_TRDT:"$_id.TD_TRDT",ISIN: "$_id.SCHEMEISIN" ,NOMINEE: "$detail.NOMINEE",  BANK_NAME: "$detail.BNAME" ,AC_NO: "$detail.BNKACNO", JTNAME2: "$detail.JTNAME2", JTNAME1: "$detail.JTNAME1",cnav: "$nav.NetAssetValue", UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } } } ,
     ]
 
@@ -2285,7 +2285,7 @@ app.post("/api/getfoliodetailweb", function (req, res) {
             as: "nav"
         }
     },
-    { $unwind: "$nav" },
+  //  { $unwind: "$nav" },
         { $project: { _id: 0,FOLIO:"$_id.FOLIO_NO", INVNAME: "$_id.INVESTOR_2",SCHEME:"$_id.SCHEME_NA1", NATURE: "$_id.TRXN_TYPE",TD_TRDT:"$_id.TRXN_DATE",ISIN: "$_id.ISIN", NOMINEE: "$_id.NOMINEE1", BANK_NAME: "$_id.PBANK_NAME", AC_NO: "$_id.PERSONAL23", JTNAME2: "$_id.JOINT_NAM2", JTNAME1: "$_id.JOINT_NAM1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
     ]
 
@@ -2304,9 +2304,8 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                                 message: "Data not found"
                             };
                         }
-                      var datacon = frankdata.concat(karvydata.concat(camsdata));
-                 
-                        datacon = datacon
+                         var datacon = frankdata.concat(karvydata.concat(camsdata));
+                             datacon = datacon
                             .map(JSON.stringify)
                             .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                             .filter(function (item, index, arr) {
@@ -2314,9 +2313,8 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                             }) // check if there is any occurence of the item in whole array
                             .reverse()
                             .map(JSON.parse);
-                            resdata.data = datacon;
-                        //     console.log(datacon)
-                        //     console.log(datacon.length)
+                          //  resdata.data = datacon;
+                            
                         for(i = 0; i<datacon.length; i++) {
                             if (datacon[i]['NATURE'] === "RED" ||datacon[i]['NATURE'] === "LTOP" ||datacon[i]['NATURE'] === "Lateral Shift Out" || 
                             datacon[i]['NATURE'] === "Switch Out" ||datacon[i]['NATURE'] === "IPOR" ||datacon[i]['NATURE'] === "LTOF" ||
@@ -2329,20 +2327,27 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                               }
                          
                              balance = parseFloat(unit)+parseFloat(balance) ;
-                             console.log(i,balance)
                              cnav = datacon[i].cnav;
                         
                         }
-                        
                         var index = datacon.length - 1 ;
                         datacon[index].UNITS = balance;
                         datacon[index].AMOUNT = parseFloat(cnav)*parseFloat(balance) ;
-                        datacon[index].BANK_NAME =  datacon[0].BANK_NAME;
+                        if(datacon[0].BANK_NAME[0].length <2){
+                            console.log(datacon[0].BANK_NAME[0].length)
+                            datacon[index].BANK_NAME =  datacon[0].BANK_NAME;
+                            datacon[index].AC_NO =  datacon[0].AC_NO;
+                        }else{
+                            console.log(datacon[0].BANK_NAME[0].length)
+                            datacon[index].BANK_NAME =  datacon[0].BANK_NAME[0];
+                            datacon[index].AC_NO =  datacon[0].AC_NO[0];
+                        }
+                        
                         datacon[index].INVNAME =  datacon[0].INVNAME;
-                        datacon[index].AC_NO =  datacon[0].AC_NO;
-                        datacon[index].NOMINEE =  datacon[0].NOMINEE;
-                        datacon[index].JTNAME2 =  datacon[0].JTNAME2;
-                        datacon[index].JTNAME1 =  datacon[0].JTNAME1;
+                        
+                        datacon[index].NOMINEE =  datacon[0].NOMINEE[0];
+                        datacon[index].JTNAME2 =  datacon[0].JTNAME2[0];
+                        datacon[index].JTNAME1 =  datacon[0].JTNAME1[0];
                        resdata.data = [datacon[index]];
                          
                         res.json(resdata);

@@ -2331,23 +2331,43 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                         
                         }
                         var index = datacon.length - 1 ;
+                      
+                        if(balance>0){
                         datacon[index].UNITS = balance;
                         datacon[index].AMOUNT = parseFloat(cnav)*parseFloat(balance) ;
-                        if(datacon[0].BANK_NAME[0].length <2){
-                            console.log(datacon[0].BANK_NAME[0].length)
-                            datacon[index].BANK_NAME =  datacon[0].BANK_NAME;
-                            datacon[index].AC_NO =  datacon[0].AC_NO;
+                        }else if(balance===0){
+                            datacon[index].UNITS = balance;
+                        datacon[index].AMOUNT = parseFloat(cnav)*parseFloat(balance) ;
                         }else{
-                            console.log(datacon[0].BANK_NAME[0].length)
+                            datacon[index].UNITS = 0;
+                            datacon[index].AMOUNT = parseFloat(cnav)*0 ;
+                        }
+                       
+                        if(datacon[0].BANK_NAME[0].length <2 || datacon[0].JTNAME1[0].length <2){
+                           datacon[index].BANK_NAME =  datacon[0].BANK_NAME;
+                            datacon[index].AC_NO =  datacon[0].AC_NO;
+                            datacon[index].JTNAME2 =  datacon[0].JTNAME2;
+                            
+                        }else{
                             datacon[index].BANK_NAME =  datacon[0].BANK_NAME[0];
                             datacon[index].AC_NO =  datacon[0].AC_NO[0];
-                        }
-                        
+                            datacon[index].JTNAME2 =  datacon[0].JTNAME2[0];
+                             }
+                        if(datacon[0].JTNAME1[0].length <2){
+                           datacon[index].JTNAME1 =  datacon[0].JTNAME1;
+                         }else{
+                          datacon[index].JTNAME1 =  datacon[0].JTNAME1[0];
+                          }
+                          if(datacon[0].NOMINEE[0].length <2){
+                            datacon[index].NOMINEE =  datacon[0].NOMINEE;
+                          }else{
+                            datacon[index].NOMINEE =  datacon[0].NOMINEE[0];
+                           }
                         datacon[index].INVNAME =  datacon[0].INVNAME;
                         
-                        datacon[index].NOMINEE =  datacon[0].NOMINEE[0];
-                        datacon[index].JTNAME2 =  datacon[0].JTNAME2[0];
-                        datacon[index].JTNAME1 =  datacon[0].JTNAME1[0];
+                        
+                        
+                        
                        resdata.data = [datacon[index]];
                          
                         res.json(resdata);
@@ -2357,6 +2377,7 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                });
            });
 })
+
 
 app.post("/api/getfoliodetail", function (req, res) {     
                     const pipeline3 = [  //trans_cams

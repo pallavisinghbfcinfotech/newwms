@@ -422,66 +422,92 @@ app.post("/api/getsearchfoliodetail", function (req, res) {
 
 app.post("/api/getsearchdatamanagement", function (req, res) {
 
-    var searchvalue="";
-    var search="";
+    var marketvalue=0;var cnav=0;
+    var unit=0;var balance=0;
     var searchtype=req.body.searchtype;
     var pipeline1="";var pipeline2="";var pipeline3="";
-    if(searchtype === "searchName"){
         pipeline1 = [  //trans_cams
-            { $match:{  INV_NAME:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } } },
-            { $group: { _id: { PAN:"$PAN",INV_NAME:"$INV_NAME", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
-            { $project: { _id: 0, PAN:"$_id.PAN", INVNAME: { "$toLower": ["$_id.INV_NAME"] }, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } },RTA:"CAMS" } },
+            { $match:{ SCHEME:req.body.scheme,PAN:{$regex : `^${req.body.pan}.*` , $options: 'i' },FOLIO_NO:req.body.folio } },
+            { $group: { _id: {  PAN:"$PAN", INV_NAME: { "$toLower": ["$INV_NAME"] }, FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", TRXN_TYPE_:"$TRXN_TYPE_",TRADDATE:"$TRADDATE", AMC_CODE: "$AMC_CODE", PRODCODE: "$PRODCODE", code: { $reduce: { input: { $split: ["$PRODCODE", "$AMC_CODE"] }, initialValue: "", in: { $concat: ["$$value", "$$this"] } } } } ,UNITS: { $sum: "$UNITS" }} },
+            {
+                $lookup:
+                {
+                    from: "products",
+                    let: { ccc: "$_id.code", amc: "$_id.AMC_CODE" },
+                    pipeline: [
+                        {
+                            $match:
+                            {
+                                $expr:
+                                {
+                                    $and:
+                                        [
+                                            { $eq: ["$PRODUCT_CODE", "$$ccc"] },
+                                            { $eq: ["$AMC_CODE", "$$amc"] }
+                                        ]
+                                }
+                            }
+                        },
+                        { $project: { _id: 0 } }
+                    ],
+                    as: "products"
+                }
+            },
+
+            //{ $unwind: "$products" },
+            { $group: { _id:{ PAN:"$_id.PAN", INV_NAME: { "$toLower": ["$_id.INV_NAME"] }, FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", TRXN_TYPE_:"$_id.TRXN_TYPE_",TRADDATE:"$_id.TRADDATE",ISIN:"$products.ISIN" } ,UNITS: { $sum: "$UNITS" }} },
+            { $lookup: { from: 'cams_nav', localField: '_id.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+            // { $unwind: "$nav" },
+             { $project: { _id: 0, PAN:"$_id.PAN",INVNAME: { "$toLower": ["$_id.INV_NAME"] }, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME",  NATURE: "$_id.TRXN_TYPE_",DATE:{ $dateToString: { format: "%m/%d/%Y", date: "$_id.TRADDATE" } },RTA:"CAMS",cnav: "$nav.NetAssetValue",navdate:"$nav.Date" , UNITS: { $sum: "$UNITS" }} },
+             { $sort: { INVNAME: 1 } }
+        ]
+        
+        pipeline2 = [  //trans_karvy
+            { $match:{ FUNDDESC:req.body.scheme,PAN1:{$regex : `^${req.body.pan}.*` , $options: 'i' },TD_ACNO:req.body.folio,SCHEMEISIN: { $ne : ""} ,SCHEMEISIN: { $ne : null} } },
+            { $group: { _id: { PAN1:"$PAN1",INVNAME:"$INVNAME", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_TRTYPE: "$TD_TRTYPE",TD_TRDT:"$TD_TRDT" , SCHEMEISIN: "$SCHEMEISIN" }, TD_UNITS: { $sum: "$TD_UNITS" } } },
+            {
+                $lookup:
+                {
+                    from: "cams_nav",
+                    let: { isin: "$_id.SCHEMEISIN" },
+                    pipeline: [
+                        {
+                            $match:
+                            {
+                                $expr:
+                                {
+                                    $or:
+                                        [
+                                            { $eq: ["$ISINDivPayoutISINGrowth", "$$isin"] },
+                                            { $eq: ["$ISINDivReinvestment", "$$isin"] }
+                                        ]
+                                }
+                            }
+                        },
+                        { $project: { _id: 0 } }
+                    ],
+                    as: "nav"
+                }
+            },
+            //{ $unwind: "$nav" },
+            { $project: { _id: 0, PAN:"$_id.PAN1",INVNAME: { "$toLower": ["$_id.INVNAME"] }, FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC",  NATURE: "$_id.TD_TRTYPE" ,DATE:{ $dateToString: { format: "%m/%d/%Y", date: "$_id.TD_TRDT" } } ,RTA:"KARVY",cnav: "$nav.NetAssetValue",navdate:"$nav.Date", UNITS: { $sum: "$TD_UNITS" }} },
             { $sort: { INVNAME: 1 } }
         ]
-        pipeline2 = [  //trans_karvy
-            { $match:{  INVNAME:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } } },
-            { $group: { _id: { PAN1:"$PAN1",INVNAME:"$INVNAME", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
-            { $project: { _id: 0, PAN:"$_id.PAN1",INVNAME: { "$toLower": ["$_id.INVNAME"] }, FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } ,RTA:"KARVY"} },
+
+
+        pipeline3 = [  //trans_franklin
+            { $match:{ SCHEME_NA1:req.body.scheme,IT_PAN_NO1:{$regex : `^${req.body.pan}.*` , $options: 'i' },FOLIO_NO:req.body.folio ,ISIN: { $ne : ""} ,ISIN: { $ne : null} } },
+            { $group: { _id: { IT_PAN_NO1:"$IT_PAN_NO1",INVESTOR_2:"$INVESTOR_2", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1",TRXN_TYPE:"$TRXN_TYPE",TRXN_DATE:"$TRXN_DATE", ISIN:"$ISIN" }, UNITS: { $sum: "$UNITS" } } },
+            { $lookup: { from: 'cams_nav', localField: '_id.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+           // { $unwind: "$nav" },
+            { $project: { _id: 0, PAN:"$_id.IT_PAN_NO1",INVNAME: { "$toLower": ["$_id.INVESTOR_2"] }, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", NATURE:"$_id.TRXN_TYPE",DATE:{ $dateToString: { format: "%m/%d/%Y", date: "$_id.TRXN_DATE" } }, RTA:"FRANKLIN",cnav: "$nav.NetAssetValue",navdate:"$nav.Date" , UNITS: { $sum: "$UNITS" }} },
             { $sort: { INVNAME: 1 } }
         ]
-        pipeline3 = [  //trans_franklin
-            { $match:{  INVESTOR_2:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } } },
-            { $group: { _id: { IT_PAN_NO1:"$IT_PAN_NO1",INVESTOR_2:"$INVESTOR_2", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
-            { $project: { _id: 0, PAN:"$_id.IT_PAN_NO1",INVNAME: { "$toLower": ["$_id.INVESTOR_2"] }, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", AMOUNT: "$_id.AMOUNT", DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } } ,RTA:"FRANKLIN"} },
-            { $sort: { INVNAME: 1 } }
-        ]
-    }else if(searchtype === "searchFolio"){
-        pipeline2 = [  //trans_karvy
-            { $match:{  TD_ACNO:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } } },
-            { $group: { _id: { PAN1:"$PAN1",INVNAME:"$INVNAME", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
-            { $project: { _id: 0, PAN:"$_id.PAN1",INVNAME:"$_id.INVNAME", FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } },RTA:"KARVY" } },
-        ]
-        pipeline1 = [  //trans_cams
-            { $match:{  FOLIO_NO:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } } },
-            { $group: { _id: { PAN:"$PAN",INV_NAME:"$INV_NAME", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
-            { $project: { _id: 0, PAN:"$_id.PAN",INVNAME:"$_id.INV_NAME", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } },RTA:"CAMS" } },
-        ]
-        pipeline3 = [  //trans_franklin
-            { $match:{  FOLIO_NO:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } } },
-            { $group: { _id: { IT_PAN_NO1:"$IT_PAN_NO1",INVESTOR_2:"$INVESTOR_2", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
-            { $project: { _id: 0, PAN:"$_id.IT_PAN_NO1",INVNAME:"$_id.INVESTOR_2", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", AMOUNT: "$_id.AMOUNT", DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } },RTA:"FRANKLIN" } },
-        ]
-    }else{
-        pipeline2 = [  //trans_karvy
-            { $match:{  PAN1:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } } },
-            { $group: { _id: { PAN1:"$PAN1",INVNAME:"$INVNAME", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
-            { $project: { _id: 0, PAN:"$_id.PAN1",INVNAME:"$_id.INVNAME", FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } },RTA:"KARVY" } },
-        ]
-        pipeline1 = [  //trans_cams
-            { $match:{  PAN:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } } },
-            { $group: { _id: { PAN:"$PAN",INV_NAME:"$INV_NAME", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
-            { $project: { _id: 0, PAN:"$_id.PAN",INVNAME:"$_id.INV_NAME", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } },RTA:"CAMS" } },
-        ]
-        pipeline3 = [  //trans_franklin
-            { $match:{  IT_PAN_NO1:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } } },
-            { $group: { _id: { IT_PAN_NO1:"$IT_PAN_NO1",INVESTOR_2:"$INVESTOR_2", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
-            { $project: { _id: 0, PAN:"$_id.IT_PAN_NO1",INVNAME:"$_id.INVESTOR_2", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", AMOUNT: "$_id.AMOUNT", DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } },RTA:"FRANKLIN" } },
-        ]
-    }
-    transf.aggregate(pipeline3, (err, frankdata) => {
+  
+   transf.aggregate(pipeline3, (err, frankdata) => {
       transc.aggregate(pipeline1, (err, camsdata) => {
-       transk.aggregate(pipeline2, (err, karvydata) => {
-        if(karvydata != 0 || camsdata != 0 ||  frankdata!=0){
+        transk.aggregate(pipeline2, (err, karvydata) => {
+       if( camsdata != 0 || karvydata !=0 || frankdata !=0){
             resdata = {
                 status: 200,
                 message: 'Successfull',
@@ -493,7 +519,7 @@ app.post("/api/getsearchdatamanagement", function (req, res) {
                 message: 'Data not found',
             }
         }
-                      var datacon = karvydata.concat(camsdata.concat(frankdata));
+        var datacon = karvydata.concat(camsdata.concat(frankdata));
                           var removeduplicates = datacon.map(JSON.stringify)
                           .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                           .filter(function (item, index, arr) {
@@ -501,10 +527,10 @@ app.post("/api/getsearchdatamanagement", function (req, res) {
                           }) // check if there is any occurence of the item in whole array
                           .reverse()
                           .map(JSON.parse);
-                           var uniquedata = Array.from(new Set(removeduplicates));
-                           datacon = uniquedata.sort((a, b) => (a.INVNAME.replace(/ /g,'') > b.INVNAME.replace(/ /g,'')) ? 1 :(b.INVNAME.replace(/ /g,'') > a.INVNAME.replace(/ /g,'')) ? -1 :0);
-                          res.send(datacon);
-                           return datacon;
+                            var uniquedata = Array.from(new Set(removeduplicates));
+                            resdata.data = uniquedata.sort((a, b) => (a.INVNAME.replace(/ /g,'') > b.INVNAME.replace(/ /g,'')) ? 1 :(b.INVNAME.replace(/ /g,'') > a.INVNAME.replace(/ /g,'')) ? -1 :0);
+                            res.send(resdata);
+                           return resdata;
                         });
                     });       
        });      

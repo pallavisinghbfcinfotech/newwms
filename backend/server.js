@@ -420,6 +420,73 @@ app.post("/api/getsearchfoliodetail", function (req, res) {
                         });      
   })
 
+app.post("/api/getdetailnamewise", function (req, res) {
+    var pipeline1="";var pipeline2="";var pipeline3="";
+    if(req.body.searchtype === "searchName"){
+    pipeline1 = [  //trans_cams
+        { $match: {   INV_NAME:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' },SCHEME: { $ne: null },FOLIO_NO: { $ne: null } }  },
+        { $group: { _id: { PAN: "$PAN",FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME" } } },
+        { $project: { _id: 0, PAN:"$_id.PAN", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME" } }
+    ]
+    pipeline2 = [  //trans_karvy
+        { $match: {   INVNAME:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' }, FUNDDESC: { $ne: null } ,TD_ACNO: { $ne: null } }  },
+        { $group: { _id: {  PAN1: "$PAN1",TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", } } },
+        { $project: { _id: 0,  PAN: "$_id.PAN1",FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", } }
+    ]
+    pipeline3 = [ ///trans_franklin
+        { $match: {   INVESTOR_2:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' },SCHEME_NA1: { $ne: null },FOLIO_NO: { $ne: null } }  },
+        { $group: { _id: {  IT_PAN_NO1: "$IT_PAN_NO1" ,FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1" } } },
+        { $project: { _id: 0, PAN: "$_id.IT_PAN_NO1",FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1" } }
+    ]
+    }else if(req.body.searchtype === "searchPan"){
+        pipeline1 = [  //trans_cams
+            { $match: {   PAN:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' },SCHEME: { $ne: null },FOLIO_NO: { $ne: null } }  },
+            { $group: { _id: { PAN: "$PAN",FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME" } } },
+            { $project: { _id: 0, PAN:"$_id.PAN", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME" } }
+        ]
+        pipeline2 = [  //trans_karvy
+            { $match: {   PAN1:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' } , FUNDDESC: { $ne: null } ,TD_ACNO: { $ne: null }}  },
+            { $group: { _id: {  PAN1: "$PAN1",TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", } } },
+            { $project: { _id: 0,  PAN: "$_id.PAN1",FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", } }
+        ]
+        pipeline3 = [ ///trans_franklin
+            { $match: {   IT_PAN_NO1:{$regex : `^${req.body.searchvalue}.*` , $options: 'i' },SCHEME_NA1: { $ne: null },FOLIO_NO: { $ne: null } }  },
+            { $group: { _id: {  IT_PAN_NO1: "$IT_PAN_NO1" ,FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1" } } },
+            { $project: { _id: 0, PAN: "$_id.IT_PAN_NO1",FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1" } }
+        ]
+    }else{
+        pipeline1 = [  //trans_cams
+            { $match: {   FOLIO_NO:req.body.searchvalue,SCHEME: { $ne: null } }  },
+            { $group: { _id: { PAN: "$PAN",FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME" } } },
+            { $project: { _id: 0, PAN:"$_id.PAN", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME" } }
+        ]
+        pipeline2 = [  //trans_karvy
+            { $match: {   TD_ACNO:req.body.searchvalue , FUNDDESC: { $ne: null } }  },
+            { $group: { _id: {  PAN1: "$PAN1",TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", } } },
+            { $project: { _id: 0,  PAN: "$_id.PAN1",FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", } }
+        ]
+        pipeline3 = [ ///trans_franklin
+            { $match: {   FOLIO_NO:req.body.searchvalue,SCHEME_NA1: { $ne: null } }  },
+            { $group: { _id: {  IT_PAN_NO1: "$IT_PAN_NO1" ,FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1" } } },
+            { $project: { _id: 0, PAN: "$_id.IT_PAN_NO1",FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1" } }
+        ]
+    }
+    transc.aggregate(pipeline1, (err, camsdata) => {
+        transk.aggregate(pipeline2, (err, karvydata) => {
+            transf.aggregate(pipeline3, (err, frankdata) => {
+                 if (frankdata.length != 0 || karvydata.length != 0 || camsdata.length != 0) {
+                 var datacon = frankdata.concat(karvydata.concat(camsdata))
+                  datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                        .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                        .reverse().map(JSON.parse);
+                        res.json(datacon)
+                }
+            });
+        });
+    });
+})
+
+
 app.post("/api/getsearchdatamanagement", function (req, res) {
 
     var marketvalue=0;var cnav=0;

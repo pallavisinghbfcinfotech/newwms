@@ -603,48 +603,6 @@ app.post("/api/getsearchdatamanagement", function (req, res) {
        });      
   })
 
-app.post("/api/getsearchname", function (req, res) {
-    const pipeline1 = [  //trans_karvy
-        { $match:{  INVNAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
-        { $group: { _id: { INVNAME: { "$toUpper": ["$INVNAME"] } ,PAN1:"$PAN1"} } },
-        { $project: { _id: 0, INVNAME:{ "$toUpper": ["$_id.INVNAME"] }, PAN:"$_id.PAN1" } }
-    ]
-    const pipeline2 = [  //trans_cams
-        { $match:{  INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
-        { $group: { _id: { INV_NAME: { "$toUpper": ["$INV_NAME"] } ,PAN:"$PAN"} } },
-        { $project: { _id: 0, INVNAME:{ "$toUpper": ["$_id.INV_NAME"] }, PAN:"$_id.v" } }
-    ]
-    const pipeline3 = [  //trans_franklin
-        { $match:{  INVESTOR_2:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
-        { $group: { _id: { INVESTOR_2: { "$toUpper": ["$INVESTOR_2"] } ,IT_PAN_NO1:"$IT_PAN_NO1"} } },
-        { $project: { _id: 0, INVNAME:{ "$toUpper": ["$_id.INVESTOR_2"] }, PAN:"$_id.IT_PAN_NO1" } }
-    ]
-
-    transk.aggregate(pipeline1, (err, karvydata) => {
-        transc.aggregate(pipeline2, (err, camsdata) => {
-            transf.aggregate(pipeline3, (err, frankdata) => {
-               if ( frankdata != 0 || camsdata != 0 || karvydata != 0) {
-                    if (err) {
-                        res.send(err);
-                    }
-                    else {
-                        var datacon= frankdata.concat(camsdata.concat(karvydata));
-                        var removeduplicates = datacon.map(JSON.stringify)
-                        .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                        .filter(function (item, index, arr) {
-                            return arr.indexOf(item, index + 1) === -1;
-                        }) // check if there is any occurence of the item in whole array
-                        .reverse()
-                        .map(JSON.parse);
-                        datacon = Array.from(new Set(removeduplicates));
-                        res.send(datacon);
-                        return datacon;
-                    }
-                }
-     });
-    });
-});
-})
 
 app.post("/api/getsipstpuserwise", function (req, res) {
     var mon = parseInt(req.body.month);
@@ -1982,36 +1940,51 @@ app.post("/api/getportfolio", function (req, res) {
             
          });
     })
+
 app.post("/api/getsearchname", function (req, res) {
   //  var name = req.body.name;
     const pipeline1 = [  //trans_karvy
-        { $match:{  INVNAME:{$regex : `^${req.body.name}.*` , $options: 'si' } } },
+        { $match:{  INVNAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
         { $group: { _id: { INVNAME: { "$toUpper": ["$INVNAME"] } ,PAN1:"$PAN1"} } },
         { $project: { _id: 0, INVNAME:{ "$toUpper": ["$_id.INVNAME"] }, PAN:"$_id.PAN1" } }
     ]
-    var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');
-     transk.aggregate(pipeline1, (err, data) => {
-               if ( data != 0 ) {
+    const pipeline2 = [  //trans_cams
+        { $match:{  INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
+        { $group: { _id: { INV_NAME: { "$toUpper": ["$INV_NAME"] } ,PAN:"$PAN"} } },
+        { $project: { _id: 0, INVNAME:{ "$toUpper": ["$_id.INV_NAME"] }, PAN:"$_id.v" } }
+    ]
+    const pipeline3 = [  //trans_franklin
+        { $match:{  INVESTOR_2:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
+        { $group: { _id: { INVESTOR_2: { "$toUpper": ["$INVESTOR_2"] } ,IT_PAN_NO1:"$IT_PAN_NO1"} } },
+        { $project: { _id: 0, INVNAME:{ "$toUpper": ["$_id.INVESTOR_2"] }, PAN:"$_id.IT_PAN_NO1" } }
+    ]
+
+    transk.aggregate(pipeline1, (err, karvydata) => {
+        transc.aggregate(pipeline2, (err, camsdata) => {
+            transf.aggregate(pipeline3, (err, frankdata) => {
+               if ( frankdata != 0 || camsdata != 0 || karvydata != 0) {
                     if (err) {
                         res.send(err);
                     }
                     else {
-                        //console.log(data)
-                        
-                        var removeduplicates = data.map(JSON.stringify)
+                        var datacon= frankdata.concat(camsdata.concat(karvydata))
+                        var removeduplicates = datacon.map(JSON.stringify)
                         .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                         .filter(function (item, index, arr) {
                             return arr.indexOf(item, index + 1) === -1;
                         }) // check if there is any occurence of the item in whole array
                         .reverse()
                         .map(JSON.parse);
-                        var datacon = Array.from(new Set(removeduplicates));
+                        datacon = Array.from(new Set(removeduplicates));
                         res.send(datacon);
                         return datacon;
                     }
                 }
      });
+    });
+});
 })
+
 
 app.post("/api/getnavdate", function (req, res) {
     const pipeline = [  

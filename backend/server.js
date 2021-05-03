@@ -282,20 +282,29 @@ app.post("/api/Removedata",function(req,res){
            });
    })
 
+
 app.post("/api/gettransschemedetail", function (req, res) {
-	try{
+    try{
 const pipeline1 = [  //trans_karvy    
     { $match: { FUNDDESC: req.body.scheme, PAN1: req.body.pan ,TD_ACNO:req.body.folio } },
-   { $project: { _id:1,PAN: "$PAN1", FUNDDESC:"$FUNDDESC",TD_NAV: "$TD_NAV", NATURE: "$TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$TD_TRDT" } }, TRDESC: "$TRDESC", INVNAME: "$INVNAME",  UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } ,RTA:"KARVY" } },
+    //{ $lookup: { from: 'cams_nav', localField: 'SCHEMEISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+    //{ $unwind: "$nav"},
+    { $project: { _id:1,PAN: "$PAN1", FUNDDESC:"$FUNDDESC",TD_NAV: "$TD_NAV", NATURE: "$TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$TD_TRDT" } }, TRDESC: "$TRDESC", INVNAME: "$INVNAME",  UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } ,RTA:"KARVY" } },
     {$sort : {TD_TRDT : -1}}
 ]
 const pipeline2=[  //trans_franklin
     {$match: { SCHEME_NA1: req.body.scheme, IT_PAN_NO1: req.body.pan ,FOLIO_NO:req.body.folio } },
+    //{ $group: { _id: { IT_PAN_NO1: "$IT_PAN_NO1",SCHEME_NA1:"$SCHEME_NA1", NAV: "$NAV", TRXN_TYPE: "$TRXN_TYPE", TRXN_DATE: "$TRXN_DATE", TRXN_TYPE: "$TRXN_TYPE", INVESTOR_2: "$INVESTOR_2", ISIN: "$ISIN", cnav: "$nav.NetAssetValue" }, UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+    //{ $lookup: { from: 'cams_nav', localField: 'ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+    //{ $unwind: "$nav"},
     { $project: { _id:1,PAN: "$IT_PAN_NO1", FUNDDESC:"$SCHEME_NA1",TD_NAV: "$NAV", NATURE: "$TRXN_TYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$TRXN_DATE" } }, TRDESC: "$TRXN_TYPE", INVNAME: "$INVESTOR_2",  UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } ,RTA:"FRANKLIN" } },
     {$sort : {TD_TRDT : -1}}
 ] 
 const pipeline3=[  //trans_cams
     {$match: { SCHEME: req.body.scheme, PAN: req.body.pan ,FOLIO_NO:req.body.folio } },
+    //{ $group: { _id: { IT_PAN_NO1: "$IT_PAN_NO1",SCHEME_NA1:"$SCHEME_NA1", NAV: "$NAV", TRXN_TYPE: "$TRXN_TYPE", TRXN_DATE: "$TRXN_DATE", TRXN_TYPE: "$TRXN_TYPE", INVESTOR_2: "$INVESTOR_2", ISIN: "$ISIN", cnav: "$nav.NetAssetValue" }, UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+    //{ $lookup: { from: 'cams_nav', localField: 'ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+    //{ $unwind: "$nav"},
     { $project: { _id:1,PAN: "$PAN", FUNDDESC:"$SCHEME", TD_NAV: "NAV",NATURE: "$TRXN_TYPE_", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$TRADDATE" } }, TRDESC: "$TRXN_TYPE_", INVNAME: "$INV_NAME",  UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } ,RTA:"CAMS" } },
     {$sort : {TD_TRDT : -1}}
 ] 
@@ -352,6 +361,9 @@ transk.aggregate(pipeline1, (err, karvydata) => {
         || datacon[i]['NATURE'] === "NEWPUR") {
             datacon[i]['NATURE'] = "Purchase";
         }
+        if (datacon[i]['NATURE'] === "Additional Purchase") {
+            datacon[i]['NATURE'] = "Add. Purchase";
+        }
     }        
     // resdata.data = datacon;
     resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime())
@@ -360,10 +372,11 @@ transk.aggregate(pipeline1, (err, karvydata) => {
 });
 }); 
 })
-	} catch (err) {
-        console.log(e)
-    }
+} catch (err) {
+    console.log(e)
+}
 })
+
 
 app.post("/api/getsearchfoliodetail", function (req, res) {
                         var pipeline="";var trans='';var rta="";

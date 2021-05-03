@@ -21,7 +21,6 @@ class Transactiondetail extends Component {
   }
  
   componentDidMount(){
-
     document.title = "WMS | Transaction Detail"
     const query = new URLSearchParams(this.props.location.search);  
     const pan = query.get('pan');
@@ -38,7 +37,9 @@ class Transactiondetail extends Component {
     })
     axios.post('/api/gettransschemedetail',{pan:pan,folio:folio,scheme:scheme})
             .then(response => {
-                 this.setState({schemedetail: response.data.data, isFetching: false})
+              //this.setState({...this.state, isFetching: false});
+              console.log(scheme)
+                this.setState({schemedetail: response.data.data, isFetching: false})
             })
             .catch(e => {
                 console.log(e);
@@ -51,13 +52,12 @@ class Transactiondetail extends Component {
             .catch(e => {
                 console.log(e);
                 this.setState({...this.state, isFetching: false});
-            });
-   
-    
+            }); 
   }
+
+  
   deleteProducts = () => {
 		if(window.confirm('Are you sure, want to delete the selected product?')) {
-
         $.ajax({
           url: "/api/Removedata",
           type: "POST",
@@ -86,19 +86,25 @@ class Transactiondetail extends Component {
 
   render(){
    //const { schemedetail } = this.state ;
+
    var balance = 0;
    var unit = 0;
    var currentNav= 0;
-	  const schemedetail = this.state.schemedetail.map(item => {
-    if(item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' ||item.NATURE ==='STPO'){
-   unit = "-"+item.UNITS;
+   const schemedetail = this.state.schemedetail.map(item => {
+    if(item.NATURE ==='RED' || item.NATURE ==='FUL'|| item.NATURE ==='Switch Out'||item.NATURE ==='Full Redemption' 
+    || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' ||item.NATURE ==='STPO'||item.NATURE ==='IPOR'
+    ||item.NATURE ==='Full Switch Out'||item.NATURE ==='Partial Switch Out'||item.NATURE ==='Partial Redemption'
+    ||item.NATURE ==='CNO'){
+      unit = "-"+item.UNITS
     }else{
-      unit = item.UNITS;
+      unit = item.UNITS
     }
-      
-           balance = parseFloat(unit)+parseFloat(balance);
+     
+           balance = parseFloat(unit)+parseFloat(balance)
+          
+         
     return {
-      CHECK:<input type="checkbox"  className="selectsingle" value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
+   //   CHECK:<input type="checkbox"  className="selectsingle" value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
       DATE: item.TD_TRDT,
       NATURE: item.NATURE,
       AMOUNT: item.AMOUNT,
@@ -110,11 +116,11 @@ class Transactiondetail extends Component {
   })
    const data = {
     columns: [
-      {
-        label: 'CHECK',
-        field: 'CHECK',
-        width: 50
-      },
+      // {
+      //   label: 'CHECK',
+      //   field: 'CHECK',
+      //   width: 50
+      // },
       {
         label: 'DATE',
         field: 'DATE',
@@ -154,7 +160,7 @@ class Transactiondetail extends Component {
     rows: schemedetail
     
   };
-
+ 
   return (  
     <>
     <style jsx>
@@ -240,7 +246,7 @@ class Transactiondetail extends Component {
         <div className="card-header">
         <div id="msg"></div>
         <button type="button"  class="btn btn-primary mb-4" id="delbtn" onClick={this.deleteProducts} >Delete</button>
-          {/* <h3 className="card-title">DataTable with default features </h3> */}
+        <span>  <button type="button"  class="btn btn-primary mb-4" id="selectallbtn"  onClick={this.checkAllChebox} >Select All</button></span>
         </div>
        
         <div className="card-body">
@@ -258,7 +264,8 @@ class Transactiondetail extends Component {
       data={data}
       pagingTop
        searchTop
-      searchBottom={false}/>
+      searchBottom={false}
+     />
         </div>
         
       </div>

@@ -3,6 +3,7 @@ import $ from "jquery";
 import { Component } from "react"; 
 import {  MDBDataTableV5 } from 'mdbreact';
 import { Link } from 'react-router-dom';
+import Moment from 'moment';
 
 
 class Datamanagement extends Component { 
@@ -12,24 +13,120 @@ class Datamanagement extends Component {
     this.state = {
       data1:[],
       searchdata:[],
+      searchname:[],
+      arr:[],
      };
   }
-  
+ 
   serachdata = (e) =>{
+    this.setState({searchdata: []});
+    this.setState({arr: []});
+   // this.setState({searchdata: ""});
+    var schemeurl = "Transaction-detail";
+    var foliourl = "Datafolio-detail";
+    var searchvalue="";
     var searchtype = e.target.id;
-    var searchvalue = $("input[name='"+searchtype+"']").val();
+    if(searchtype==="searchName"){
+      var selectedvalue = e.target.innerText;
+        var searchvalue = selectedvalue.split('/')[0];
+        $(".searchname").val(selectedvalue);
+        $(".inputdata").hide();
+    }
+    if(searchtype==="searchPan" || searchtype==="searchFolio"){
+    searchvalue = $("input[name='"+searchtype+"']").val();
+    }   
+    // alert(searchvalue)
+    // alert(searchtype)
     $.ajax({
+      url: "/api/getdetailnamewise",
+      type: "POST",
+      data:{searchvalue: searchvalue,searchtype:searchtype},
+      success: function (res) {
+     
+        for(var i = 0; i< res.length;i++){    
+         $.ajax({
       url: "/api/getsearchdatamanagement",
       type: "POST",
-      data:{searchvalue: searchvalue,searchtype: searchtype},
-      success: function (res4) {
-        this.setState({ searchdata: res4 });
-       }.bind(this),
-      error: function(jqXHR) {
-        console.log(jqXHR);         
-      }
-    });    
+      data:{scheme:res[i].SCHEME,pan:res[i].PAN,folio:res[i].FOLIO},
+      success: function (res2) {
+       
+
+        res2.data =res2.data.sort((a, b) => new Date(a.DATE.split("-").reverse().join("/")).getTime() - new Date(b.DATE.split("-").reverse().join("/")).getTime())
+         var unit=0;var balance=0;var cnav=0;var currentvalue = 0;
+        for(var j = 0; j<res2.data.length; j++){
+            if(res2.data[j].SCHEME === res2.data[0].SCHEME){
+            if(res2.data[j].NATURE === 'RED' || res2.data[j].NATURE === 'LTOP' || res2.data[j].NATURE === 'Lateral Shift Out' ||
+             res2.data[j].NATURE === 'LTOF' || res2.data[j].NATURE === 'IPOR' || res2.data[j].NATURE === 'Switch Out' ||
+              res2.data[j].NATURE === 'FUL' || res2.data[j].NATURE === 'STPO' || res2.data[j].NATURE === 'CNO'
+              || res2.data[j].NATURE === 'FULR'|| res2.data[j].NATURE === 'Full Redemption'|| res2.data[j].NATURE === 'Partial Switch Out'
+              || res2.data[j].NATURE === 'Full Switch Out'|| res2.data[j].NATURE === 'Partial Redemption'){
+              unit = "-"+res2.data[j].UNITS
+            }
+            else{
+              unit = res2.data[j].UNITS 
+            }
+            balance = parseFloat(unit)+parseFloat(balance)
+            cnav = res2.data[j].cnav;
+            currentvalue= parseFloat(cnav)*parseFloat(balance);         
+        }
+        }
+        
+        var index = res2.data.length-1;
+        if(balance === 0 && currentvalue === 0 && balance === null){
+          res2.data[index].AMOUNT = 0; 
+        }else{
+          if (isNaN(currentvalue)) currentvalue = 0;
+          res2.data[index].AMOUNT = Math.round(currentvalue); 
+        }
+      
+          res2.data[index].navdate =res2.data[0].navdate;
+          res2.data[index].SCHEME =res2.data[0].SCHEME ;
+          res2.data[index].FOLIO =res2.data[0].FOLIO ;
+          res2.data[index].INVNAME =res2.data[0].INVNAME;
+          res2.data[index].PAN =res2.data[0].PAN; 
+         this.state.arr.push(res2.data[index]);
+       this.setState({searchdata: this.state.arr});
+
+        }.bind(this),
+        error: function(jqXHR) {
+         console.log(jqXHR);         
+       }
+      });
+    }
+  }.bind(this),
+  error: function(jqXHR) {
+   console.log(jqXHR);         
+ }
+});
   }
+          //  return {
+          //    CHECK:<input type="checkbox" value={item.FOLIO} />,
+          //    FOLIO: <a href={foliourl+'?folio='+item.FOLIO+'&rta='+item.RTA+'&scheme=/'+schname} target='_blank'>{item.FOLIO}</a>,
+          //    SCHEME: <a href={schemeurl+'?pan='+item.PAN+'&folio='+item.FOLIO+'&scheme=/'+schname} target='_blank'>{item.SCHEME}</a>,
+          //    INVNAME: item.INVNAME,
+          //    PAN: item.NATURE,
+          //    AMOUNT: item.UNITS,
+          //    navdate: Moment(item.navdate).format('DD-MM-YYYY'),
+          //  }
+        
+    
+          suggestionBox = (e) =>{
+            $(".inputdata").show();
+            var inputValue = $(".searchname").val();
+            $.ajax({
+              url: "/api/getsearchname",
+              type: "POST",
+              data:{name: inputValue},
+              success: function (res4) {
+                this.setState({ searchname: res4 });
+                
+              }.bind(this),
+              error: function(jqXHR) {
+                console.log(jqXHR);         
+              }
+            });    
+        }
+    
 
   componentDidMount(){
     document.title = "WMS | Datamanagement"
@@ -37,64 +134,111 @@ class Datamanagement extends Component {
   }
 
   render(){
-    const { searchdata } = this.state ;
+    // var searchdata = ""
+    const {searchdata} = [];
     var schemeurl = "Transaction-detail";
-    var foliourl = "Datafolio-detail";
-    const data = {
-    columns: [
-      {
-        label: 'CHECK',
-        field: 'CHECK',
-        width: 50
-      },
-      {
-        label: 'FOLIO',
-        field: 'FOLIO',
-        width: 150
-      },
-      {
-        label: 'SCHEME',
-        field: 'SCHEME',
-        width: 370
-      },
-      {
-        label: 'APPLICANT',
-        field: 'INVNAME',
-        width: 200
-      },
-      {
-        label: 'PAN',
-        field: 'PAN',
-        width: 150
-      },
-      {
-        label: 'AUM',
-        field: 'AMOUNT',
-        width: 50
-      },
-      
-      {
-        label: 'VALUATION DATE',
-        field: 'DATE',
-        width: 120
-      }          
-    ],
-    rows: searchdata.map(item => {
-      return {
-        CHECK:<input type="checkbox" value={item.FOLIO} />,
-        FOLIO: <a href={foliourl+"?folio="+item.FOLIO+"&rta="+item.RTA+'&scheme=/'+item.SCHEME} target='_blank'>{item.FOLIO}</a>,
-        SCHEME: <a href={schemeurl+"?pan="+item.PAN+"&folio="+item.FOLIO+"&scheme=/"+item.SCHEME} target='_blank'>{item.SCHEME}</a>,
-        // SCHEME: <Link to={"Transaction-detail?scheme="+item.SCHEME+"&pan="+item.PAN+"&folio="+item.FOLIO} > {item.SCHEME} </Link>,
-        INVNAME: item.INVNAME,
-        PAN: item.PAN,
-        AMOUNT: item.AMOUNT,
-        DATE: item.DATE,
-      }
-    })
+
+    console.log(this.state);
     
-  };
+  const data = {
+      columns: [
+        {
+          label: 'CHECK',
+          field: 'CHECK',
+          width: 50
+        },
+        {
+          label: 'FOLIO',
+          field: 'FOLIO',
+          width: 150
+        },
+        {
+          label: 'SCHEME',
+          field: 'SCHEME',
+          width: 370
+        },
+        {
+          label: 'APPLICANT',
+          field: 'INVNAME',
+          width: 200
+        },
+        {
+          label: 'PAN',
+          field: 'PAN',
+          width: 150
+        },
+        {
+          label: 'AUM',
+          field: 'AMOUNT',
+          width: 50
+        },
+        {
+          label: 'VALUATION DATE',
+          field: 'navdate',
+          width: 120
+        }          
+      ],
+      rows:this.state.searchdata.map(item => {
+       
+        return{
+          
+        CHECK:<input type="checkbox" value={item.FOLIO} name="check" />,
+        FOLIO:item.FOLIO,
+        SCHEME: <a href={schemeurl+'?pan='+item.PAN+'&folio='+item.FOLIO+'&scheme=/'+item.SCHEME} target='_blank'>{item.SCHEME}</a>,
+        INVNAME: item.INVNAME,
+        PAN:item.PAN,
+        AMOUNT: item.AMOUNT,
+      //  navdate:Moment(item.navdate).format("YYYY-MM-DD"),
+        
+        navdate: new Date(item.navdate).toLocaleDateString(),
+        
+        }
+      })
+      
+    };
+
+    
+   
  return (   
-    <>
+  <>
+  <style jsx>
+    {`
+    .list-group-item{
+      border:none!important;
+    }
+    .list-group-item:hover{
+      border:none!important;
+    }
+    .hide-bal{
+      display:none;
+    }
+    .search-data{
+      list-style: none;
+      padding: 10px;
+      border: 1px solid #eee;
+      height: auto;
+      overflow-y: auto;
+      background-color: white;
+      position: absolute;
+      max-width: 486px;
+      max-height: 200px;
+      min-width:430px;
+      z-index: 9;
+      width: auto;
+    }
+    .search-data li {
+      list-style: none;
+      padding: 6px 10px;
+      border-bottom: 1px solid #eee;
+      cursor:pointer;
+      
+    }
+      .search-data li:hover{
+        background-color:#eee;
+      }
+
+    `}
+    </style>
     <div className="content-wrapper">
     <section className="content-header p-1">
           <div className="container-fluid">
@@ -125,12 +269,23 @@ class Datamanagement extends Component {
 				</nav>
 				<div class="tab-content py-3 px-3 px-sm-0" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="nav-client" role="tabpanel" aria-labelledby="nav-client-tab">
-					<div class="input-group">
+					{/* <div class="input-group">
                     <input type="text" class="form-control searchName" name="searchName"  placeholder="Search Name" aria-label="Search Name" aria-describedby="basic-addon2" />
                     <div class="input-group-append">
                     <button id="searchName" onClick={this.serachdata} class="btn btn-outline-secondary" type="button"> <span className="fas fa-search mr-2"></span>Search</button>
                     </div>
-                    </div>
+                    </div> */}
+
+
+<input type="text" name="searchname" onKeyUp={this.suggestionBox} className="form-control searchname" autoComplete="off" />
+                                        <div className="inputdata">
+                                            <ul className="search-data">
+                                              {this.state.searchname.map((item, index) => (
+                                                <li id="searchName" onClick={this.serachdata} >{item.INVNAME}/{item.PAN}</li> 
+                                                ))}
+                                               
+                                            </ul>
+                                          </div>
 					</div>
 
                     <div class="tab-pane fade" id="nav-folio" role="tabpanel" aria-labelledby="nav-folio-tab">
@@ -152,22 +307,10 @@ class Datamanagement extends Component {
 					</div>
 				</div>			
 			</div>
-           <div>  
+     
+        
+           <div class="datatable">  
 
-              {/* <MDBDataTable
-              entriesOptions={[100, 300, 400, 600]}
-              entries={100}
-               pagesAmount={4}
-              scrollY
-              maxHeight="400px"
-              striped
-              bordered
-              small
-              responsive
-              hover
-              data={data}    
-              sortRows={[]}
-                  /> */}
              <MDBDataTableV5  hover
       entriesOptions={[100, 300, 500]}
       entries={100}

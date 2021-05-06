@@ -2293,9 +2293,9 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                 as: "products"
             }
         },
-        // { $unwind: "$products" },
+      //   { $unwind: "$products" },
          { $lookup: { from: 'cams_nav', localField: 'products.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
-        // { $unwind: "$nav" },
+       //  { $unwind: "$nav" },
          { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
        //  { $unwind: "$detail" },
          { $project: { _id: 0, FOLIO:"$_id.FOLIO_NO",INVNAME: "$_id.INV_NAME",SCHEME:"$_id.SCHEME",NATURE: "$_id.TRXN_TYPE_",TD_TRDT:"$_id.TRADDATE",ISIN: "$products.ISIN",NOMINEE: "$detail.NOM_NAME", BANK_NAME: "$_id.BANK_NAME", AC_NO: "$_id.AC_NO",JTNAME2: "$detail.JNT_NAME2", JTNAME1: "$detail.JNT_NAME1", cnav: "$nav.NetAssetValue",  UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
@@ -2328,9 +2328,9 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                 as: "nav"
             }
         },
-       // { $unwind: "$nav" },
+      //  { $unwind: "$nav" },
         { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
-       // { $unwind: "$detail" },
+      //  { $unwind: "$detail" },
         { $project: { _id: 0, FOLIO:"$_id.TD_ACNO",INVNAME: "$_id.INVNAME",SCHEME:"$_id.FUNDDESC",NATURE: "$_id.TD_TRTYPE",TD_TRDT:"$_id.TD_TRDT",ISIN: "$_id.SCHEMEISIN" ,NOMINEE: "$detail.NOMINEE",  BANK_NAME: "$detail.BNAME" ,AC_NO: "$detail.BNKACNO", JTNAME2: "$detail.JTNAME2", JTNAME1: "$detail.JTNAME1",cnav: "$nav.NetAssetValue", UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } } } ,
     ]
 
@@ -2363,7 +2363,7 @@ app.post("/api/getfoliodetailweb", function (req, res) {
             as: "nav"
         }
     },
-  //  { $unwind: "$nav" },
+   // { $unwind: "$nav" },
         { $project: { _id: 0,FOLIO:"$_id.FOLIO_NO", INVNAME: "$_id.INVESTOR_2",SCHEME:"$_id.SCHEME_NA1", NATURE: "$_id.TRXN_TYPE",TD_TRDT:"$_id.TRXN_DATE",ISIN: "$_id.ISIN", NOMINEE: "$_id.NOMINEE1", BANK_NAME: "$_id.PBANK_NAME", AC_NO: "$_id.PERSONAL23", JTNAME2: "$_id.JOINT_NAM2", JTNAME1: "$_id.JOINT_NAM1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
     ]
 
@@ -2383,7 +2383,8 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                             };
                         }
                          var datacon = frankdata.concat(karvydata.concat(camsdata));
-                             datacon = datacon
+                         console.log(datacon)
+                         datacon = datacon
                             .map(JSON.stringify)
                             .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                             .filter(function (item, index, arr) {
@@ -2391,14 +2392,14 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                             }) // check if there is any occurence of the item in whole array
                             .reverse()
                             .map(JSON.parse);
-                          //  resdata.data = datacon;
-                            
+                         
                         for(i = 0; i<datacon.length; i++) {
                             if (datacon[i]['NATURE'] === "RED" ||datacon[i]['NATURE'] === "LTOP" ||datacon[i]['NATURE'] === "Lateral Shift Out" || 
                             datacon[i]['NATURE'] === "Switch Out" ||datacon[i]['NATURE'] === "IPOR" ||datacon[i]['NATURE'] === "LTOF" ||
                             datacon[i]['NATURE'] === "FUL" ||datacon[i]['NATURE'] === "STPO" ||datacon[i]['NATURE'] === "CNO" ||
                             datacon[i]['NATURE'] === "FULR" ||datacon[i]['NATURE'] === "Full Redemption" || datacon[i]['NATURE'] === "Partial Switch Out"
-                            || datacon[i]['NATURE'] === "Full Switch Out" || datacon[i]['NATURE'] === "Partial Redemption") {
+                            || datacon[i]['NATURE'] === "Full Switch Out" || datacon[i]['NATURE'] === "Partial Redemption"
+                            || datacon[i]['NATURE'] === "SWD" || datacon[i]['NATURE'] === "SWOF") {
                                 unit = "-"+datacon[i].UNITS;
                               }else{
                                 unit = datacon[i].UNITS;
@@ -2406,48 +2407,53 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                          
                              balance = parseFloat(unit)+parseFloat(balance) ;
                              cnav = datacon[i].cnav;
-                        
                         }
                         var index = datacon.length - 1 ;
-                      
                         if(balance>0){
                         datacon[index].UNITS = balance;
                         datacon[index].AMOUNT = parseFloat(cnav)*parseFloat(balance) ;
-                        }else if(balance===0){
+                        }else if(balance.isNaN || cnav !=""){
+                        datacon[index].UNITS = 0;
+                        datacon[index].AMOUNT = 0 ;
+                         }
+                       else{
                             datacon[index].UNITS = balance;
-                        datacon[index].AMOUNT = parseFloat(cnav)*parseFloat(balance) ;
-                        }else{
-                            datacon[index].UNITS = 0;
-                            datacon[index].AMOUNT = parseFloat(cnav)*0 ;
+                            datacon[index].AMOUNT = 0 ;
                         }
-                       
-                        if(datacon[0].BANK_NAME[0].length <2 || datacon[0].JTNAME1[0].length <2){
-                           datacon[index].BANK_NAME =  datacon[0].BANK_NAME;
-                            datacon[index].AC_NO =  datacon[0].AC_NO;
-                            datacon[index].JTNAME2 =  datacon[0].JTNAME2;
-                            
-                        }else{
-                            datacon[index].BANK_NAME =  datacon[0].BANK_NAME[0];
-                            datacon[index].AC_NO =  datacon[0].AC_NO[0];
-                            datacon[index].JTNAME2 =  datacon[0].JTNAME2[0];
-                             }
-                        if(datacon[0].JTNAME1[0].length <2){
-                           datacon[index].JTNAME1 =  datacon[0].JTNAME1;
+
+                         if(datacon[0].BANK_NAME[0].length <2 || datacon[0].BANK_NAME[0] === ""){
+                             datacon[index].BANK_NAME =  datacon[0].BANK_NAME;  
                          }else{
-                          datacon[index].JTNAME1 =  datacon[0].JTNAME1[0];
-                          }
-                          if(datacon[0].NOMINEE[0].length <2){
-                            datacon[index].NOMINEE =  datacon[0].NOMINEE;
-                          }else{
-                            datacon[index].NOMINEE =  datacon[0].NOMINEE[0];
+                             datacon[index].BANK_NAME =  datacon[0].BANK_NAME[0];
+                         }
+                        if(datacon[0].AC_NO[0].length <2 || datacon[0].AC_NO[0] === ""){
+                             datacon[index].AC_NO =  datacon[0].AC_NO;
+                        }else{
+                             datacon[index].AC_NO =  datacon[0].AC_NO[0];
+                         }
+                         if( datacon[0].JTNAME2[0] === ""){
+                             datacon[index].JTNAME2 =  datacon[0].JTNAME2;
+                           }else{
+                            datacon[index].JTNAME2 =  datacon[0].JTNAME2[0];
+                            }  
+                           if(datacon[0].JTNAME1 === "" ){
+                            datacon[index].JTNAME1 = datacon[0].JTNAME1; 
                            }
+                         else if(datacon[0].JTNAME1[0].length <2 ||  datacon[0].JTNAME1[0] === "" ||datacon[0].JTNAME1 === ""  ){
+                            datacon[index].JTNAME1 =  datacon[0].JTNAME1;
+                          }else{
+                           datacon[index].JTNAME1 =  datacon[0].JTNAME1[0];
+                           }
+                           if(datacon[0].NOMINEE ===""){
+                            datacon[index].NOMINEE =  datacon[0].NOMINEE;
+                           }
+                           else if(datacon[0].NOMINEE[0].length <2 ||  datacon[0].NOMINEE[0] === ""  ){
+                             datacon[index].NOMINEE =  datacon[0].NOMINEE;
+                           }else{
+                             datacon[index].NOMINEE =  datacon[0].NOMINEE[0];
+                            }
                         datacon[index].INVNAME =  datacon[0].INVNAME;
-                        
-                        
-                        
-                        
                        resdata.data = [datacon[index]];
-                         
                         res.json(resdata);
                         return resdata;
 

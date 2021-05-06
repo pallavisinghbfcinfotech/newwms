@@ -57,9 +57,10 @@ class Datamanagement extends Component {
             if(res2.data[j].SCHEME === res2.data[0].SCHEME){
             if(res2.data[j].NATURE === 'RED' || res2.data[j].NATURE === 'LTOP' || res2.data[j].NATURE === 'Lateral Shift Out' ||
              res2.data[j].NATURE === 'LTOF' || res2.data[j].NATURE === 'IPOR' || res2.data[j].NATURE === 'Switch Out' ||
-              res2.data[j].NATURE === 'FUL' || res2.data[j].NATURE === 'STPO' || res2.data[j].NATURE === 'CNO'
+              res2.data[j].NATURE === 'FUL' || res2.data[j].NATURE === 'STPO' || res2.data[j].NATURE === 'CNO' || res2.data[j].NATURE === 'SWOF'
               || res2.data[j].NATURE === 'FULR'|| res2.data[j].NATURE === 'Full Redemption'|| res2.data[j].NATURE === 'Partial Switch Out'
-              || res2.data[j].NATURE === 'Full Switch Out'|| res2.data[j].NATURE === 'Partial Redemption'){
+              || res2.data[j].NATURE === 'Full Switch Out'|| res2.data[j].NATURE === 'Partial Redemption'
+              || res2.data[j].NATURE === 'SWD'){
               unit = "-"+res2.data[j].UNITS
             }
             else{
@@ -99,16 +100,6 @@ class Datamanagement extends Component {
  }
 });
   }
-          //  return {
-          //    CHECK:<input type="checkbox" value={item.FOLIO} />,
-          //    FOLIO: <a href={foliourl+'?folio='+item.FOLIO+'&rta='+item.RTA+'&scheme=/'+schname} target='_blank'>{item.FOLIO}</a>,
-          //    SCHEME: <a href={schemeurl+'?pan='+item.PAN+'&folio='+item.FOLIO+'&scheme=/'+schname} target='_blank'>{item.SCHEME}</a>,
-          //    INVNAME: item.INVNAME,
-          //    PAN: item.NATURE,
-          //    AMOUNT: item.UNITS,
-          //    navdate: Moment(item.navdate).format('DD-MM-YYYY'),
-          //  }
-        
     
           suggestionBox = (e) =>{
             $(".inputdata").show();

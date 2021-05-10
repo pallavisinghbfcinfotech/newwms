@@ -269,6 +269,8 @@ app.get("/api/gettranscams", function (req, res) {
 
 app.post("/api/Removedata",function(req,res){ 
      transk.remove({ _id: req.body.id }, function(err) {
+        transc.remove({ _id: req.body.id }, function(err) {
+            transf.remove({ _id: req.body.id }, function(err) {
                if(err){
                    res.send(err);
                }
@@ -277,10 +279,14 @@ app.post("/api/Removedata",function(req,res){
                     status: 200,
                     message: 'Deleted',
                     }
-                      res.send(resdata);           
+                      res.send(resdata);      
+                      return resdata;     
                   }
            });
+        });
+    });
    })
+
 
 
 app.post("/api/gettransschemedetail", function (req, res) {

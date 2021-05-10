@@ -2103,8 +2103,8 @@ app.post("/api/getfolio", function (req, res) {
                      }) // check if there is any occurence of the item in whole array
                      .reverse()
                      .map(JSON.parse);
-                 res.send(datacon);
 		     console.log(datacon);
+                 res.send(datacon);		     
                  return datacon;
              }
             }

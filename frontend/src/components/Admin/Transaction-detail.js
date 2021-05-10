@@ -15,11 +15,16 @@ class Transactiondetail extends Component {
       scheme:"",
       pan:"",
       folio:"",
-      };
+      rta:"",
+      setCheckbox1:'',
+      checkbox1:'',
+      arr:[],
+      }
+      this.checkAll = this.checkAll.bind(this);
       this.deleteProducts = this.deleteProducts.bind(this);
       this.toggleCheckbox = this.toggleCheckbox.bind(this);
   }
- 
+
   componentDidMount(){
     document.title = "WMS | Transaction Detail"
     const query = new URLSearchParams(this.props.location.search);  
@@ -52,16 +57,38 @@ class Transactiondetail extends Component {
             .catch(e => {
                 console.log(e);
                 this.setState({...this.state, isFetching: false});
-            }); 
-  }
+            });
+           }
+         checkAll() {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            var selectchecked = document.getElementById('check');
+          if (selectchecked.checked === true) {
+            for (var i = 0; i < checkboxes.length; i++) {
+                    checkboxes[i].checked = true;
+//                   	this.setState = {
+//                       //checkedBoxes: checkboxes[i].value
+                      
+//                     }
+                    this.state.checkedBoxes.push(checkboxes[i].value);
+                 } 
+          }else{
+            for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = false;
+            }
+          }
+          
+        }
+     
 
-  
   deleteProducts = () => {
-		if(window.confirm('Are you sure, want to delete the selected product?')) {
+   if(window.confirm('Are you sure, want to delete the selected product?')) {
+     for(var i=0 ; i<this.state.checkedBoxes.length ; i++){
+       var collection = document.getElementById("singleclass")
+    if(this.state.checkedBoxes[i] != "on"){
         $.ajax({
           url: "/api/Removedata",
           type: "POST",
-          data:{id: this.state.checkedBoxes},
+          data:{id: this.state.checkedBoxes[i]},
           success: function (response) {
             window.location.reload();
             if(response.status === 200) {
@@ -70,7 +97,10 @@ class Transactiondetail extends Component {
           	}  
           }); 
         }
+        }
+        }
       }
+
   toggleCheckbox = (e, item) => {		
 		if(e.target.checked) {
 			let arr = this.state.checkedBoxes;
@@ -85,7 +115,6 @@ class Transactiondetail extends Component {
 	}
 
   render(){
-   //const { schemedetail } = this.state ;
 
    var balance = 0;
    var unit = 0;
@@ -94,17 +123,17 @@ class Transactiondetail extends Component {
     if(item.NATURE ==='RED' || item.NATURE ==='FUL'|| item.NATURE ==='Switch Out'||item.NATURE ==='Full Redemption' 
     || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' ||item.NATURE ==='STPO'||item.NATURE ==='IPOR'
     ||item.NATURE ==='Full Switch Out'||item.NATURE ==='Partial Switch Out'||item.NATURE ==='Partial Redemption'
-    ||item.NATURE ==='CNO'){
+    ||item.NATURE ==='CNO' ||item.NATURE ==='SWOF' ||item.NATURE ==='SWD'){
       unit = "-"+item.UNITS
     }else{
       unit = item.UNITS
     }
      
            balance = parseFloat(unit)+parseFloat(balance)
+          // this.state.rta.push(item.RTA);
           
-         
     return {
-   //   CHECK:<input type="checkbox"  className="selectsingle" value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
+      CHECK:<input type="checkbox" id="singleclass" class={item.RTA} value={item._id} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
       DATE: item.TD_TRDT,
       NATURE: item.NATURE,
       AMOUNT: item.AMOUNT,
@@ -116,11 +145,11 @@ class Transactiondetail extends Component {
   })
    const data = {
     columns: [
-      // {
-      //   label: 'CHECK',
-      //   field: 'CHECK',
-      //   width: 50
-      // },
+      {
+        label: <input type="checkbox" onClick={this.checkAll} id="check" />,
+        field: 'CHECK',
+        width: 50
+      },
       {
         label: 'DATE',
         field: 'DATE',
@@ -245,8 +274,7 @@ class Transactiondetail extends Component {
           <div className="card card-primary card-outline mt-3">
         <div className="card-header">
         <div id="msg"></div>
-        <button type="button"  class="btn btn-primary mb-4" id="delbtn" onClick={this.deleteProducts} >Delete</button>
-        <span>  <button type="button"  class="btn btn-primary mb-4" id="selectallbtn"  onClick={this.checkAllChebox} >Select All</button></span>
+        <button type="button" class="btn btn-primary mb-4" id="delbtn" onClick={this.deleteProducts} >Delete</button>
         </div>
        
         <div className="card-body">
@@ -265,6 +293,7 @@ class Transactiondetail extends Component {
       pagingTop
        searchTop
       searchBottom={false}
+     
      />
         </div>
         

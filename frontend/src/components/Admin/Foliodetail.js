@@ -34,6 +34,7 @@ changeScheme = (e) =>{
     type: "POST",
     data:{scheme:sel,folio:folioval,pan:this.state.pan},
      success: function (res4) {
+    //   console.log(res4.data.length)
       this.setState({ data4: res4.data });
       $("#detail").show();
     }.bind(this),
@@ -61,10 +62,11 @@ suggestionBox = (e) =>{
 }
 
 changeFolio = (selectedOption) =>{ 
-    this.setState({ selectedOption });
-     var optionElement = selectedOption.value
-     var name =  optionElement.split('/')[0];
-  var sel =  optionElement.split('/')[1];
+    // this.setState({ selectedOption });
+   // var optionElement = selectedOption.value
+      var sel = selectedOption.target.value
+  //    var name =  optionElement.split('/')[0];
+  // var sel =  optionElement.split('/')[1];
   this.setState({secdrp:sel})
   $.ajax({
     url: "/api/getscheme",
@@ -91,6 +93,9 @@ changeApplicant = (e) =>{
   var selectedvalue = e.target.innerText;
   var name = selectedvalue.split('/')[0];
   var pan = selectedvalue.split('/')[1];
+  //alert(name)
+ // var userdetail = "<b>"+name+"/"+"["+pan+"]"+"</b>";
+ // $(".namepan").html(userdetail);
   $(".searchname").val(selectedvalue);
   $(".inputdata").hide();
 
@@ -104,14 +109,15 @@ changeApplicant = (e) =>{
       type: "POST",
       data:{pan:pan,name:name},
        success: function (res2) {
-        this.setState({ options: res2 });
+       // this.setState({ options: res2 });
+       this.setState({ data2: res2 });
          var folionumber = "<option value=''>Select Folio No.</option>";
          var schemename = "<option value=''>Select scheme</option>";
-        // var foliodetail = "";
-        // {this.state.options.map((item, index) => (
-        //   folionumber += "<option value='"+item+"'>"+item+"</option>"   
-        // ))}
-      //  $("#folio").html(folionumber);
+        var foliodetail = "";
+        {this.state.data2.map((item, index) => (
+          folionumber += "<option value='"+item.FOLIO+"'>"+item.AMC+"/"+item.FOLIO+"</option>"   
+        ))}
+        $("#folio").html(folionumber);
         $("#scheme").html(schemename);
         $("#detail").hide();
       }.bind(this),
@@ -226,7 +232,7 @@ changeApplicant = (e) =>{
                                           </div>
                           </div>
                         </div>
-                        {/* <div className="col-md-12">
+                        <div className="col-md-12">
                           <div className="form-group">
                             <label>Folio :</label>
                             <select className="form-control" id="folio" onChange={this.changeFolio}>
@@ -234,17 +240,18 @@ changeApplicant = (e) =>{
                              
                             </select>
                           </div>
-                        </div> */}
-                         <div className="col-md-12">
+                        </div>
+                         {/* <div className="col-md-12">
                           <div className="form-group">
                             <label>Folio :</label>
                             <Select
         value={selectedOption}
         onChange={this.changeFolio}
         options={options} 
+        id="folio"
       />
                           </div>
-                        </div> 
+                        </div>  */}
                         <div className="col-md-12">
                           <div className="form-group">
                             <label>Scheme :</label>

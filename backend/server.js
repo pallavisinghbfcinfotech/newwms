@@ -2063,6 +2063,8 @@ app.post("/api/getportfolioscheme", function (req, res) {
 })
 
 app.post("/api/getfolio", function (req, res) {
+	console.log(req.body.pan)
+	console.log(req.body.name)
     pipeline1 = [  //trans_cams
                 { $match:{  PAN:req.body.pan,INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
                 { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE:"$AMC_CODE" } } },
@@ -2102,6 +2104,7 @@ app.post("/api/getfolio", function (req, res) {
                      .reverse()
                      .map(JSON.parse);
                  res.send(datacon);
+		     console.log(datacon);
                  return datacon;
              }
             }

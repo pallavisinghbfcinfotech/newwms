@@ -2056,29 +2056,77 @@ app.post("/api/getportfolioscheme", function (req, res) {
     });
 })
 
-    app.get("/api/getfolio", function (req, res) {
-       transc.find({"PAN":req.query.pan,"INV_NAME":{$regex : `^${req.query.name}.*` , $options: 'si' }}).distinct("FOLIO_NO", function (err, camsdata){
-            transk.find({"PAN1":req.query.pan,"INVNAME":{$regex : `^${req.query.name}.*` , $options: 'si' }}).distinct("TD_ACNO", function (err, karvydata){
-                 transf.find({"IT_PAN_NO1":req.query.pan,"INVESTOR_2":{$regex : `^${req.query.name}.*` , $options: 'si' }}).distinct("FOLIO_NO", function (err, frankdata) {
-                if (err) {
-                    res.send(err);
-                }
-                else {
-                    var datacon = frankdata.concat(karvydata.concat(camsdata))
-                    var removeduplicates = Array.from(new Set(datacon));
-                    datacon = removeduplicates.map(JSON.stringify)
-                        .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                        .filter(function (item, index, arr) {
-                            return arr.indexOf(item, index + 1) === -1;
-                        }) // check if there is any occurence of the item in whole array
-                        .reverse()
-                        .map(JSON.parse);
-                    res.send(datacon);
-                    return datacon;
-                }
-            });
-        });
-    });
+//     app.get("/api/getfolio", function (req, res) {
+//        transc.find({"PAN":req.query.pan,"INV_NAME":{$regex : `^${req.query.name}.*` , $options: 'si' }}).distinct("FOLIO_NO", function (err, camsdata){
+//             transk.find({"PAN1":req.query.pan,"INVNAME":{$regex : `^${req.query.name}.*` , $options: 'si' }}).distinct("TD_ACNO", function (err, karvydata){
+//                  transf.find({"IT_PAN_NO1":req.query.pan,"INVESTOR_2":{$regex : `^${req.query.name}.*` , $options: 'si' }}).distinct("FOLIO_NO", function (err, frankdata) {
+//                 if (err) {
+//                     res.send(err);
+//                 }
+//                 else {
+//                     var datacon = frankdata.concat(karvydata.concat(camsdata))
+//                     var removeduplicates = Array.from(new Set(datacon));
+//                     datacon = removeduplicates.map(JSON.stringify)
+//                         .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+//                         .filter(function (item, index, arr) {
+//                             return arr.indexOf(item, index + 1) === -1;
+//                         }) // check if there is any occurence of the item in whole array
+//                         .reverse()
+//                         .map(JSON.parse);
+//                     res.send(datacon);
+//                     return datacon;
+//                 }
+//             });
+//         });
+//     });
+// })
+
+app.post("/api/getfolio", function (req, res) {
+    pipeline1 = [  //trans_cams
+        { $match:{  PAN:req.body.pan,INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
+        { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE:"$AMC_CODE" } } },
+        { $lookup: { from: 'amc_list', localField: '_id.AMC_CODE', foreignField: 'amc_code', as: 'amclist' } },
+        { $unwind: "$amclist" },
+        { $project: { _id: 0, value:{ $concat: [ "$amclist.long_name","/","$_id.FOLIO_NO" ] } , label: { $concat: [ "$amclist.long_name","/","$_id.FOLIO_NO" ]  } } },
+    ]
+    pipeline2 = [  //trans_karvy
+        { $match:{ PAN1:req.body.pan,INVNAME:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
+        { $group: { _id: { TD_ACNO: "$TD_ACNO", TD_FUND:"$TD_FUND" } } },
+        { $lookup: { from: 'amc_list', localField: '_id.TD_FUND', foreignField: 'amc_code', as: 'amclist' } },
+        { $unwind: "$amclist" },
+        { $project: { _id: 0, value:{ $concat: [ "$amclist.long_name","/","$_id.TD_ACNO" ] } , label: { $concat: [ "$amclist.long_name","/","$_id.TD_ACNO" ]  } } },
+    ]
+    pipeline3 = [  //trans_franklin
+        { $match:{ IT_PAN_NO1:req.body.pan,INVESTOR_2:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
+        { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE:"$COMP_CODE" } } },
+        { $lookup: { from: 'amc_list', localField: '_id.COMP_CODE', foreignField: 'amc_code', as: 'amclist' } },
+        { $unwind: "$amclist" },
+        { $project: { _id: 0, value:{ $concat: [ "$amclist.long_name","/","$_id.FOLIO_NO" ] } , label: { $concat: [ "$amclist.long_name","/","$_id.FOLIO_NO" ]  } } },
+    ]
+    transc.aggregate(pipeline1, (err, camsdata) => {
+        transk.aggregate(pipeline2, (err, karvydata) => {
+            transf.aggregate(pipeline3, (err, frankdata) => {
+                if (frankdata.length != 0 || karvydata.length != 0 || camsdata.length != 0) {
+                    if (err) {
+                        res.send(err);
+                    }
+                    else {
+                 var datacon = frankdata.concat(karvydata.concat(camsdata))
+                 var removeduplicates = Array.from(new Set(datacon));
+                 datacon = removeduplicates.map(JSON.stringify)
+                     .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                     .filter(function (item, index, arr) {
+                         return arr.indexOf(item, index + 1) === -1;
+                     }) // check if there is any occurence of the item in whole array
+                     .reverse()
+                     .map(JSON.parse);
+                 res.send(datacon);
+                 return datacon;
+             }
+            }
+         });
+     });
+ });
 })
     app.get("/api/getscheme", function (req, res) {
         var transc = mongoose.model('trans_cams', transcams, 'trans_cams');             

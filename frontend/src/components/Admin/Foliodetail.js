@@ -60,8 +60,11 @@ suggestionBox = (e) =>{
   });    
 }
 
-changeFolio = (e) =>{
-  var sel = e.target.value;
+changeFolio = (selectedOption) =>{ 
+    this.setState({ selectedOption });
+     var optionElement = selectedOption.value
+     var name =  optionElement.split('/')[0];
+  var sel =  optionElement.split('/')[1];
   this.setState({secdrp:sel})
   $.ajax({
     url: "/api/getscheme",
@@ -84,11 +87,10 @@ changeFolio = (e) =>{
 }
 
 changeApplicant = (e) =>{ 
+ 
   var selectedvalue = e.target.innerText;
   var name = selectedvalue.split('/')[0];
   var pan = selectedvalue.split('/')[1];
- // var userdetail = "<b>"+name+"/"+"["+pan+"]"+"</b>";
- // $(".namepan").html(userdetail);
   $(".searchname").val(selectedvalue);
   $(".inputdata").hide();
 
@@ -99,17 +101,17 @@ changeApplicant = (e) =>{
 
     $.ajax({
       url: "/api/getfolio",
-      type: "GET",
+      type: "POST",
       data:{pan:pan,name:name},
        success: function (res2) {
-        this.setState({ data2: res2 });
-        var folionumber = "<option value=''>Select Folio No.</option>";
-        var schemename = "<option value=''>Select scheme</option>";
-        var foliodetail = "";
-        {this.state.data2.map((item, index) => (
-          folionumber += "<option value='"+item+"'>"+item+"</option>"   
-        ))}
-        $("#folio").html(folionumber);
+        this.setState({ options: res2 });
+         var folionumber = "<option value=''>Select Folio No.</option>";
+         var schemename = "<option value=''>Select scheme</option>";
+        // var foliodetail = "";
+        // {this.state.options.map((item, index) => (
+        //   folionumber += "<option value='"+item+"'>"+item+"</option>"   
+        // ))}
+      //  $("#folio").html(folionumber);
         $("#scheme").html(schemename);
         $("#detail").hide();
       }.bind(this),
@@ -133,6 +135,7 @@ changeApplicant = (e) =>{
     });
   }
   render(){
+    const { selectedOption,options } = this.state;
     var balance = 0;
     var unit = 0;
     var currentNav= 0;
@@ -223,7 +226,7 @@ changeApplicant = (e) =>{
                                           </div>
                           </div>
                         </div>
-                        <div className="col-md-12">
+                        {/* <div className="col-md-12">
                           <div className="form-group">
                             <label>Folio :</label>
                             <select className="form-control" id="folio" onChange={this.changeFolio}>
@@ -231,7 +234,17 @@ changeApplicant = (e) =>{
                              
                             </select>
                           </div>
-                        </div>
+                        </div> */}
+                         <div className="col-md-12">
+                          <div className="form-group">
+                            <label>Folio :</label>
+                            <Select
+        value={selectedOption}
+        onChange={this.changeFolio}
+        options={options} 
+      />
+                          </div>
+                        </div> 
                         <div className="col-md-12">
                           <div className="form-group">
                             <label>Scheme :</label>
@@ -266,7 +279,7 @@ changeApplicant = (e) =>{
                   {this.state.data4.map((item, index) => (
                     <div className="card-body box-profile">
                       <h3 className="profile-username text-center">{item.INVNAME}</h3>
-                     <ul className="list-group list-group-unbordered mb-3">  
+                      <ul className="list-group list-group-unbordered mb-3">  
                       {(item.UNITS === "" || item.UNITS === null || item.UNITS === 0 || item.UNITS === NaN) ? (
                         
                         <div> <b>Units</b> <a className="float-right">{0}</a></div>

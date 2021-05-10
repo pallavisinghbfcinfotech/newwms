@@ -30,7 +30,7 @@ changeScheme = (e) =>{
   var sel = e.target.value;
   var folioval = this.state.secdrp;
    $.ajax({
-    url: "http://localhost:3001/api/getfoliodetailweb",
+    url: "/api/getfoliodetailweb",
     type: "POST",
     data:{scheme:sel,folio:folioval,pan:this.state.pan},
      success: function (res4) {
@@ -48,7 +48,7 @@ suggestionBox = (e) =>{
   $(".inputdata").show();
   var inputValue = $(".searchname").val();
   $.ajax({
-    url: "http://localhost:3001/api/getsearchname",
+    url: "/api/getsearchname",
     type: "POST",
     data:{name: inputValue},
     success: function (res4) {
@@ -69,7 +69,7 @@ changeFolio = (selectedOption) =>{
   // var sel =  optionElement.split('/')[1];
   this.setState({secdrp:sel})
   $.ajax({
-    url: "http://localhost:3001/api/getscheme",
+    url: "/api/getscheme",
     type: "GET",
     data:{folio:sel},
      success: function (res3) {
@@ -104,7 +104,7 @@ changeApplicant = (e) =>{
   })
 
     $.ajax({
-      url: "http://localhost:3001/api/getfolio",
+      url: "/api/getfolio",
       type: "POST",
       data:{pan:pan,name:name},
        success: function (res2) {
@@ -129,7 +129,7 @@ changeApplicant = (e) =>{
   componentDidMount(){
     document.title = "WMS | Folio Detail"
     $.ajax({
-      url: "http://localhost:3001/api/getapplicant",
+      url: "/api/getapplicant",
       type: "GET",
        success: function (res1) {
         this.setState({ searchname: res1 });

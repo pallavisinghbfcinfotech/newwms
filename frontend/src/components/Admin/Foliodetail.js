@@ -8,6 +8,7 @@ import '../../../node_modules/aos/dist/aos.css';
 class Foliodetail extends Component { 
   constructor(props) {
     super(props);
+    this.changeFolio = this.changeFolio.bind(this);
     this.changeApplicant = this.changeApplicant.bind(this);
     this.changeScheme = this.changeScheme.bind(this);
     this.state = {
@@ -62,11 +63,7 @@ suggestionBox = (e) =>{
 }
 
 changeFolio = (selectedOption) =>{ 
-    // this.setState({ selectedOption });
-   // var optionElement = selectedOption.value
-      var sel = selectedOption.target.value
-  //    var name =  optionElement.split('/')[0];
-  // var sel =  optionElement.split('/')[1];
+   var sel = selectedOption.target.value
   this.setState({secdrp:sel})
   $.ajax({
     url: "/api/getscheme",
@@ -92,20 +89,15 @@ changeApplicant = (e) =>{
   var selectedvalue = e.target.innerText;
   var name = selectedvalue.split('/')[0];
   var pan = selectedvalue.split('/')[1];
-  //alert(name)
- // var userdetail = "<b>"+name+"/"+"["+pan+"]"+"</b>";
- // $(".namepan").html(userdetail);
   $(".searchname").val(selectedvalue);
   $(".inputdata").hide();
-
    this.setState({
     pan:pan,
     name: name
   })
-
     $.ajax({
       url: "/api/getfolio",
-      type: "POST",
+      type: "GET",
       data:{pan:pan,name:name},
        success: function (res2) {
        // this.setState({ options: res2 });

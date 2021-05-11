@@ -1968,7 +1968,7 @@ app.post("/api/getsearchname", function (req, res) {
     const pipeline2 = [  //trans_cams
         { $match:{  INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
         { $group: { _id: { INV_NAME: { "$toUpper": ["$INV_NAME"] } ,PAN:"$PAN"} } },
-        { $project: { _id: 0, INVNAME:{ "$toUpper": ["$_id.INV_NAME"] }, PAN:"$_id.v" } }
+        { $project: { _id: 0, INVNAME:{ "$toUpper": ["$_id.INV_NAME"] }, PAN:"$_id.$PAN" } }
     ]
     const pipeline3 = [  //trans_franklin
         { $match:{  INVESTOR_2:{$regex : `^${req.body.name}.*` , $options: 'i' } } },

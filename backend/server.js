@@ -331,10 +331,12 @@ transk.aggregate(pipeline1, (err, karvydata) => {
         };
     }
      var datacon = karvydata.concat(frankdata.concat(camsdata));    
-     for (var i = 0; i < datacon.length; i++) {
-        if (datacon[i]['NATURE'] === "Redemption" || datacon[i]['NATURE'] === "FUL") {
+        for (var i = 0; i < datacon.length; i++) {
+        if (datacon[i]['NATURE'] === "Redemption" || datacon[i]['NATURE'] === "FUL" || datacon[i]['NATURE'] === "Full Redemption") {
             datacon[i]['NATURE'] = "RED";
-        }if (datacon[i]['NATURE'].match(/Systematic Investment.*/) || datacon[i]['NATURE'].match(/Systematic Withdrawal.*/) || datacon[i]['NATURE'].match(/Systematic - Instalment.*/) || datacon[i]['NATURE'].match(/Systematic - To.*/) || datacon[i]['NATURE'].match(/Systematic-NSE.*/) || datacon[i]['NATURE'].match(/Systematic Physical.*/) || datacon[i]['NATURE'].match(/Systematic.*/) || datacon[i]['NATURE'].match(/Systematic-Normal.*/) || datacon[i]['NATURE'].match(/Systematic (ECS).*/)) {
+        }if (datacon[i]['NATURE'].match(/Systematic Investment.*/) || datacon[i]['NATURE'] === "SIN" ||
+        datacon[i]['NATURE'].match(/Systematic Withdrawal.*/) || 
+        datacon[i]['NATURE'].match(/Systematic - Instalment.*/) || datacon[i]['NATURE'].match(/Systematic - To.*/) || datacon[i]['NATURE'].match(/Systematic-NSE.*/) || datacon[i]['NATURE'].match(/Systematic Physical.*/) || datacon[i]['NATURE'].match(/Systematic.*/) || datacon[i]['NATURE'].match(/Systematic-Normal.*/) || datacon[i]['NATURE'].match(/Systematic (ECS).*/)) {
             datacon[i]['NATURE'] = "SIP";
         }
         if (datacon[i]['NATURE'] === "Transmission Out" || datacon[i]['NATURE'] === "Switch Over Out" || datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "LTOF" || datacon[i]['NATURE'] === "Lateral Shift Out") {
@@ -353,7 +355,7 @@ transk.aggregate(pipeline1, (err, karvydata) => {
             datacon[i]['NATURE'] = "Gross Div.";
         }
         if (datacon[i]['NATURE'] === "Lateral Shift In" || 
-        datacon[i]['NATURE'] === "Switch Over In") {
+        datacon[i]['NATURE'] === "Switch Over In" || datacon[i]['NATURE'] === "LTIN") {
             datacon[i]['NATURE'] = "Switch In";
         }
         if (datacon[i]['NATURE'] === "Consolidation Out") {
@@ -367,10 +369,10 @@ transk.aggregate(pipeline1, (err, karvydata) => {
         || datacon[i]['NATURE'] === "NEWPUR") {
             datacon[i]['NATURE'] = "Purchase";
         }
-        if (datacon[i]['NATURE'] === "Additional Purchase") {
+        if (datacon[i]['NATURE'] === "Additional Purchase" || datacon[i]['NATURE'] === "ADD" || datacon[i]['NATURE'] === "ADDPUR") {
             datacon[i]['NATURE'] = "Add. Purchase";
         }
-    }        
+    } 
     // resdata.data = datacon;
     resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime())
     res.json(resdata);
@@ -2063,21 +2065,21 @@ app.post("/api/getportfolioscheme", function (req, res) {
 })
 
 app.get("/api/getfolio", function (req, res) {
-    const pipeline1 = [  //trans_cams
+    pipeline1 = [  //trans_cams
                 { $match:{  PAN:req.query.pan,INV_NAME:{$regex : `^${req.query.name}.*` , $options: 'i' } } },
                 { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE:"$AMC_CODE" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.AMC_CODE', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
                 { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.FOLIO_NO"  } },
             ]
-            const pipeline2 = [  //trans_karvy
+            pipeline2 = [  //trans_karvy
                 { $match:{ PAN1:req.query.pan,INVNAME:{$regex : `^${req.query.name}.*` , $options: 'i' }} },
                 { $group: { _id: { TD_ACNO: "$TD_ACNO", TD_FUND:"$TD_FUND" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.TD_FUND', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
                 { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.TD_ACNO"  } },
             ]
-            gettransschemedetail pipeline3 = [  //trans_franklin
+            pipeline3 = [  //trans_franklin
                 { $match:{ IT_PAN_NO1:req.query.pan,INVESTOR_2:{$regex : `^${req.query.name}.*` , $options: 'i' }} },
                 { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE:"$COMP_CODE" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.COMP_CODE', foreignField: 'amc_code', as: 'amclist' } },

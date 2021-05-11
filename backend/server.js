@@ -2063,21 +2063,21 @@ app.post("/api/getportfolioscheme", function (req, res) {
 })
 
 app.get("/api/getfolio", function (req, res) {
-    pipeline1 = [  //trans_cams
+    const pipeline1 = [  //trans_cams
                 { $match:{  PAN:req.query.pan,INV_NAME:{$regex : `^${req.query.name}.*` , $options: 'i' } } },
                 { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE:"$AMC_CODE" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.AMC_CODE', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
                 { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.FOLIO_NO"  } },
             ]
-            pipeline2 = [  //trans_karvy
+            const pipeline2 = [  //trans_karvy
                 { $match:{ PAN1:req.query.pan,INVNAME:{$regex : `^${req.query.name}.*` , $options: 'i' }} },
                 { $group: { _id: { TD_ACNO: "$TD_ACNO", TD_FUND:"$TD_FUND" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.TD_FUND', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
                 { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.TD_ACNO"  } },
             ]
-            pipeline3 = [  //trans_franklin
+            gettransschemedetail pipeline3 = [  //trans_franklin
                 { $match:{ IT_PAN_NO1:req.query.pan,INVESTOR_2:{$regex : `^${req.query.name}.*` , $options: 'i' }} },
                 { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE:"$COMP_CODE" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.COMP_CODE', foreignField: 'amc_code', as: 'amclist' } },

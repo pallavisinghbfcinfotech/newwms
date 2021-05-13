@@ -59,7 +59,7 @@ class Datamanagement extends Component {
              res2.data[j].NATURE === 'LTOF' || res2.data[j].NATURE === 'IPOR' || res2.data[j].NATURE === 'Switch Out' ||
               res2.data[j].NATURE === 'FUL' || res2.data[j].NATURE === 'STPO' || res2.data[j].NATURE === 'CNO' || res2.data[j].NATURE === 'SWOF'
               || res2.data[j].NATURE === 'FULR'|| res2.data[j].NATURE === 'Full Redemption'|| res2.data[j].NATURE === 'Partial Switch Out'
-              || res2.data[j].NATURE === 'Full Switch Out'|| res2.data[j].NATURE === 'Partial Redemption'
+              || res2.data[j].NATURE === 'Full Switch Out'|| res2.data[j].NATURE === 'Partial Redemption' || res2.data[j].NATURE === 'TOCOB'
               || res2.data[j].NATURE === 'SWD'){
               unit = "-"+res2.data[j].UNITS
             }

@@ -2318,6 +2318,7 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                             };
                         }
                          var datacon = frankdata.concat(karvydata.concat(camsdata));
+                         console.log(datacon)
                          datacon = datacon
                             .map(JSON.stringify)
                             .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
@@ -2333,7 +2334,7 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                             datacon[i]['NATURE'] === "FUL" ||datacon[i]['NATURE'] === "STPO" ||datacon[i]['NATURE'] === "CNO" ||
                             datacon[i]['NATURE'] === "FULR" ||datacon[i]['NATURE'] === "Full Redemption" || datacon[i]['NATURE'] === "Partial Switch Out"
                             || datacon[i]['NATURE'] === "Full Switch Out" || datacon[i]['NATURE'] === "Partial Redemption"
-                            || datacon[i]['NATURE'] === "SWD" || datacon[i]['NATURE'] === "SWOF") {
+                            || datacon[i]['NATURE'] === "SWD" || datacon[i]['NATURE'] === "SWOF" || datacon[i]['NATURE'] === "TOCOB") {
                                 unit = "-"+datacon[i].UNITS;
                               }else{
                                 unit = datacon[i].UNITS;
@@ -2403,6 +2404,7 @@ app.post("/api/getfoliodetailweb", function (req, res) {
                });
            });
 })
+
 
 app.post("/api/getfoliodetail", function (req, res) {     
                     const pipeline3 = [  //trans_cams

@@ -120,10 +120,10 @@ class Transactiondetail extends Component {
    var unit = 0;
    var currentNav= 0;
    const schemedetail = this.state.schemedetail.map(item => {
-    if(item.NATURE ==='RED' || item.NATURE ==='FUL'|| item.NATURE ==='Switch Out'||item.NATURE ==='Full Redemption' 
+     if(item.NATURE ==='RED' || item.NATURE ==='FUL'|| item.NATURE ==='Switch Out'||item.NATURE ==='Full Redemption' 
     || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' ||item.NATURE ==='STPO'||item.NATURE ==='IPOR'
     ||item.NATURE ==='Full Switch Out'||item.NATURE ==='Partial Switch Out'||item.NATURE ==='Partial Redemption'
-    ||item.NATURE ==='CNO' ||item.NATURE ==='SWOF' ||item.NATURE ==='SWD'){
+    ||item.NATURE ==='CNO' ||item.NATURE ==='SWOF' ||item.NATURE ==='SWD' ||item.NATURE ==='TOCOB'){
       unit = "-"+item.UNITS
     }else{
       unit = item.UNITS

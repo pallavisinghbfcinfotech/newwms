@@ -52,6 +52,7 @@ class Transaction  extends Component {
      });
  }
   onChanger2(e) {
+    this.setState({data3: []});
     $(".search-data").hide();
     $(".inputdata").hide();
     this.setState({
@@ -88,6 +89,7 @@ class Transaction  extends Component {
 }
 
 changeApplicant = (e) =>{ 
+  this.setState({data3: []});
   $(".inputdata").hide();
   $("#showmsg").hide();
   $("#clientdata").hide();
@@ -117,10 +119,9 @@ changeApplicant = (e) =>{
           if(this.state.msg3 === "Data not found"){
             $("#showmsg").html(this.state.msg3);
             $("#showmsg").show();
-           
            }
           $(".loader").css("display", "none");
-          $("#example1").css("display", "block");
+          $("#clientdata").css("display", "block");
       }.bind(this),
       error: function(jqXHR) {
         console.log(jqXHR);          
@@ -151,6 +152,8 @@ handlechange1(){
      }
    });   
  }else if(this.state.rvalue === "no"){
+  this.setState({data3: []});
+  this.setState({msg3: []});
   $(".loader").css("display", "block");
     $("#clientdata").css("display", "none");
    $.ajax({
@@ -158,11 +161,13 @@ handlechange1(){
      type: "POST",
      data:{month:month,year:year,pan:this.state.pan,name:this.state.name},
       success: function (res3) {
+        console.log(res3.message)
        this.setState({
          data3: res3.data,
          msg3: res3.message});
          if(this.state.msg3 === "Data not found"){
           $(".showmsg").html(this.state.msg3);
+          $("#showmsg").show();
            }
          $(".loader").css("display", "none");
          $("#clientdata").css("display", "block");
@@ -204,6 +209,7 @@ handlechange1(){
   }
   
   render() {    
+      
     return (  
       <>
       <style jsx>
@@ -336,6 +342,7 @@ handlechange1(){
                         </div>
                         {/* /.card-header */}
                         <div className="card-body">
+                       
                         <table  className="table table-bordered table-striped">
                         <thead className="bg-primary">
                               <tr>
@@ -347,6 +354,7 @@ handlechange1(){
                                 <th>Trxn Type</th>
                               </tr>
                             </thead>
+                           
                             <tbody>
                             {this.state.data1.map((item, index) => (
                                 <tr key={index}>
@@ -356,18 +364,24 @@ handlechange1(){
                                     <td>{item.SCHEME}</td>
                                     <td>{item.AMOUNT}</td>
                                     <td>{item.TRXN_NATUR}</td>
-                                </tr>                       
-                            ))}         
-                              </tbody>                
+                                </tr>
+                            
+                            ))}
+                                
+                              </tbody>
+                              
                           </table>
+                          
                         </div>
                         {/* /.card-body */}
                       </div>
                         ):  (<div align="center"  className="col-sm-10">
                           <br/>
                         {/* <h6>Data Not Found</h6> */}
-                      </div>)}	 
+                      </div>)}
+			 
 	  </div>
+	  
 	   ): ( this.state.rvalue==='no')?(
           <div>
             <form role="form">
@@ -397,10 +411,17 @@ handlechange1(){
                         <div className="card-header bg-primary">
                           <h3 className="card-title"></h3>
                           <div className="card-tools">
+                            {/* <div className="input-group input-group-sm" style={{width: '150px'}}>
+                              <input type="text" name="table_search" className="form-control float-right" placeholder="Search" />
+                              <div className="input-group-append">
+                                <button type="submit" className="btn btn-default"><i className="fas fa-search" /></button>
+                              </div>
+                            </div> */}
                           </div>
                         </div>
                         {/* /.card-header */}
                         <div className="card-body table-responsive p-0">
+                       
                        <table className="table table-hover text-nowrap">
                        <thead>
                               <tr>
@@ -425,19 +446,24 @@ handlechange1(){
                                 </tr>
                             
                             ))}
-                              </tbody>                  
-                          </table>                   
+                                
+                              </tbody>
+                              
+                          </table>
+                          
                         </div>
                         {/* /.card-body */}
                       </div>
-                        ):  (<div align="center"  className="col-sm-10">
-                          <br/>
-                          <h6 id="showmsg"></h6>
-                        {/* <h6>Data Not Found</h6> */}
-                      </div>)}	 
+                        ):  (<div align="center" class="showmsg">
+                        <br/>
+                      <h6></h6>
+                    </div>)}
+			 
 	  </div>
-             </div>  
+             </div>
+             
              ): (<div> <br /> </div>)}
+
                       {/* /.card */}
                 </div>
                 {/*/.col (left) */}
@@ -447,7 +473,7 @@ handlechange1(){
           </section>
         </div>
       </>
-    );  
+    );   
   }
 }
 export default Transaction ;

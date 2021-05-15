@@ -149,8 +149,9 @@ changeyear = (e) =>{
         console.log(jqXHR);         
       }
     });   
-  }else{
-    $("#clientdata").hide();
+  }else if(this.state.rvalue == "no"){
+    $(".loader").css("display", "block");
+    $("#clientdata").css("display", "none");
     $.ajax({
       url: "/api/gettaxsavinguserwise",
       type: "POST",
@@ -163,8 +164,13 @@ changeyear = (e) =>{
             $("#showmsg").html(res3.message);
             $("#clientdata").hide();
            }
+           $(".loader").css("display", "none");
+           $("#clientdata").css("display", "block");
       }.bind(this)
     });
+  }else{
+    $(".loader").css("display", "none");
+     $("#clientdata").css("display", "block");
   }
 }
  
@@ -277,13 +283,12 @@ changeyear = (e) =>{
                                     </span>
                                 </div>
                                 <select className="form-control" onChange={this.changeyear}  id="finanyear" >
-	    			<option value="2021-2022">2021-2022</option>
+                                <option value="2021-2022">2021-2022</option>
                                 <option value="2020-2021">2020-2021</option>
                                 <option value="2019-2020">2019-2020</option> 
                                 <option value="2018-2019">2018-2019</option>
                                 <option value="2017-2018">2017-2018</option>
                                 <option value="2016-2017">2016-2017</option>
-	    			<option value="2015-2016">2015-2016</option>
                               </select>    
                             </div>
                             {/* /.input group */}
@@ -306,6 +311,14 @@ changeyear = (e) =>{
                         </label>
                       </div>
                     </div>
+                        {/* <div className="form-check-inline">
+                          <input type="radio" id="yes" name="kstatus" defaultValue="yes" onClick={this.onChangekstatus}  />
+                          <label htmlFor="yes">ALL</label>&nbsp;   <br/>
+                        </div> */}
+                        {/* <div className="form-check-inline">
+                          <input type="radio" id="no" name="kstatus" defaultValue="no" onClick={this.onChangekstatus}/>
+                          <label htmlFor="no">Userwise</label>
+                        </div>  */}
                       </div>
                     </div>
                     <Loader/>
@@ -318,7 +331,12 @@ changeyear = (e) =>{
                         <div className="card-header bg-primary">
                           <h3 className="card-title"></h3>
                           <div className="card-tools">
-                          
+                            {/* <div className="input-group input-group-sm" style={{width: '150px'}}>
+                              <input type="text" name="table_search" className="form-control float-right" placeholder="Search" />
+                              <div className="input-group-append">
+                                <button type="submit" className="btn btn-default"><i className="fas fa-search" /></button>
+                              </div>
+                            </div> */}
                           </div>
                         </div>
                         {/* /.card-header */}
@@ -345,6 +363,11 @@ changeyear = (e) =>{
                                     <td>{item.SCHEME}</td>
                                     <td>{item.AMOUNT}</td>
                                     <td>{item.TRXN_NATURE}</td>
+                                    {/* {(item.TRXN_NATURE.match(new RegExp(`${"Systematic - To"}`))) ? (
+                                     <td>STP</td> ) :(item.TRXN_NATURE.match(new RegExp(`${"SIP Rejection"}`)) || item.TRXN_NATURE.match(new RegExp(`${"Systematic"}`))  && (Math.sign(item.AMOUNT) === -1)) ? (
+                                      <td>SIP Reversal</td>  ) :(item.TRXN_NATURE.match(new RegExp(`${"Purchase"}`))  ) ? (
+                                        <td>Purchase</td>  ) :(
+                                        <td>SIP</td> ) } */}
                                 </tr>
                             
                             ))}
@@ -392,7 +415,13 @@ changeyear = (e) =>{
                         <div className="card-header bg-primary">
                           <h3 className="card-title"></h3>
                           <div className="card-tools">
-                            </div>
+                            {/* <div className="input-group input-group-sm" style={{width: '150px'}}>
+                              <input type="text" name="table_search" className="form-control float-right" placeholder="Search" />
+                              <div className="input-group-append">
+                                <button type="submit" className="btn btn-default"><i className="fas fa-search" /></button>
+                              </div>
+                            </div> */}
+                          </div>
                         </div>
                         {/* /.card-header */}
                         <div className="card-body">
@@ -417,7 +446,12 @@ changeyear = (e) =>{
                                     <td>{item.FOLIO_NO}</td>
                                     <td>{item.SCHEME}</td>
                                     <td>{item.AMOUNT}</td>
-                                    <td>{item.TRXN_NATURE}</td>
+                                    <td>{item.TRXN_NATUR}</td>
+                                    {/* {(item.TRXN_NATURE.match(new RegExp(`${"Systematic - To"}`))) ? (
+                                     <td>STP</td> ) :(item.TRXN_NATURE.match(new RegExp(`${"SIP Rejection"}`)) || item.TRXN_NATURE.match(new RegExp(`${"Systematic"}`))  && (Math.sign(item.AMOUNT) === -1)) ? (
+                                      <td>SIP Reversal</td>  ) :(item.TRXN_NATURE.match(new RegExp(`${"Purchase"}`))  ) ? (
+                                        <td>Purchase</td>  ) :(
+                                        <td>SIP</td> ) } */}
                                 </tr>
                             
                             ))}
@@ -448,14 +482,7 @@ changeyear = (e) =>{
           </section>
         </div>
       </>
-    );
-
-
-
-
-
-
-   
+    );   
   }
 }
 export default Taxsavinginvest; ;

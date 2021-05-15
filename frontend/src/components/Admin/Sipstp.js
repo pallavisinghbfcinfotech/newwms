@@ -95,10 +95,10 @@ class Sipstp extends Component {
 }
   
   changeApplicant = (e) =>{ 
-    $("#showmsg").hide();
+    $(".showmsg").hide();
     $("#clientdata").hide();
     $(".loader").css("display", "block");
-      $("#example1").css("display", "none");
+      $("#clientdata").css("display", "none");
      var selectedvalue = e.target.innerText;
         var name = selectedvalue.split('/')[0];
         var pan = selectedvalue.split('/')[1];
@@ -106,7 +106,7 @@ class Sipstp extends Component {
         $(".inputdata").hide();
      this.setState({
       pan:pan,
-      name: name
+      name:name
     })
     var sel = document.getElementById("getcalender").value;
     var month = sel.split('-')[1];
@@ -120,12 +120,12 @@ class Sipstp extends Component {
           data3: res3.data,
           msg3: res3.message});
           if(res3.message === "Data not found"){
-            $("#showmsg").show();
-            $("#showmsg").html(res3.message);
+            $(".showmsg").show();
+            $(".showmsg").html(res3.message);
            }
           $(".loader").css("display", "none");
-          $("#example1").css("display", "block");
-         
+          $("#clientdata").css("display", "block");
+          $(".showmsg").show();
           
       }.bind(this),
       error: function(jqXHR) {
@@ -137,6 +137,7 @@ handlechange1(){
    var sel = document.getElementById("getcalender").value;
     var month = sel.split('-')[1];
     var year = sel.split('-')[0];
+    alert(this.state.rvalue)
   if(this.state.rvalue == "yes"){
 
     $(".loader").css("display", "block");
@@ -159,8 +160,9 @@ handlechange1(){
         console.log(jqXHR);         
       }
     });   
-  }else if(this.state.rvalue == "no"){
-    $("#clientdata").hide();
+  }else{
+   $(".loader").css("display", "block");
+    $("#clientdata").css("display", "none");
     $.ajax({
       url: "/api/getsipstpuserwise",
       type: "POST",
@@ -169,14 +171,13 @@ handlechange1(){
         this.setState({
           data3: res3.data,
           msg3: res3.message});
-          if(res3.message === "Data not found"){
-            $("#showmsg").html(res3.message);
-            $("#clientdata").hide();
-           }
+          if(this.state.msg3 === "Data not found"){
+            $(".showmsg").html(this.state.msg3);
+             }
+           $(".loader").css("display", "none");
+           $("#clientdata").css("display", "block");
       }.bind(this)
     });
-  }else{
-
   }
 }
 
@@ -214,8 +215,9 @@ handlechange1(){
   render() {     
     const { selectedOption,options } = this.state; 
     var date = new Date();
-    var mm=date.getMonth()+1;
-    var yy=date.getFullYear();
+    var MM=date.getMonth()+1;
+    var yyyy=date.getFullYear();
+
     return (  
       <>
        <style jsx>
@@ -436,7 +438,7 @@ handlechange1(){
                             <tbody>
                             {this.state.data3.map((item, index) => (
                                 <tr key={index}>
-                                    <td>{index+1}</td> 
+                                <td>{index+1}</td>
                                     <td>{item.TRADDATE}</td>
                                     <td>{item.FOLIO_NO}</td>
                                     <td>{item.SCHEME}</td>
@@ -459,7 +461,7 @@ handlechange1(){
                       </div>
                         ):  (<div align="center"  className="col-sm-10">
                           <br/>
-                        <h6 id="showmsg"></h6>
+                        <h6 class="showmsg"></h6>
                       </div>)}
 			 
 	  </div>

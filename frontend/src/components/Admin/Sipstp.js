@@ -57,8 +57,13 @@ class Sipstp extends Component {
     
  }
   onChanger2(e) {
+    this.setState({data3: []});
     $(".search-data").hide();
     $(".inputdata").hide();
+    $("#clientdata").hide();
+    $("#clientdata").html();
+
+      $("#clientdata").css("display", "none");
     this.setState({
       rvalue: e.target.value    
     });
@@ -134,6 +139,7 @@ class Sipstp extends Component {
     });
 }
 handlechange1(){
+  $(".showmsg").css("display", "none");
    var sel = document.getElementById("getcalender").value;
     var month = sel.split('-')[1];
     var year = sel.split('-')[0];
@@ -141,7 +147,7 @@ handlechange1(){
     $(".loader").css("display", "block");
     $("#example1").css("display", "none");
     $.ajax({
-      url: "http://localhost:3001/api/getsipstpall",
+      url: "/api/getsipstpall",
       type: "POST",
       data:{month:month,year:year},
        success: function (res1) {
@@ -159,7 +165,7 @@ handlechange1(){
    $(".loader").css("display", "block");
     $("#clientdata").css("display", "none");
     $.ajax({
-      url: "http://localhost:3001/api/getsipstpuserwise",
+      url: "/api/getsipstpuserwise",
       type: "POST",
       data:{month:month,year:year,pan:this.state.pan,name:this.state.name},
        success: function (res3) {
@@ -167,6 +173,7 @@ handlechange1(){
           data3: res3.data,
           msg3: res3.message});
           if(this.state.msg3 === "Data not found"){
+            $(".showmsg").show();
             $(".showmsg").html(this.state.msg3);
              }
            $(".loader").css("display", "none");
@@ -457,9 +464,9 @@ handlechange1(){
                         </div>
                         {/* /.card-body */}
                       </div>
-                        ):  (<div align="center"  className="col-sm-10">
+                        ):  (<div align="center" class="showmsg">
                           <br/>
-                        <h6 class="showmsg"></h6>
+                        <h6></h6>
                       </div>)}
 			 
 	  </div>

@@ -138,32 +138,28 @@ handlechange1(){
     var month = sel.split('-')[1];
     var year = sel.split('-')[0];
   if(this.state.rvalue == "yes"){
-
     $(".loader").css("display", "block");
     $("#example1").css("display", "none");
-
     $.ajax({
-      url: "/api/getsipstpall",
+      url: "http://localhost:3001/api/getsipstpall",
       type: "POST",
       data:{month:month,year:year},
        success: function (res1) {
         this.setState({
            data1: res1.data,
            msg: res1.message});
-
            $(".loader").css("display", "none");
            $("#example1").css("display", "block");
-
       }.bind(this),
       error: function(jqXHR) {
         console.log(jqXHR);         
       }
     });   
-  }else{
+  }else if(this.state.rvalue == "no"){
    $(".loader").css("display", "block");
     $("#clientdata").css("display", "none");
     $.ajax({
-      url: "/api/getsipstpuserwise",
+      url: "http://localhost:3001/api/getsipstpuserwise",
       type: "POST",
       data:{month:month,year:year,pan:this.state.pan,name:this.state.name},
        success: function (res3) {
@@ -177,6 +173,9 @@ handlechange1(){
            $("#clientdata").css("display", "block");
       }.bind(this)
     });
+  }else{
+    $(".loader").css("display", "none");
+     $("#clientdata").css("display", "block");
   }
 }
 

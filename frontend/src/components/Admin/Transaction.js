@@ -336,7 +336,6 @@ handlechange1(){
                         </div>
                         {/* /.card-header */}
                         <div className="card-body">
-                       
                         <table  className="table table-bordered table-striped">
                         <thead className="bg-primary">
                               <tr>
@@ -348,7 +347,6 @@ handlechange1(){
                                 <th>Trxn Type</th>
                               </tr>
                             </thead>
-                           
                             <tbody>
                             {this.state.data1.map((item, index) => (
                                 <tr key={index}>
@@ -358,36 +356,18 @@ handlechange1(){
                                     <td>{item.SCHEME}</td>
                                     <td>{item.AMOUNT}</td>
                                     <td>{item.TRXN_NATUR}</td>
-                                    {/* {(item.TRXN_NATUR.match(new RegExp(`${"Systematic - To"}`)) || item.TRXN_NATUR.match(new RegExp(`${"S T P"}`))) ? (
-                                     <td>STP</td> ) :(item.TRXN_NATUR.match(new RegExp(`${"Systematic"}`))  && (Math.sign(item.AMOUNT) === -1)) ? (
-                                      <td>SIP Reversal</td>  ) :(item.TRXN_NATUR.match(new RegExp(`${"Lateral Shift In"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Switch-In"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Transfer-In"}`))) ? (
-                                        <td>Switch In</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Lateral Shift Out"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Switchout"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Transfer-Out"}`)) ) ? (
-                                          <td>Switch Out</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Redemption"}`)) ) ? (
-                                            <td>Redemption</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Purchase"}`)) ) ? (
-                                              <td> Purchase</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Dividend Reinvest"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Dividend Paid"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Div. Reinvestment"}`)) ) ? (
-                                                <td> Dividend </td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Gross Dividend"}`))  ) ? (
-                                                  <td> Dividend Payout</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Consolidation In"}`))  ) ? (
-                                                    <td> Con In</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Consolidation Out"}`))  ) ? (
-                                                      <td> Con Out</td>  ):(
-                                                      <td>SIP</td> ) } */}
-                                </tr>
-                            
-                            ))}
-                                
-                              </tbody>
-                              
+                                </tr>                       
+                            ))}         
+                              </tbody>                
                           </table>
-                          
                         </div>
                         {/* /.card-body */}
                       </div>
                         ):  (<div align="center"  className="col-sm-10">
                           <br/>
                         {/* <h6>Data Not Found</h6> */}
-                      </div>)}
-			 
+                      </div>)}	 
 	  </div>
-	  
 	   ): ( this.state.rvalue==='no')?(
           <div>
             <form role="form">
@@ -417,17 +397,10 @@ handlechange1(){
                         <div className="card-header bg-primary">
                           <h3 className="card-title"></h3>
                           <div className="card-tools">
-                            {/* <div className="input-group input-group-sm" style={{width: '150px'}}>
-                              <input type="text" name="table_search" className="form-control float-right" placeholder="Search" />
-                              <div className="input-group-append">
-                                <button type="submit" className="btn btn-default"><i className="fas fa-search" /></button>
-                              </div>
-                            </div> */}
                           </div>
                         </div>
                         {/* /.card-header */}
                         <div className="card-body table-responsive p-0">
-                       
                        <table className="table table-hover text-nowrap">
                        <thead>
                               <tr>
@@ -449,27 +422,11 @@ handlechange1(){
                                     <td>{item.SCHEME}</td>
                                     <td>{item.AMOUNT}</td>
                                     <td>{item.TRXN_NATUR}</td>
-                                    {/* {(item.TRXN_NATUR.match(new RegExp(`${"Systematic - To"}`)) || item.TRXN_NATUR.match(new RegExp(`${"S T P"}`))) ? (
-                                     <td>STP</td> ) :(item.TRXN_NATUR.match(new RegExp(`${"Systematic"}`))  && (Math.sign(item.AMOUNT) === -1)) ? (
-                                      <td>SIP Reversal</td>  ) :(item.TRXN_NATUR.match(new RegExp(`${"Lateral Shift In"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Switch-In"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Transfer-In"}`))) ? (
-                                        <td>Switch In</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Lateral Shift Out"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Switchout"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Transfer-Out"}`)) ) ? (
-                                          <td>Switch Out</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Redemption"}`)) ) ? (
-                                            <td>Redemption</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Purchase"}`)) ) ? (
-                                              <td> Purchase</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Dividend Reinvest"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Dividend Paid"}`)) || item.TRXN_NATUR.match(new RegExp(`${"Div. Reinvestment"}`)) ) ? (
-                                                <td> Dividend </td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Gross Dividend"}`))  ) ? (
-                                                  <td> Dividend Payout</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Consolidation In"}`))  ) ? (
-                                                    <td> Con In</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"Consolidation Out"}`))  ) ? (
-                                                      <td> Con Out</td>  ):(item.TRXN_NATUR.match(new RegExp(`${"DIR"}`))  ) ? (
-                                                        <td> DIR</td>  ):(
-                                                      <td>SIP</td> ) } */}
                                 </tr>
                             
                             ))}
-                                
-                              </tbody>
-                              
-                          </table>
-                          
+                              </tbody>                  
+                          </table>                   
                         </div>
                         {/* /.card-body */}
                       </div>
@@ -477,12 +434,10 @@ handlechange1(){
                           <br/>
                           <h6 id="showmsg"></h6>
                         {/* <h6>Data Not Found</h6> */}
-                      </div>)}		 
+                      </div>)}	 
 	  </div>
-             </div>
-             
+             </div>  
              ): (<div> <br /> </div>)}
-
                       {/* /.card */}
                 </div>
                 {/*/.col (left) */}
@@ -492,7 +447,7 @@ handlechange1(){
           </section>
         </div>
       </>
-    );
+    );  
   }
 }
 export default Transaction ;

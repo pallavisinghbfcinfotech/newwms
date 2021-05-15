@@ -1138,19 +1138,28 @@ app.post("/api/gettransactionall", function (req, res) {
                     .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                     .reverse().map(JSON.parse);
                 for (var i = 0; i < datacon.length; i++) {
-                    if (datacon[i]['TRXN_NATUR'] === "Redemption") {
+                   if (datacon[i]['TRXN_NATUR'] === "Redemption" || datacon[i]['TRXN_NATUR'] === "FUL" || 
+                    datacon[i]['TRXN_NATUR'] === "Full Redemption" || datacon[i]['TRXN_NATUR'] === "Partial Redemption") {
                         datacon[i]['TRXN_NATUR'] = "RED";
-                    } if (datacon[i]['TRXN_NATUR'].match(/Systematic Investment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic Withdrawal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - Instalment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - To.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-NSE.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic Physical.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-Normal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic (ECS).*/)) {
+                    } if (datacon[i]['TRXN_NATUR'].match(/Systematic Investment.*/) || 
+                    datacon[i]['TRXN_NATUR'].match(/Systematic Withdrawal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - Instalment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - To.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-NSE.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic Physical.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-Normal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic (ECS).*/)) {
                         datacon[i]['TRXN_NATUR'] = "SIP";
                     } if (Math.sign(datacon[i]['AMOUNT']) === -1) {
                         datacon[i]['TRXN_NATUR'] = "SIPR";
-                    } if (datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/) || datacon[i]['TRXN_NATUR'] === "S T P") {
+                    } if (datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/) || datacon[i]['TRXN_NATUR'] === "S T P" || datacon[i]['TRXN_NATUR'] === "S T P In") {
                         datacon[i]['TRXN_NATUR'] = "STP";
-                    }if (datacon[i]['TRXN_NATUR'] === "Switchout" || datacon[i]['TRXN_NATUR'] === "Lateral Shift Out" || datacon[i]['TRXN_NATUR'] === "Transfer-Out") {
+                    }if (datacon[i]['TRXN_NATUR'] === "Lateral Shift Out" || datacon[i]['TRXN_NATUR'] === "Switchout"
+                     || datacon[i]['TRXN_NATUR'] === "Transfer-Out" || datacon[i]['TRXN_NATUR'] === "Transmission Out"
+                      || datacon[i]['TRXN_NATUR'] === "Switch Over Out" || datacon[i]['TRXN_NATUR'] === "LTOP"
+                      || datacon[i]['TRXN_NATUR'] === "LTOF" || datacon[i]['TRXN_NATUR'] === "Partial Switch Out" || 
+                      datacon[i]['TRXN_NATUR'] === "Full Switch Out") {
                         datacon[i]['TRXN_NATUR'] = "Switch Out";
-                    }if (datacon[i]['TRXN_NATUR'] === "Lateral Shift In" || datacon[i]['TRXN_NATUR'] === "Switch-In" || datacon[i]['TRXN_NATUR'] === "Transfer-In") {
+                    }if (datacon[i]['TRXN_NATUR'] === "Lateral Shift In" || datacon[i]['TRXN_NATUR'] === "Switch-In" 
+                    || datacon[i]['TRXN_NATUR'] === "Transfer-In" || datacon[i]['TRXN_NATUR'] === "Switch Over In" 
+                    || datacon[i]['TRXN_NATUR'] === "LTIN" || datacon[i]['TRXN_NATUR'] === "LTIA") {
                         datacon[i]['TRXN_NATUR'] = "Switch In";
-                    }if (datacon[i]['TRXN_NATUR'] === "Dividend Reinvest" || datacon[i]['TRXN_NATUR'] === "Dividend Paid" || datacon[i]['TRXN_NATUR'] === "Div. Reinvestment") {
+                    }if (datacon[i]['TRXN_NATUR'] === "Dividend Reinvest" || datacon[i]['TRXN_NATUR'] === "Dividend Paid"
+                     || datacon[i]['TRXN_NATUR'] === "Div. Reinvestment") {
                         datacon[i]['TRXN_NATUR'] = "Dividend";
                     }if (datacon[i]['TRXN_NATUR'] === "Gross Dividend") {
                         datacon[i]['TRXN_NATUR'] = "Dividend Payout";
@@ -1158,6 +1167,15 @@ app.post("/api/gettransactionall", function (req, res) {
                         datacon[i]['TRXN_NATUR'] = "Con In";
                     }if (datacon[i]['TRXN_NATUR'] === "Consolidation Out") {
                         datacon[i]['TRXN_NATUR'] = "Con Out";
+                    }if (datacon[i]['TRXN_NATUR'] === "Consolidation Out") {
+                        datacon[i]['TRXN_NATUR'] = "Con Out";
+                    }if (datacon[i]['TRXN_NATUR'] === "Purchase" || datacon[i]['TRXN_NATUR'] === "NEW" || 
+                    datacon[i]['TRXN_NATUR'] === "Initial Allotment"
+                    || datacon[i]['TRXN_NATUR'] === "NEWPUR") {
+                        datacon[i]['TRXN_NATUR'] = "Purchase";
+                    }if(datacon[i]['TRXN_NATUR'] === "Additional Purchase" || datacon[i]['TRXN_NATUR'] === "ADD" ||
+                     datacon[i]['TRXN_NATUR'] === "ADDPUR") {
+                        datacon[i]['TRXN_NATUR'] = "Add. Purchase";
                     }
                 }
                 //   console.log(datacon);

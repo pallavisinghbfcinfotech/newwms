@@ -139,7 +139,7 @@ font-size:14px;
               <li className="nav-item has-treeview">
                 <a href="Datamanagement" className="nav-link">
                   <i className="nav-icon fas fa-chart-line" />
-                  <p className="side_p">Datamanagement</p>
+                  <p className="side_p">Data Management</p>
                 </a>
               </li>
               {/* <li className="nav-item has-treeview">

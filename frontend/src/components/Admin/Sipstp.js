@@ -137,7 +137,6 @@ handlechange1(){
    var sel = document.getElementById("getcalender").value;
     var month = sel.split('-')[1];
     var year = sel.split('-')[0];
-    alert(this.state.rvalue)
   if(this.state.rvalue == "yes"){
 
     $(".loader").css("display", "block");

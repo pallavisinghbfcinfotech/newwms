@@ -52,8 +52,8 @@ class Transaction  extends Component {
      });
  }
   onChanger2(e) {
+    $(".search-data").hide();
     $(".inputdata").hide();
-
     this.setState({
       rvalue: e.target.value    
     });
@@ -129,7 +129,6 @@ changeApplicant = (e) =>{
 }
   
 handlechange1(){
-
   var sel = document.getElementById("getcalender").value;
    var month = sel.split('-')[1];
    var year = sel.split('-')[0];
@@ -152,7 +151,8 @@ handlechange1(){
      }
    });   
  }else if(this.state.rvalue === "no"){
-  $("#clientdata").hide();
+  $(".loader").css("display", "block");
+    $("#clientdata").css("display", "none");
    $.ajax({
      url: "/api/gettransactionuserwise",
      type: "POST",
@@ -161,15 +161,17 @@ handlechange1(){
        this.setState({
          data3: res3.data,
          msg3: res3.message});
-         if(res3.message === "Data not found"){
-          $("#showmsg").html(res3.message);
-          $("#clientdata").hide();
-         }
+         if(this.state.msg3 === "Data not found"){
+          $(".showmsg").html(this.state.msg3);
+           }
+         $(".loader").css("display", "none");
+         $("#clientdata").css("display", "block");
      }.bind(this)
    });
- }else{
-
- }
+  }else{
+    $(".loader").css("display", "none");
+     $("#clientdata").css("display", "block");
+  }
 }
   componentDidMount(){
     document.title = "WMS | Transaction Detail"
@@ -424,10 +426,10 @@ handlechange1(){
                           </div>
                         </div>
                         {/* /.card-header */}
-                        <div className="card-body">
+                        <div className="card-body table-responsive p-0">
                        
-                       <table className="table table-bordered table-striped">
-                       <thead className="bg-primary">
+                       <table className="table table-hover text-nowrap">
+                       <thead>
                               <tr>
                                 <th>S. No.</th>
                                 <th>Date</th>
@@ -475,8 +477,7 @@ handlechange1(){
                           <br/>
                           <h6 id="showmsg"></h6>
                         {/* <h6>Data Not Found</h6> */}
-                      </div>)}
-			 
+                      </div>)}		 
 	  </div>
              </div>
              
@@ -492,13 +493,6 @@ handlechange1(){
         </div>
       </>
     );
-
-
-
-
-
-
-   
   }
 }
 export default Transaction ;

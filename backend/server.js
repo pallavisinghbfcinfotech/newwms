@@ -2083,26 +2083,29 @@ app.post("/api/getportfolioscheme", function (req, res) {
 })
 
 app.get("/api/getfolio", function (req, res) {
-    const pipeline1 = [  //trans_cams
+    pipeline1 = [  //trans_cams
                 { $match:{  PAN:req.query.pan,INV_NAME:{$regex : `^${req.query.name}.*` , $options: 'i' } } },
                 { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE:"$AMC_CODE" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.AMC_CODE', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
                 { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.FOLIO_NO"  } },
+                { $sort: {AMC:1}}
             ]
-            const pipeline2 = [  //trans_karvy
+            pipeline2 = [  //trans_karvy
                 { $match:{ PAN1:req.query.pan,INVNAME:{$regex : `^${req.query.name}.*` , $options: 'i' }} },
                 { $group: { _id: { TD_ACNO: "$TD_ACNO", TD_FUND:"$TD_FUND" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.TD_FUND', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
                 { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.TD_ACNO"  } },
+                { $sort: {AMC:1}}
             ]
-            const pipeline3 = [  //trans_franklin
+            pipeline3 = [  //trans_franklin
                 { $match:{ IT_PAN_NO1:req.query.pan,INVESTOR_2:{$regex : `^${req.query.name}.*` , $options: 'i' }} },
                 { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE:"$COMP_CODE" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.COMP_CODE', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
                 { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.FOLIO_NO"  } },
+                { $sort: {AMC:1}}
             ]
             transc.aggregate(pipeline1, (err, camsdata) => {
                 transk.aggregate(pipeline2, (err, karvydata) => {
@@ -2121,6 +2124,7 @@ app.get("/api/getfolio", function (req, res) {
                      }) // check if there is any occurence of the item in whole array
                      .reverse()
                      .map(JSON.parse);
+                     datacon = datacon.sort((a, b) => (a.AMC > b.AMC) ? 1 : -1);
                  res.send(datacon);
                  return datacon;
              }

@@ -1300,10 +1300,10 @@ app.post("/api/gettaxsaving", function (req, res) {
        
         { $sort: { TRADDATE: -1 } }
     ]
-     pipeline1 = [  ///trans_karvy
-        { $match: { $and: [{ FUNDDESC: /TAX/ },{ TRDESC: { $not: /^Gross Dividend.*/ } }, { TRDESC: { $not: /^Redemption.*/ } }, { TRDESC: { $not: /^Switch Over Out.*/ } },{ TRDESC: { $not: /^S T P Out.*/ } }, { TRDESC: { $not: /^Dividend.*/ } }, { TRDESC: { $not: /^Switchout.*/ } }, { TRDESC: { $not: /^Transfer-Out.*/ } }, { TRDESC: { $not: /^Lateral Shift Out.*/ } } ,{ TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
+    pipeline1 = [  ///trans_karvy
+        { $match: { $and: [{$or: [{ FUNDDESC: /TAX/ },{ FUNDDESC: /Long Term Equity Fund/ },{ FUNDDESC: /IDBI Equity Advantage Fund/ },{ FUNDDESC: /Sundaram Diversified Equity Fund/ } ] },{ TRDESC: { $not: /^Gross Dividend.*/ } }, { TRDESC: { $not: /^Redemption.*/ } }, { TRDESC: { $not: /^Switch Over Out.*/ } },{ TRDESC: { $not: /^S T P Out.*/ } }, { TRDESC: { $not: /^Dividend.*/ } }, { TRDESC: { $not: /^Switchout.*/ } }, { TRDESC: { $not: /^Transfer-Out.*/ } }, { TRDESC: { $not: /^Lateral Shift Out.*/ } } ,{ TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
         { $group: { _id: { FUNDDESC: "$FUNDDESC", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
-        { $project: { _id: 0, SCHEME: "$_id.FUNDDESC", TRXN_NATURE: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } } },
+        { $project: { _id: 0, SCHEME: "$_id.FUNDDESC", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } } },
         { $sort: { TRADDATE: -1 } }
     ]
      pipeline2 = [  ///trans_franklin

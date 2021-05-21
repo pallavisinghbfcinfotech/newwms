@@ -108,7 +108,7 @@ font-size:14px;
               <li className="nav-item has-treeview">
                 <a href="Transaction" className="nav-link">
                   <i className="nav-icon fas fa-exchange-alt" />
-                  <p className="side_p">Tranaction</p>
+                  <p className="side_p">Transaction</p>
                 </a>
               </li>
              

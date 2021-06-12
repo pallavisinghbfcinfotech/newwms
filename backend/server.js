@@ -1888,23 +1888,23 @@ app.get("/api/getfoliolist", function (req, res) {
 
 app.post("/api/getschemepersonaldetail", function (req, res) {
     try{
-    const pipeline1 = [  ///trans_karvy
+     pipeline1 = [  ///trans_karvy
         { $match: { FUNDDESC: req.body.scheme, PAN1: req.body.pan , TD_ACNO:req.body.folio} },
-        { $group: { _id: { PAN1:"$PAN1",FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO", INVNAME: "$INVNAME" } } },
+        { $group: { _id: { PAN1:"$PAN1",INVNAME: "$INVNAME",FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO",  } } },
         { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
-       // { $unwind: "$detail" },
+        { $unwind: "$detail" },
         { $project: { _id: 0,PAN:"$_id.PAN1",INVNAME: "$_id.INVNAME",FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC" , NOMINEE:"$detail.NOMINEE", BANK: "$detail.BNAME" ,ACCOUNTNO: "$detail.BNKACNO"  } },
     ] 
-    const pipeline2 = [  ///trans_franklin
+     pipeline2 = [  ///trans_franklin
         {$match : { IT_PAN_NO1:req.body.pan,SCHEME_NA1:req.body.scheme, FOLIO_NO:req.body.folio}}, 
         {$group : {_id : {IT_PAN_NO1:"$IT_PAN_NO1",SCHEME_NA1:"$SCHEME_NA1",FOLIO_NO:"$FOLIO_NO",INVESTOR_2:"$INVESTOR_2",NOMINEE1:"$NOMINEE1",PBANK_NAME:"$PBANK_NAME",PERSONAL23:"$PERSONAL23"}}}, 
         {$project : {_id:0,PAN:"$_id.IT_PAN_NO1",SCHEME:"$_id.SCHEME_NA1",FOLIO:"$_id.FOLIO_NO",INVNAME:"$_id.INVESTOR_2",NOMINEE:"$_id.NOMINEE1",BNAME:"$_id.PBANK_NAME",ACCOUNTNO:"$_id.PERSONAL23"}}
     ]     
-    const pipeline3 = [  //trans_cams
+     pipeline3 = [  //trans_cams
         {$match : { PAN:req.body.pan,SCHEME:req.body.scheme, FOLIO_NO:req.body.folio}}, 
         { $group: { _id: { PAN:"$PAN",INV_NAME:"$INV_NAME", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME",  SCHEME_TYP: "$SCHEME_TYP",AC_NO: "$AC_NO",BANK_NAME: "$BANK_NAME" } } },
         { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
-       // { $unwind: "$detail" },
+        { $unwind: "$detail" },
         { $project: { _id: 0, PAN:"$_id.PAN",INVNAME:"$_id.INV_NAME", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME" ,ACCOUNTNO: "$_id.AC_NO",BANK: "$_id.BANK_NAME" ,NOMINEE:"$detail.NOM_NAME" } },
     ]
  transc.aggregate(pipeline3, (err, camsdata) => {
@@ -1915,15 +1915,20 @@ app.post("/api/getschemepersonaldetail", function (req, res) {
                     res.send(err);
                 }
                 else {
-                    var datacon = frankdata.concat(karvydata.concat(camsdata))
+                    var datacon = frankdata.concat(karvydata.concat(camsdata));
                     var removeduplicates = datacon.map(JSON.stringify)
                     .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                     .filter(function (item, index, arr) {
                         return arr.indexOf(item, index + 1) === -1;
                     }) // check if there is any occurence of the item in whole array
-                    .reverse()
-                    .map(JSON.parse);
+                    .reverse().map(JSON.parse);
                      datacon = Array.from(new Set(removeduplicates));
+                     var filtered = datacon.filter(
+                        (temp => a =>
+                            (k => !temp[k] && (temp[k] = true))(a.FOLIO + '|' + a.SCHEME)
+                        )(Object.create(null))
+                    );
+                    datacon = filtered;
                     res.send(datacon);
                     return datacon;
                 }

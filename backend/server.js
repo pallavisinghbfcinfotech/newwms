@@ -2046,39 +2046,48 @@ app.post("/api/getnavdate", function (req, res) {
 
 
 app.post("/api/getportfolioscheme", function (req, res) {
-    const pipeline = [  //trans_cams
-        { "$match": { PAN: req.body.pan } },
-        { "$group": { _id: { PAN: "$PAN", SCHEME: "$SCHEME", FOLIO_NO: "$FOLIO_NO" } } },
-        { "$project": { _id: 0, PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO" } }
-    ]
+    //console.log("getportfolioscheme",req.body.name)
+    // const pipeline = [  //trans_cams
+    //     { "$match": { PAN: req.body.pan , INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'si' } } },
+    //     { "$group": { _id: { PAN: "$PAN", SCHEME: "$SCHEME", FOLIO_NO: "$FOLIO_NO" } } },
+    //     { "$project": { _id: 0, PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO" } }
+    // ]
     const pipeline1 = [  //trans_karvy
-        { "$match": { PAN1: req.body.pan ,STATUS:"INDIVIDUAL"} },
-        { "$group": { _id: { PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO" } } },
-        { "$project": { _id: 0, PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO" } }
+        { $match: { PAN1: req.body.pan  , INVNAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
+        { $group: { _id: { PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO" } } },
+        { $project: { _id: 0, PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO" } }
     ]
-    const pipeline2 = [   //trans_franklin
-        { "$match": { IT_PAN_NO1: req.body.pan } },
-        { "$group": { _id: { IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", FOLIO_NO: "$FOLIO_NO" } } },
-        { "$project": { _id: 0, PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", FOLIO: "$_id.FOLIO_NO" } }
-    ]
-    transc.aggregate(pipeline, (err, data) => {
+    // const pipeline2 = [   //trans_franklin
+    //     { "$match": { IT_PAN_NO1: req.body.pan , INVESTOR_2:{$regex : `^${req.body.name}.*` , $options: 'si' }} },
+    //     { "$group": { _id: { IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", FOLIO_NO: "$FOLIO_NO" } } },
+    //     { "$project": { _id: 0, PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", FOLIO: "$_id.FOLIO_NO" } }
+    // ]
+   // transc.aggregate(pipeline, (err, data) => {
         transk.aggregate(pipeline1, (err, data1) => {
-            transf.aggregate(pipeline2, (err, data2) => {
-                if (data2.length != 0 || data1.length != 0 || data.length != 0) {
+       //     transf.aggregate(pipeline2, (err, data2) => {
+                if (data1 != 0 ) {
                     if (err) {
                         res.send(err);
                     }
                     else {
-                        let merged = [];
-                        merged = data1.map((item, i) => Object.assign({}, item, data2.map((items, j) => Object.assign({}, items, data[j]))));
-                        res.send(merged);
-                        return merged;
+                        let merged = data1;
+                        //let merged = [];
+                        //merged = data1.map((item, i) => Object.assign({}, item, data2.map((items, j) => Object.assign({}, items, data[j]))));
+                        //console.log(merged)
+                        var filtered = merged.filter(
+                            (temp => a =>
+                                (k => !temp[k] && (temp[k] = true))(a.SCHEME + '|' + a.FOLIO)
+                            )(Object.create(null))
+                        );
+                        res.send(filtered);
+                        return filtered;
                     }
                 }
-            });
-        });
+        //     });
+        // });
     });
 })
+
 
 app.get("/api/getfolio", function (req, res) {
     pipeline1 = [  //trans_cams

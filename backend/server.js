@@ -2730,7 +2730,6 @@ app.post("/api/getfoliodetail", function (req, res) {
                     })
 }) 
 
-getschemedetail
 app.post("/api/getschemeportfoliodetail", function (req, res) { 
 
      pipeline1 = [  //trans_karvy    "TD_TRTYPE":{$not: /^SINR.*/}

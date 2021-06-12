@@ -3,6 +3,8 @@ import { Component } from "react";
 import $ from 'jquery';
 import axios from 'axios';
 
+//var createReactClass = require('create-react-class');
+
 class Portfoliodetail extends Component { 
   constructor(props) {
     super(props);
@@ -13,7 +15,7 @@ class Portfoliodetail extends Component {
     };
   }
   componentDidMount(){
-    document.title = "WMS | Portfolio Detail"
+    document.title = "WMS | Folio Detail"
     const query = new URLSearchParams(this.props.location.search);
     const scheme = query.get('scheme')
     const pan = query.get('pan');
@@ -21,6 +23,7 @@ class Portfoliodetail extends Component {
     const isin = query.get('isin');
     axios.post('/api/getschemedetail',{scheme:scheme,pan:pan,folio:folio})
             .then(response => {
+              //console.log(response);
                 this.setState({data1: response.data.data, isFetching: false})
             })
             .catch(e => {
@@ -29,6 +32,7 @@ class Portfoliodetail extends Component {
             });
     axios.post('/api/getschemepersonaldetail',{scheme:scheme,pan:pan,folio:folio})
             .then(resp => {
+              //console.log(response);
                 this.setState({data2: resp.data, isFetching: false})
             })
             .catch(e => {
@@ -138,18 +142,19 @@ class Portfoliodetail extends Component {
                 <th>NAV/Rate</th>
                 <th>Units/Nos</th>
                 <th>Balance</th>
+                <th></th>
               </tr>
             </thead>
            
               
             {this.state.data1.map((item, index) => ( 
                <tbody >
-                 {( item.NATURE =='RED' || item.NATURE =='FUL')? (
+                 {(  item.NATURE ==='Switch Out' || item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO')? (
                 <div class="hide-bal">{(unit = "-"+item.UNITS)}
                 </div>
-                ):(item.NATURE =='LTOP' || item.NATURE =='LTOF' || item.NATURE =='STPO')? (
-                  <div class="hide-bal">{(unit = "-"+item.UNITS)}
-                  </div>
+                // ):(item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO')? (
+                //   <div class="hide-bal">{(unit = "-"+item.UNITS)}
+                //   </div>
                   ):(
                 <div class="hide-bal">{(unit = item.UNITS)}
                 {(currentNav = item.cnav[0])}
@@ -157,8 +162,12 @@ class Portfoliodetail extends Component {
                 )}
               <tr>
                 <td>{item.TD_TRDT}</td>
-                <td>{item.NATURE}</td>
-                <td>{item.AMOUNT}</td>
+                {(item.NATURE === "Switch Out"|| item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO') ? (
+                                     <td>Switch Out</td> ) :(item.NATURE === "SIPR") ? (
+                                      <td>SIP Reversal</td>  ) :(
+                                        <td>SIP</td> ) }
+                {/* <td>{item.NATURE}</td> */}
+                <td>{Math.round(item.AMOUNT)}</td>
                 <td>{item.TD_NAV}</td>
                 <td>{unit}</td>
                 <td class="balance-unit"><div class="hide-bal">
@@ -170,6 +179,7 @@ class Portfoliodetail extends Component {
                   
                 <td><div class="hide-bal">{(balance = item.UNITS)}</div>{balancef+balance}</td>
                 )} */}
+                <td></td>
               </tr>
               </tbody>
             ))}
@@ -181,7 +191,7 @@ class Portfoliodetail extends Component {
                 <th>{(parseFloat(balance)*parseFloat(currentNav)).toFixed(4)}</th>
                 <th>{currentNav}</th>
                 <th>{balance.toFixed(4)}</th>
-                <th></th>
+                <th></th><th></th>
               </tr>
             </tfoot>
           </table>

@@ -2153,45 +2153,61 @@ app.post("/api/getnavdate", function (req, res) {
 
 
 app.post("/api/getportfolioscheme", function (req, res) {
-    //console.log("getportfolioscheme",req.body.name)
-    // const pipeline = [  //trans_cams
-    //     { "$match": { PAN: req.body.pan , INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'si' } } },
-    //     { "$group": { _id: { PAN: "$PAN", SCHEME: "$SCHEME", FOLIO_NO: "$FOLIO_NO" } } },
-    //     { "$project": { _id: 0, PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO" } }
-    // ]
-    const pipeline1 = [  //trans_karvy
-        { $match: { PAN1: req.body.pan  , INVNAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
-        { $group: { _id: { PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO" } } },
-        { $project: { _id: 0, PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO" } }
+        pipeline = [  //trans_cams
+            { $match: { PAN: req.body.pan , INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
+            { $group: { _id: { INV_NAME:"$INV_NAME",PAN: "$PAN", SCHEME: "$SCHEME", FOLIO_NO: "$FOLIO_NO" } } },
+            { $project: { _id: 0, NAME :"$_id.INV_NAME",PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO" } }
+        ]
+    if(req.body.category ==="ALL"){
+        pipeline1 = [  //trans_karvy
+            { $match: { PAN1: req.body.pan, INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
+            { $group: { _id: { INVNAME:"$INVNAME",PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO" } } },
+            { $project: { _id: 0,NAME:"$_id.INVNAME", PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO" } }
+        ]
+    }else{
+        pipeline1 = [  //trans_karvy
+            { $match: { PAN1: req.body.pan, INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' },ASSETTYPE: { $regex: `^${req.body.category}.*`, $options: 'i' } } },
+            { $group: { _id: { INVNAME:"$INVNAME",PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO" } } },
+            { $project: { _id: 0,NAME:"$_id.INVNAME",  PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO" } }
+        ]
+    }
+    
+    pipeline2 = [   //trans_franklin
+        { $match: { IT_PAN_NO1: req.body.pan, INVESTOR_2: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
+        { $group: { _id: { INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", FOLIO_NO: "$FOLIO_NO" } } },
+        { $project: { _id: 0,NAME:"$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", FOLIO: "$_id.FOLIO_NO" } }
     ]
-    // const pipeline2 = [   //trans_franklin
-    //     { "$match": { IT_PAN_NO1: req.body.pan , INVESTOR_2:{$regex : `^${req.body.name}.*` , $options: 'si' }} },
-    //     { "$group": { _id: { IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", FOLIO_NO: "$FOLIO_NO" } } },
-    //     { "$project": { _id: 0, PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", FOLIO: "$_id.FOLIO_NO" } }
-    // ]
-   // transc.aggregate(pipeline, (err, data) => {
-        transk.aggregate(pipeline1, (err, data1) => {
-       //     transf.aggregate(pipeline2, (err, data2) => {
-                if (data1 != 0 ) {
-                    if (err) {
-                        res.send(err);
-                    }
-                    else {
-                        let merged = data1;
-                        //let merged = [];
-                        //merged = data1.map((item, i) => Object.assign({}, item, data2.map((items, j) => Object.assign({}, items, data[j]))));
-                        //console.log(merged)
-                        var filtered = merged.filter(
-                            (temp => a =>
-                                (k => !temp[k] && (temp[k] = true))(a.SCHEME + '|' + a.FOLIO)
-                            )(Object.create(null))
-                        );
-                        res.send(filtered);
-                        return filtered;
-                    }
+     transc.aggregate(pipeline, (err, data) => {
+         transk.aggregate(pipeline1, (err, data1) => {
+           transf.aggregate(pipeline2, (err, data2) => {
+            if ( data2 != 0 || data1 !=0) {
+                if (err) {
+                    res.send(err);
                 }
-        //     });
-        // });
+                else {
+                    let merged = data2.concat(data1);
+                    var removeduplicates = Array.from(new Set(merged));
+                    datacon = removeduplicates.map(JSON.stringify)
+                        .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                        .filter(function (item, index, arr) {
+                            return arr.indexOf(item, index + 1) === -1;
+                        }) // check if there is any occurence of the item in whole array
+                        .reverse()
+                        .map(JSON.parse);
+                    //let merged = [];
+                    //merged = data1.map((item, i) => Object.assign({}, item, data2.map((items, j) => Object.assign({}, items, data[j]))));
+                    //console.log(merged)
+                    // datacon = datacon.filter(
+                    //     (temp => a =>
+                    //         (k => !temp[k] && (temp[k] = true))(a.SCHEME + '|' + a.FOLIO)
+                    //     )(Object.create(null))
+                    // );
+                       res.json(datacon);
+                    return datacon;
+                }
+            }
+             });
+        });
     });
 })
 

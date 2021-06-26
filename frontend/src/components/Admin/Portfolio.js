@@ -194,16 +194,14 @@ class Portfolio extends Component {
               gain = currentval - temp22;
               absreturn = ((parseFloat(currentval) - parseFloat(temp22)) / parseFloat(temp22)) * 100;
               nval = parseFloat(currentval) / parseFloat(temp22);
-              console.log("days=",temp222/temp22)
-              console.log("nval=",nval);
               t = parseFloat(temp222/temp22) / 365;
-              console.log("t=",t);
+             
                   rootval = 1 / parseFloat(t);
-                  console.log("rootval=",rootval);
+                
               mathpo = Math.pow(parseFloat(nval), parseFloat(rootval));
-              console.log("mathpo=",mathpo);
+            
               cagr = (parseFloat(mathpo) - 1) * 100;
-              console.log("cagr=",cagr);
+             
               var baseurl = window.location.href
               var domain = baseurl.split('/');
               var scheme_name_data = scheme;

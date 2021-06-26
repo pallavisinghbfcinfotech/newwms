@@ -2848,53 +2848,75 @@ app.post("/api/getfoliodetail", function (req, res) {
                     })
 }) 
 
-app.post("/api/getschemeportfoliodetail", function (req, res) { 
-
-     pipeline1 = [  //trans_karvy    "TD_TRTYPE":{$not: /^SINR.*/}
-        { $match: { FUNDDESC: req.body.scheme, PAN1: req.body.pan, TD_ACNO:req.body.folio ,INVNAME: {$regex : `^${req.body.name}.*` , $options: 'i' } } },
-        { $group: { _id: {  TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC",TD_NAV: "$TD_NAV", TD_TRTYPE: "$TD_TRTYPE", TD_TRDT: "$TD_TRDT", SCHEMEISIN: "$SCHEMEISIN", cnav: "$nav.NetAssetValue",navdate:"$nav.Date"} , TD_UNITS: {$sum:"$TD_UNITS" }, TD_AMT: {$sum: "$TD_AMT" }  } },
+app.post("/api/getschemeportfoliodetail", function (req, res) {
+    pipeline1 = [  //trans_karvy    "TD_TRTYPE":{$not: /^SINR.*/}
+        { $match: { FUNDDESC: req.body.scheme, PAN1: req.body.pan, TD_ACNO: req.body.folio, INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
+    //   { $match: { FUNDDESC: "NIPPON INDIA PHARMA FUND - GROWTH PLAN - GROWTH OPTION", PAN1: "AHNPG8965C", TD_ACNO: "413112577596", INVNAME: { $regex: `^${"SUNIL KUMAR GUPTA"}.*`, $options: 'i' } } }, 
+       { $group: { _id: { INVNAME:"$INVNAME",TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_NAV: "$TD_NAV", TD_TRTYPE: "$TD_TRTYPE", NAVDATE: "$NAVDATE", SCHEMEISIN: "$SCHEMEISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date" }, TD_UNITS: { $sum: "$TD_UNITS" }, TD_AMT: { $sum: "$TD_AMT" } } },
         { $lookup: { from: 'cams_nav', localField: '_id.SCHEMEISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
-          { $unwind: "$nav"},
-        { $project: { _id: 0,  FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC",TD_NAV: "$_id.TD_NAV", NATURE: "$_id.TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } },ISIN: "$_id.SCHEMEISIN",   cnav: "$nav.NetAssetValue",navdate: "$nav.Date" , UNITS:{$sum: "$TD_UNITS"}, AMOUNT:{$sum: "$TD_AMT" } } },
-        {$sort : {TD_TRDT : -1}}
+        { $unwind: "$nav" },
+        { $project: { _id: 0, AMT: "$TD_AMT" ,NAME:"$_id.INVNAME",FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", TD_NAV: "$_id.TD_NAV", NATURE: "$_id.TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.NAVDATE" } } , ISIN: "$_id.SCHEMEISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } } },
+        { $sort: { FOLIO: -1 } }
+    ]
+    pipeline2 = [  //trans_franklin  
+        { $match: { SCHEME_NA1: req.body.scheme, IT_PAN_NO1: req.body.pan, FOLIO_NO: req.body.folio, INVESTOR_2: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
+        { $group: { _id: { INVESTOR_2:"$INVESTOR_2",FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", NAV: "$NAV", TRXN_TYPE: "$TRXN_TYPE", TRXN_DATE: "$TRXN_DATE", ISIN: "$ISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date" }, UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+        { $lookup: { from: 'cams_nav', localField: '_id.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+        { $unwind: "$nav" },
+        { $project: { _id: 0, NAME:"$_id.INVESTOR_2",FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", TD_NAV: "$_id.NAV", NATURE: "$_id.TRXN_TYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, ISIN: "$_id.ISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+        { $sort: { FOLIO: -1 } }
     ]
     transk.aggregate(pipeline1, (err, karvydata) => {
-       
-        if (karvydata != 0) {
-            resdata = {
-                status: 200,
-                message: "Successfull",
-                data: karvydata
-            };
-        } else {
-            resdata = {
-                status: 400,
-                message: "Data not found"
-            };
-        }
-        var datacon = karvydata;
-        for (var i = 0; i < datacon.length; i++) {
-            if(datacon[i]['NATURE'] === "Redemption" || datacon[i]['NATURE'] === "RED" || 
-               datacon[i]['NATURE'] === "SIPR" || datacon[i]['NATURE'] === "Full Redemption" || 
-               datacon[i]['NATURE'] === "Partial Redemption" || datacon[i]['NATURE'] === "Lateral Shift Out" || 
-               datacon[i]['NATURE'] === "Switchout" || datacon[i]['NATURE'] === "Transfer-Out" || 
-               datacon[i]['NATURE'] === "Transmission Out" || datacon[i]['NATURE'] === "Switch Over Out" ||
-               datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "LTOF" || 
-               datacon[i]['NATURE'] === "Partial Switch Out" || datacon[i]['NATURE'] === "Full Switch Out" ||
-               datacon[i]['NATURE'] === "IPOR" || datacon[i]['NATURE'] === "FUL" || datacon[i]['NATURE'] === "STPO"){
-               datacon[i]['NATURE'] = "Switch Out";
-            }if (datacon[i]['NATURE'].match(/Systematic Investment.*/) || datacon[i]['NATURE'] === "SIN" ||
-            datacon[i]['NATURE'].match(/Systematic Withdrawal.*/) || 
-            datacon[i]['NATURE'].match(/Systematic - Instalment.*/) || datacon[i]['NATURE'].match(/Systematic - To.*/) || datacon[i]['NATURE'].match(/Systematic-NSE.*/) || datacon[i]['NATURE'].match(/Systematic Physical.*/) || datacon[i]['NATURE'].match(/Systematic.*/) || datacon[i]['NATURE'].match(/Systematic-Normal.*/) || datacon[i]['NATURE'].match(/Systematic (ECS).*/)) {
-                datacon[i]['NATURE'] = "SIP";
+        transf.aggregate(pipeline2, (err, frankdata) => {
+            if (karvydata != 0 || frankdata !=0) {
+                resdata = {
+                    status: 200,
+                    message: "Successfull",
+                    data: karvydata
+                }
+            } else {
+                resdata = {
+                    status: 400,
+                    message: "Data not found"
+                }
             }
-        }
-        resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
-        res.json(resdata);
-        return resdata;
+            var datacon = karvydata.concat(frankdata);
+            console.log(datacon)
+            for (var i = 0; i < datacon.length; i++) {
+                if (datacon[i]['NATURE'] === "Redemption" || datacon[i]['NATURE'] === "RED" ||
+                    datacon[i]['NATURE'] === "SIPR" || datacon[i]['NATURE'] === "Full Redemption" ||
+                    datacon[i]['NATURE'] === "Partial Redemption" || datacon[i]['NATURE'] === "Lateral Shift Out" ||
+                    datacon[i]['NATURE'] === "Switchout" || datacon[i]['NATURE'] === "Transfer-Out" ||
+                    datacon[i]['NATURE'] === "Transmission Out" || datacon[i]['NATURE'] === "Switch Over Out" ||
+                    datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "LTOF" || datacon[i]['NATURE'] === "FULR" ||
+                    datacon[i]['NATURE'] === "Partial Switch Out" || datacon[i]['NATURE'] === "Full Switch Out" ||
+                    datacon[i]['NATURE'] === "IPOR" || datacon[i]['NATURE'] === "FUL" || datacon[i]['NATURE'] === "STPO") {
+                    datacon[i]['NATURE'] = "Switch Out";
+                    
+                }if(datacon[i]['NATURE'].match(/Systematic Investment.*/) || 
+                    datacon[i]['NATURE'] === "SIN" ||
+                    datacon[i]['NATURE'].match(/Systematic Withdrawal.*/) ||
+                    datacon[i]['NATURE'].match(/Systematic - Instalment.*/) || 
+                    datacon[i]['NATURE'].match(/Systematic - To.*/) || 
+                    datacon[i]['NATURE'].match(/Systematic-NSE.*/) || 
+                    datacon[i]['NATURE'].match(/Systematic Physical.*/) || 
+                    datacon[i]['NATURE'].match(/Systematic.*/) || 
+                    datacon[i]['NATURE'].match(/Systematic-Normal.*/) || 
+                    datacon[i]['NATURE'].match(/Systematic (ECS).*/)) {
+                    datacon[i]['NATURE'] = "SIP";
+                }if(datacon[i]['NATURE'] === "ADDPUR" ) {
+                    datacon[i]['NATURE'] = "Purchase";
+                }
+            }
+            resdata.data = datacon;
+            //     resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
+            res.json(resdata);
+            return resdata;
 
-    })
+        });
+    });
 })
+
 
 // app.post("/api/getamclist", function(req, res) {
 //     var resdata = "";

@@ -44,12 +44,13 @@ class Portfolio extends Component {
       data: { pan: pan, name: name ,category:catValue},
       success: function (res) {
         for (var i = 0; i < res.length; i++) {
-         console.log("first response=",res[i].SCHEME,res[i].FOLIO)
+     //   console.log("first response=",res[i].SCHEME,res[i].FOLIO)
           $.ajax({
             url: "/api/getschemeportfoliodetail",
             type: "POST",
-            data: { scheme: res[i].SCHEME, pan: res[i].PAN, folio: res[i].FOLIO, name: res[i].NAME },
+            data: { scheme:res[i].SCHEME, pan:res[i].PAN, folio:res[i].FOLIO, name:res[i].NAME,RTA:res[i].RTA },
             success: function (res2) {
+              
               res2.data = res2.data.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
               fullSchemeHtml += "<tr>"
               var unit = 0; var balance = 0; var amount = 0; var amt = 0; var cnav = 0; var currentval = 0; var gain = 0; var absreturn = 0; var days = 0; var date1 = ""; var date2 = ""; var totaldays = 0;
@@ -57,65 +58,10 @@ class Portfolio extends Component {
               var arrunit = []; var arrnav = [];var amtt=0;var arrdays=[];var alldays=[];
               var arrpurchase = []; var j = 0;var temp333 =0;var temp222=0;
               var temp1, temp2 = 0; var temp3 = 0; var temp4 = 0; var temp33 = 0; var temp22 = 0; var totdays = 0;
-              var isin = ""; var newnavdate = "";var daystotal=0;
-              var lastPurchaseNav = 0;
-              var lastPurchaseNavTrue = 0;
-              var purchaseAmt = 0;
-              var newcaldate =0;
-              for (var j = 0; j < res2.data.length; j++) {
-                 if (res2.data[j].SCHEME === res2.data[0].SCHEME) {
-                  if (res2.data[j].NATURE === 'Switch Out' || res2.data[j].NATURE === 'RED' ||
-                    res2.data[j].NATURE === 'LTOP' || res2.data[j].NATURE === 'LTOF' ||
-                    res2.data[j].NATURE === 'IPOR' || res2.data[j].NATURE === 'FUL' ||
-                    res2.data[j].NATURE === 'STPO') {
-                    unit = "-" + res2.data[j].UNITS
-                    amount = "-" + res2.data[j].AMOUNT
-                  }
-                  else {
-                    unit = res2.data[j].UNITS
-                    amount = res2.data[j].AMOUNT;
-
-                  }
-
-                  balance = parseFloat(unit) + parseFloat(balance)
-
-                  if (res2.data[j].NATURE === 'Switch Out' || res2.data[j].NATURE === 'RED' ||
-                    res2.data[j].NATURE === 'LTOP' || res2.data[j].NATURE === 'LTOF' ||
-                    res2.data[j].NATURE === 'IPOR' || res2.data[j].NATURE === 'FUL' ||
-                    res2.data[j].NATURE === 'STPO') {
-                    // lastPurchaseNavTrue = ["elase","elsedata"]
-                    lastPurchaseNavTrue = res2.data[j].TD_NAV
-                  } else {
-                    //  var lastIndex = res2.data.length-1
-                    lastPurchaseNav = res2.data[j].TD_NAV
-                  }
-                  purchaseAmt = parseFloat(amount) + parseFloat(purchaseAmt)
-
-                  cnav = res2.data[j].cnav
-                  currentval = cnav * balance
-
-
-                  if (balance == 0 && balance == 0.000 && unit == 0.000 && unit == 0) {
-                    amt = 0;
-                  }
-                 
-                  var scheme = res2.data[j].SCHEME;
-                  var folio = res2.data[j].FOLIO;
-                  var isin = res2.data[j].ISIN;
-
-
-
-                }
-              }
-
-
-              if (lastPurchaseNavTrue == 0) {
-                amt = purchaseAmt;
-              } else {
-                amt = parseFloat(lastPurchaseNav) * parseFloat(balance);
-              }
-
+              var isin = ""; var newnavdate = "";var daystotal=0;            
               for (var n = 0; n < res2.data.length; n++) {
+                if(typeof res2.data[0] != "undefined"){
+                if (res2.data[n].SCHEME === res2.data[0].SCHEME) {
                 for (var jj = 0; jj < arrunit.length; jj++) {
                   if (arrunit[jj] === 0)
                     arrunit.shift();
@@ -128,6 +74,8 @@ class Portfolio extends Component {
                 }
                
                 if (res2.data[n].NATURE != 'Switch Out') {
+                  unit = res2.data[n].UNITS
+                  amount = res2.data[n].AMOUNT;
                   var date = res2.data[n].TD_TRDT;
                   var navdate = res2.data[n].navdate;
 
@@ -146,7 +94,7 @@ class Portfolio extends Component {
                   date1 = new Date(newdate);
                   date2 = new Date(newnavdate);
                   days = moment(date2).diff(moment(date1), 'days');
-                  amtt = res2.data[n].AMT+amtt ;
+                  //amtt = res2.data[n].AMT+amtt ;
                   arrunit.push(res2.data[n].UNITS);
                   arrpurchase.push(Math.round(res2.data[n].UNITS * parseFloat(res2.data[n].TD_NAV)));
                   arrdays.push(parseFloat(days)*res2.data[n].UNITS * parseFloat(res2.data[n].TD_NAV));
@@ -155,6 +103,8 @@ class Portfolio extends Component {
                   temp2 = temp1 + temp2;
                   var navrate = res2.data[n].TD_NAV
                 } else {
+                  unit = "-" + res2.data[n].UNITS
+                  amount = "-" + res2.data[n].AMOUNT
                       if (temp4 != "") {
                         arrunit.splice(0, 0, temp4);
                       }
@@ -181,6 +131,15 @@ class Portfolio extends Component {
                         }
                       }
                   }
+                  balance = parseFloat(unit) + parseFloat(balance);
+                  cnav = res2.data[n].cnav
+                  currentval = cnav * balance
+                 
+                  var scheme = res2.data[n].SCHEME;
+                  var folio = res2.data[n].FOLIO;
+                  var isin = res2.data[n].ISIN;
+                }
+              }
               }
               temp22 = 0;           
               for (var k = 0; k < arrpurchase.length; k++) {
@@ -205,9 +164,9 @@ class Portfolio extends Component {
               var baseurl = window.location.href
               var domain = baseurl.split('/');
               var scheme_name_data = scheme;
-              var portfoliourl = "http://" + domain[domain.length - 2] + "/Portfoliodetail?scheme=" + scheme_name_data + "&pan=" + pan + "&folio=" + folio + "&isin=" + isin;
+              var portfoliourl = "http://" + domain[domain.length - 2] + "/Portfoliodetail?scheme=" + scheme_name_data + "&pan=" + pan + "&folio=" + folio;
              if (balance > 0.01 && balance != 0 && balance != 0.000) {
-                fullSchemeHtml += "<td><a href='" + portfoliourl + "' target='_blank'>" + scheme + "</a></td><td>" + folio + "</td><td>" + balance.toFixed(3) + "</td><td>" + temp22 + "</td><td>" + cnav + "</td><td>" + Math.round(currentval) + "</td><td></td><td>" + Math.round(gain) + "</td><td>" + Math.round(temp222/temp22) + "</td><td>" + absreturn.toFixed(2) + "</td><td>" + cagr.toFixed(2) + "</td></tr>";
+                fullSchemeHtml += "<td><a href='" + portfoliourl + "' target='_blank'>" + scheme + "</a></td><td>" + folio + "</td><td>" + balance.toFixed(3) + "</td><td>" + temp22 + "</td><td>" + cnav + "</td><td>" + Math.round(currentval) + "</td><td>" + Math.round(gain) + "</td><td>" + Math.round(temp222/temp22) + "</td><td>" + absreturn.toFixed(2) + "</td><td>" + cagr.toFixed(2) + "</td></tr>";
                 $(".randerData").html(fullSchemeHtml)
              }
             }.bind(this),
@@ -393,7 +352,7 @@ class Portfolio extends Component {
                             <th>Purchase</th>
                             <th>Current NAV</th>
                             <th>Current Value</th>
-                            <th>Div. Paid</th>
+                            {/* <th>Div. Paid</th> */}
                             <th>Gain/Loss</th>
                             <th>Days</th>
                             <th>Absolute Return%</th>

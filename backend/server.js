@@ -466,9 +466,17 @@ app.post("/api/getschemedetail", function (req, res) {
                     }
                     var datacon = karvydata.concat(frankdata.concat(camsdata));
                     for (var i = 0; i < datacon.length; i++) {
-                        if (datacon[i]['NATURE'] === "Redemption") {
-                            datacon[i]['NATURE'] = "RED";
-                        } if (datacon[i]['NATURE'].match(/Systematic Investment.*/) || datacon[i]['NATURE'].match(/Systematic Withdrawal.*/) || datacon[i]['NATURE'].match(/Systematic - Instalment.*/) || datacon[i]['NATURE'].match(/Systematic - To.*/) || datacon[i]['NATURE'].match(/Systematic-NSE.*/) || datacon[i]['NATURE'].match(/Systematic Physical.*/) || datacon[i]['NATURE'].match(/Systematic.*/) || datacon[i]['NATURE'].match(/Systematic-Normal.*/) || datacon[i]['NATURE'].match(/Systematic (ECS).*/)) {
+                          if (datacon[i]['NATURE'] === "Redemption" || datacon[i]['NATURE'] === "RED" ||
+                        datacon[i]['NATURE'] === "SIPR" || datacon[i]['NATURE'] === "Full Redemption" ||
+                        datacon[i]['NATURE'] === "Partial Redemption" || datacon[i]['NATURE'] === "Lateral Shift Out" ||
+                        datacon[i]['NATURE'] === "Switchout" || datacon[i]['NATURE'] === "Transfer-Out" ||
+                        datacon[i]['NATURE'] === "Transmission Out" || datacon[i]['NATURE'] === "Switch Over Out" ||
+                        datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "LTOF" || datacon[i]['NATURE'] === "FULR" ||
+                        datacon[i]['NATURE'] === "Partial Switch Out" || datacon[i]['NATURE'] === "Full Switch Out" ||
+                        datacon[i]['NATURE'] === "IPOR" || datacon[i]['NATURE'] === "FUL" || datacon[i]['NATURE'] === "STPO") {
+                        datacon[i]['NATURE'] = "Switch Out";    
+                    } 
+			    if (datacon[i]['NATURE'].match(/Systematic Investment.*/) || datacon[i]['NATURE'].match(/Systematic Withdrawal.*/) || datacon[i]['NATURE'].match(/Systematic - Instalment.*/) || datacon[i]['NATURE'].match(/Systematic - To.*/) || datacon[i]['NATURE'].match(/Systematic-NSE.*/) || datacon[i]['NATURE'].match(/Systematic Physical.*/) || datacon[i]['NATURE'].match(/Systematic.*/) || datacon[i]['NATURE'].match(/Systematic-Normal.*/) || datacon[i]['NATURE'].match(/Systematic (ECS).*/)) {
                             datacon[i]['NATURE'] = "SIP";
                         }
                         if (datacon[i]['NATURE'] === "Switch Over Out" || datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "LTOF" || datacon[i]['NATURE'] === "Lateral Shift Out") {

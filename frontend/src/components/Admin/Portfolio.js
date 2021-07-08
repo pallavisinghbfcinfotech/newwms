@@ -120,12 +120,20 @@ class Portfolio extends Component {
                         } else {
                           temp4 = temp3 - temp2;
                           var len = res2.data.length -1;                  
-                          if(res2.data[len].NATURE === "SIP" || res2.data[len].NATURE === "Purchase"){
-                            arrpurchase[p] = temp4 * parseFloat(res2.data[p].TD_NAV);
+//                           if(res2.data[len].NATURE === "SIP" || res2.data[len].NATURE === "Purchase"){
+//                             arrpurchase[p] = temp4 * parseFloat(res2.data[p].TD_NAV);
+//                             arrdays[p] = parseFloat(alldays[p])*temp4 * parseFloat(res2.data[p].TD_NAV);
+//                           }else{
+//                             arrpurchase[p] = temp4 * parseFloat(navrate);
+//                             arrdays[p] = parseFloat(alldays[p])*temp4 * parseFloat(navrate);
+//                           }
+                          if(res2.data[len].NATURE === "SIP" || res2.data[len].NATURE === "Purchase"|| res2.data[len].NATURE === "Switch In"){
+                             arrpurchase[p] = temp4 * parseFloat(res2.data[p].TD_NAV);
                             arrdays[p] = parseFloat(alldays[p])*temp4 * parseFloat(res2.data[p].TD_NAV);
                           }else{
-                            arrpurchase[p] = temp4 * parseFloat(navrate);
-                            arrdays[p] = parseFloat(alldays[p])*temp4 * parseFloat(navrate);
+                           // console.log("purchaseelse=",arrpurchase,res2.data[p].SCHEME,temp4,parseFloat(res2.data[p].TD_NAV),p)
+                            arrpurchase[p] = temp4 * parseFloat(res2.data[p].TD_NAV);
+                            arrdays[p] = parseFloat(alldays[p])*temp4 * parseFloat(res2.data[p].TD_NAV);
                           }
                           break;
                         }

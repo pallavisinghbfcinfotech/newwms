@@ -167,7 +167,7 @@ class Portfoliodetail extends Component {
                                       <td>SIP Reversal</td>  ) :(
                                         <td>SIP</td> ) }
                 {/* <td>{item.NATURE}</td> */}
-                <td>{Math.round(item.AMOUNT)}</td>
+                <td>{item.AMOUNT}</td>
                 <td>{item.TD_NAV}</td>
                 <td>{unit}</td>
                 <td class="balance-unit"><div class="hide-bal">

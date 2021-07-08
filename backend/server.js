@@ -3133,6 +3133,10 @@ if(req.body.RTA === "CAMS"){
             if(datacon[i]['NATURE'] === "ADDPUR" || datacon[i]['NATURE'] === "Additional Purchase") {
                 datacon[i]['NATURE'] = "Purchase";
             }
+		if (datacon[i]['NATURE'] === "Switch In" || datacon[i]['NATURE'] === "LTIA" || 
+                datacon[i]['NATURE'] === "LTIN") {
+                 datacon[i]['NATURE'] = "Switch In";
+             }
          }
       //   resdata.data = datacon;
       resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime())
@@ -3181,6 +3185,10 @@ if(req.body.RTA === "CAMS"){
             if(datacon[i]['NATURE'] === "ADDPUR" || datacon[i]['NATURE'] === "Additional Purchase") {
                 datacon[i]['NATURE'] = "Purchase";
             }
+		 if (datacon[i]['NATURE'] === "Switch In" || datacon[i]['NATURE'] === "LTIA" || 
+                datacon[i]['NATURE'] === "LTIN") {
+                 datacon[i]['NATURE'] = "Switch In";
+             }
          }
        //  resdata.data = datacon;
        resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime())
@@ -3229,6 +3237,10 @@ if(req.body.RTA === "CAMS"){
             if(datacon[i]['NATURE'] === "ADDPUR" || datacon[i]['NATURE'] === "Additional Purchase") {
                 datacon[i]['NATURE'] = "Purchase";
             }
+		 if (datacon[i]['NATURE'] === "Switch In" || datacon[i]['NATURE'] === "LTIA" || 
+                datacon[i]['NATURE'] === "LTIN") {
+                 datacon[i]['NATURE'] = "Switch In";
+             }
          }
       //   resdata.data = datacon;
       resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime())

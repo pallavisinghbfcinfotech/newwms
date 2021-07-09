@@ -20,7 +20,7 @@ class Portfoliodetail extends Component {
     const scheme = query.get('scheme')
     const pan = query.get('pan');
     const folio = query.get('folio');
-    const isin = query.get('isin');
+    //const isin = query.get('isin');
     axios.post('/api/getschemedetail',{scheme:scheme,pan:pan,folio:folio})
             .then(response => {
               //console.log(response);
@@ -142,14 +142,18 @@ class Portfoliodetail extends Component {
                 <th>NAV/Rate</th>
                 <th>Units/Nos</th>
                 <th>Balance</th>
-                <th></th>
+                <th>RTA</th>
               </tr>
             </thead>
            
               
             {this.state.data1.map((item, index) => ( 
                <tbody >
-                 {(  item.NATURE ==='Switch Out' || item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO')? (
+              {( 
+                item.NATURE ==='Switch Out' || 
+                // item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='Partial Switch Out' ||
+                //  item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO' || 
+                 item.NATURE ==='SWD')? (
                 <div class="hide-bal">{(unit = "-"+item.UNITS)}
                 </div>
                 // ):(item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO')? (
@@ -164,7 +168,8 @@ class Portfoliodetail extends Component {
                 <td>{item.TD_TRDT}</td>
                 {(item.NATURE === "Switch Out"|| item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO') ? (
                                      <td>Switch Out</td> ) :(item.NATURE === "SIPR") ? (
-                                      <td>SIP Reversal</td>  ) :(
+                                      <td>SIP Reversal</td> ) :(item.NATURE === "SWD") ? (
+                                        <td>Sys. Withdraw</td>  ): (
                                         <td>SIP</td> ) }
                 {/* <td>{item.NATURE}</td> */}
                 <td>{item.AMOUNT}</td>
@@ -179,7 +184,7 @@ class Portfoliodetail extends Component {
                   
                 <td><div class="hide-bal">{(balance = item.UNITS)}</div>{balancef+balance}</td>
                 )} */}
-                <td></td>
+                <td>{item.RTA}</td>
               </tr>
               </tbody>
             ))}

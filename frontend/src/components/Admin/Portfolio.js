@@ -55,16 +55,17 @@ class Portfolio extends Component {
               fullSchemeHtml += "<tr>"
               var unit = 0; var balance = 0; var amount = 0; var amt = 0; var cnav = 0; var currentval = 0; var gain = 0; var absreturn = 0; var days = 0; var date1 = ""; var date2 = ""; var totaldays = 0;
               var t = 0; var cagr = 0; var avgDays = 0; var rootval = 0; var nval = 0; var mathpo = 0;
-              var arrunit = []; var arrnav = [];var amtt=0;var arrdays=[];var alldays=[];
-              var arrpurchase = []; var j = 0;var temp333 =0;var temp222=0;var rowval = 0;
+              var arrunit = []; var arrnav = [];var amtt=0;var arrdays=[];var alldays=[];var sum1=[];
+              var arrpurchase = []; var j = 0;var temp333 =0;var temp222=0;var rowval = 0;var sum2=[];var sum3=[];
               var temp1, temp2 = 0; var temp3 = 0; var temp4 = 0; var temp33 = 0; var temp22 = 0; var totdays = 0;
-              var isin = ""; var newnavdate = "";var daystotal=0;            
+              var isin = ""; var newnavdate = "";var daystotal=0;var navrate=0;    
               for (var n = 0; n < res2.data.length; n++) {
                 if(typeof res2.data[0] != "undefined"){
                 if (res2.data[n].SCHEME === res2.data[0].SCHEME) {
                   if(Math.sign(res2.data[n].UNITS) != -1) {
-                    console.log(res2.data[n].UNITS, res2.data[n].SCHEME );
+                    if(res2.data[n].NATURE === "Switch Out")
                 for (var jj = 0; jj < arrunit.length; jj++) {
+                  
                   if (arrunit[jj] === 0)
                     arrunit.shift();
                   if (arrpurchase[jj] === 0)
@@ -73,6 +74,10 @@ class Portfolio extends Component {
                     arrdays.shift();
                     if (alldays[jj] === 0)
                     alldays.shift();
+                    if (sum1[jj] === 0)
+                    sum1.shift();
+                    if (sum2[jj] === 0)
+                    sum2.shift();
                 }
               }
                 
@@ -98,18 +103,24 @@ class Portfolio extends Component {
                   date1 = new Date(newdate);
                   date2 = new Date(newnavdate);
                   days = moment(date2).diff(moment(date1), 'days');
-                  //amtt = res2.data[n].AMT+amtt ;
                   arrunit.push(res2.data[n].UNITS);
                   arrpurchase.push(res2.data[n].UNITS * res2.data[n].TD_NAV);
                   arrdays.push(parseFloat(days)*res2.data[n].UNITS * parseFloat(res2.data[n].TD_NAV));
                   alldays.push(parseFloat(days));
+                  //sum1(purchase cost*days*cagr)
+                  if(days === 0){
+                  sum1.push(0);
+                  }else{
+                  sum1.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days)*parseFloat( (parseFloat(Math.pow(parseFloat( (res2.data[n].cnav*res2.data[n].UNITS)/(res2.data[n].UNITS*res2.data[n].TD_NAV)) ,parseFloat(1/parseFloat(days/365)) ) ) -1)*100) ); 
+                  }
+                  sum2.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days));
                   temp1 = res2.data[n].UNITS;
                   temp2 = temp1 + temp2;
-                  var navrate = res2.data[n].TD_NAV;
-                  console.log("purchase=",arrpurchase,res2.data[n].SCHEME,res2.data[n].UNITS ,res2.data[n].TD_NAV)
+                  navrate = res2.data[n].TD_NAV;
+                  
                 } else {
-                  //console.log("ggg=",res2.data[n].SCHEME);
-                  unit = "-" + res2.data[n].UNITS
+                  
+                 unit = "-" + res2.data[n].UNITS
                   amount = "-" + res2.data[n].AMOUNT
                       if (temp4 != "") {
                         arrunit.splice(0, 0, temp4);
@@ -124,6 +135,8 @@ class Portfolio extends Component {
                           arrpurchase[p] = 0;
                           arrdays[p]=0;
                           alldays[p]=0;
+                          sum1[p]=0;
+                          sum2[p]=0;
                           temp2 = parseFloat(temp2) - parseFloat(temp3);
                         } else {
                           temp4 = temp3 - temp2;
@@ -131,18 +144,20 @@ class Portfolio extends Component {
                         
                            if(res2.data[len].NATURE === "SIP" || res2.data[len].NATURE === "Purchase"|| res2.data[len].NATURE === "Switch In"){
                              arrpurchase[p] = temp4 * parseFloat(res2.data[p].TD_NAV);
-                            arrdays[p] = parseFloat(alldays[p])*temp4 * parseFloat(res2.data[p].TD_NAV);
+                            arrdays[p] = parseFloat(alldays[p])*parseFloat(temp4 )* parseFloat(res2.data[p].TD_NAV);
+                            sum1[p]= parseFloat(temp4 * parseFloat(res2.data[p].TD_NAV))*parseFloat(alldays[p])*parseFloat((parseFloat(Math.pow(parseFloat( (res2.data[p].cnav*temp4)/(temp4 * parseFloat(res2.data[p].TD_NAV))) ,parseFloat(1/parseFloat(alldays[p]/365)) ) ) -1)*100);
+                            sum2[p]=parseFloat(temp4 * parseFloat(res2.data[p].TD_NAV))*parseFloat(alldays[p]);
                           }else{
-                           // console.log("purchaseelse=",arrpurchase,res2.data[p].SCHEME,temp4,parseFloat(res2.data[p].TD_NAV),p)
-                            arrpurchase[p] = temp4 * parseFloat(res2.data[p].TD_NAV);
+                           arrpurchase[p] = temp4 * parseFloat(res2.data[p].TD_NAV);
                             arrdays[p] = parseFloat(alldays[p])*temp4 * parseFloat(res2.data[p].TD_NAV);
+                            sum1[p]=parseFloat(temp4 * parseFloat(res2.data[p].TD_NAV))*parseFloat(alldays[p])*parseFloat((parseFloat(Math.pow(parseFloat( (res2.data[p].cnav*temp4)/(temp4 * parseFloat(res2.data[p].TD_NAV))) ,parseFloat(1/parseFloat(alldays[p]/365)) ) ) -1)*100);
+                            sum2[p]=parseFloat(temp4 * parseFloat(res2.data[p].TD_NAV))*parseFloat(alldays[p])
                           }
-                           break;
+                          break;
                         }
                       }
                   }
                   balance = parseFloat(unit) + parseFloat(balance);
-                  // console.log("bal=",balance,res2.data[n].SCHEME)
                   cnav = res2.data[n].cnav
                   currentval = cnav * balance
                  
@@ -154,15 +169,20 @@ class Portfolio extends Component {
            
               }
               temp22 = 0;           
-            
               for (var k = 0; k < arrpurchase.length; k++) {
                 temp33 = Math.round(arrpurchase[k]);
                 temp22 = temp33 + temp22;
-                temp333 = Math.round(arrdays[k]);
-                temp222 = temp333 + temp222;
+                temp222 = Math.round(arrdays[k]) + temp222;
              
               }
-
+              var sum1all =0;var sum2all=0;
+              for (var kk = 0; kk < sum1.length; kk++) {
+                sum1all = sum1[kk] + sum1all;
+                 }
+                 for (var kkk = 0; kkk < sum2.length; kkk++) {
+                  sum2all = sum2[kkk] + sum2all;
+                   }
+                   cagr=sum1all/sum2all;
               gain = currentval - temp22;
               absreturn = ((parseFloat(currentval) - parseFloat(temp22)) / parseFloat(temp22)) * 100;
               nval = parseFloat(currentval) / parseFloat(temp22);
@@ -172,7 +192,7 @@ class Portfolio extends Component {
                 
               mathpo = Math.pow(parseFloat(nval), parseFloat(rootval));
             
-              cagr = (parseFloat(mathpo) - 1) * 100;
+          //    cagr = (parseFloat(mathpo) - 1) * 100;
              
               var baseurl = window.location.href
               var domain = baseurl.split('/');

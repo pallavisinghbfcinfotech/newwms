@@ -105,14 +105,14 @@ class Portfoliodetail extends Component {
                  <td>IND</td>
                 </tr>
 
-                <tr>
+                {/* <tr>
                 <th>Joint 1</th>
                  <td>{item.JTNAME1}</td>
                  <th></th>
                  <td></td>
                  <th>Joint 2</th>
                  <td>{item.JTNAME2}</td>
-                </tr>
+                </tr> */}
 
                 <tr>
                  <th>Nominee</th>
@@ -120,7 +120,7 @@ class Portfoliodetail extends Component {
                  <th></th>
                  <td></td>
                  <th>Bank</th>
-                 <td>{item.BNAME} {[item.BNKACNO]}</td>
+                 <td>{item.BANK} {[item.ACCOUNTNO]}</td>
                 </tr>
                 </tbody>
              ) ) }
@@ -169,7 +169,11 @@ class Portfoliodetail extends Component {
                 {(item.NATURE === "Switch Out"|| item.NATURE ==='RED' || item.NATURE ==='FUL' || item.NATURE ==='LTOP' || item.NATURE ==='LTOF' || item.NATURE ==='STPO') ? (
                                      <td>Switch Out</td> ) :(item.NATURE === "SIPR") ? (
                                       <td>SIP Reversal</td> ) :(item.NATURE === "SWD") ? (
-                                        <td>Sys. Withdraw</td>  ): (
+                                        <td>Sys. Withdraw</td>  ):(item.NATURE === "ADDPUR" || 
+                                        item.NATURE === "Additional Purchase" || item.NATURE === "NEW" || item.NATURE === "ADD") ? (
+                                          <td>Purchase</td>  ):(item.NATURE === "ADDPUR" || 
+                                          item.NATURE === "STPA" ||  item.NATURE === "Switch In" ) ? (
+                                            <td>Sys. Transfer In</td>  ):(
                                         <td>SIP</td> ) }
                 {/* <td>{item.NATURE}</td> */}
                 <td>{item.AMOUNT}</td>

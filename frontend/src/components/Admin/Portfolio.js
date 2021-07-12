@@ -199,7 +199,7 @@ class Portfolio extends Component {
               var scheme_name_data = scheme;
               var portfoliourl = "http://" + domain[domain.length - 2] + "/Portfoliodetail?scheme=" + scheme_name_data + "&pan=" + pan + "&folio=" + folio;
              if (balance > 0.01 && balance != 0 && balance != 0.000) {
-                fullSchemeHtml += "<td><a href='" + portfoliourl + "' target='_blank'>" + scheme + "</a></td><td>" + folio + "</td><td>" + balance.toFixed(3) + "</td><td>" + temp22 + "</td><td>" + cnav + "</td><td>" + Math.round(currentval) + "</td><td>" + Math.round(gain) + "</td><td>" + Math.round(temp222/temp22) + "</td><td>" + absreturn.toFixed(2) + "</td><td>" + cagr.toFixed(2) + "</td></tr>";
+                fullSchemeHtml += "<td><a href='" + portfoliourl + "' target='_blank'>" + scheme + "</a></td><td>" + folio + "</td><td>" + balance.toFixed(3) + "</td><td>" + temp22.toLocaleString('en-IN') + "</td><td>" + cnav + "</td><td>" + (Math.round(currentval).toLocaleString('en-IN')) + "</td><td>" + Math.round(gain) + "</td><td>" + Math.round(temp222/temp22) + "</td><td>" + absreturn.toFixed(2) + "</td><td>" + cagr.toFixed(2) + "</td></tr>";
                 $(".randerData").html(fullSchemeHtml)
              }
             }.bind(this),

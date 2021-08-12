@@ -2343,11 +2343,11 @@ if(req.body.category ==="ALL"){
         { $group: { _id: { INVNAME:"$INVNAME",PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO" } } },
         { $project: { _id: 0,NAME:"$_id.INVNAME", PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO" ,RTA:"KARVY" } }
     ]  
-    pipeline3 = [   //trans_franklin
-        { $match: { IT_PAN_NO1: req.body.pan, INVESTOR_2: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
-        { $group: { _id: { INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", FOLIO_NO: "$FOLIO_NO" } } },
-        { $project: { _id: 0,NAME:"$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", FOLIO: "$_id.FOLIO_NO",RTA:"FRANKLIN" } }
-    ]
+//     pipeline3 = [   //trans_franklin
+//         { $match: { IT_PAN_NO1: req.body.pan, INVESTOR_2: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
+//         { $group: { _id: { INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", FOLIO_NO: "$FOLIO_NO" } } },
+//         { $project: { _id: 0,NAME:"$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", FOLIO: "$_id.FOLIO_NO",RTA:"FRANKLIN" } }
+//     ]
 }else{
     pipeline1 = [  //trans_cams
         { $match: { PAN: req.body.pan , INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' },SCHEME_TYP: { $regex: `^${req.body.category}.*`, $options: 'i' } } },
@@ -2359,22 +2359,22 @@ if(req.body.category ==="ALL"){
         { $group: { _id: { INVNAME:"$INVNAME",PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO" } } },
         { $project: { _id: 0,NAME:"$_id.INVNAME",  PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO" } }
     ]
-    pipeline3 = [   //trans_franklin
-        { $match: { IT_PAN_NO1: req.body.pan, INVESTOR_2: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
-        { $group: { _id: { INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", FOLIO_NO: "$FOLIO_NO" } } },
-        { $project: { _id: 0,NAME:"$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", FOLIO: "$_id.FOLIO_NO",RTA:"FRANKLIN" } }
-    ]
+//     pipeline3 = [   //trans_franklin
+//         { $match: { IT_PAN_NO1: req.body.pan, INVESTOR_2: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
+//         { $group: { _id: { INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", FOLIO_NO: "$FOLIO_NO" } } },
+//         { $project: { _id: 0,NAME:"$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", FOLIO: "$_id.FOLIO_NO",RTA:"FRANKLIN" } }
+//     ]
 }
 transc.aggregate(pipeline1, (err, data1) => {
     transk.aggregate(pipeline2, (err, data2) => {
-       transf.aggregate(pipeline3, (err, data3) => {     
+//        transf.aggregate(pipeline3, (err, data3) => {     
       
-        if ( data3.length != 0 || data2.length !=0 || data1.length !=0) {
+        if (data2.length !=0 || data1.length !=0) {
             if (err) {
                 res.send(err);
             }
             else {
-                let merged = data1.concat(data2.concat(data3));
+                let merged = data1.concat(data2);
                 var removeduplicates = Array.from(new Set(merged));
                 datacon = removeduplicates.map(JSON.stringify)
                     .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
@@ -2395,7 +2395,7 @@ transc.aggregate(pipeline1, (err, data1) => {
                 return datacon;
             }
         }
-        });
+//         });
     });
 });
 })

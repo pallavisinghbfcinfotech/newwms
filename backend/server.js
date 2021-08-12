@@ -3084,14 +3084,14 @@ app.post("/api/getschemeportfoliodetail", function (req, res) {
     ]
 
 
-    pipeline3 = [  //trans_franklin  
-        { $match: { SCHEME_NA1: req.body.scheme, IT_PAN_NO1: req.body.pan, FOLIO_NO: req.body.folio, INVESTOR_2: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
-        { $group: { _id: { FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", NAV: "$NAV", TRXN_TYPE: "$TRXN_TYPE", TRXN_DATE: "$TRXN_DATE", ISIN: "$ISIN" }, UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
-        { $lookup: { from: 'cams_nav', localField: '_id.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
-        { $unwind: "$nav" },
-        { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", TD_NAV: "$_id.NAV", NATURE: "$_id.TRXN_TYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, ISIN: "$_id.ISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
-        { $sort: { TD_TRDT: -1 } }
-    ]
+//     pipeline3 = [  //trans_franklin  
+//         { $match: { SCHEME_NA1: req.body.scheme, IT_PAN_NO1: req.body.pan, FOLIO_NO: req.body.folio, INVESTOR_2: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
+//         { $group: { _id: { FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", NAV: "$NAV", TRXN_TYPE: "$TRXN_TYPE", TRXN_DATE: "$TRXN_DATE", ISIN: "$ISIN" }, UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+//         { $lookup: { from: 'cams_nav', localField: '_id.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+//         { $unwind: "$nav" },
+//         { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", TD_NAV: "$_id.NAV", NATURE: "$_id.TRXN_TYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, ISIN: "$_id.ISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+//         { $sort: { TD_TRDT: -1 } }
+//     ]
     if (req.body.RTA === "CAMS") {
         transc.aggregate(pipeline1, (err, camsdata) => {
             if (camsdata != 0) {
@@ -3146,7 +3146,7 @@ app.post("/api/getschemeportfoliodetail", function (req, res) {
             res.json(resdata);
             return resdata;
         });
-    } else if (req.body.RTA === "KARVY") {
+    } else {
         transk.aggregate(pipeline2, (err, karvydata) => {
 
             if (karvydata != 0) {
@@ -3202,61 +3202,61 @@ app.post("/api/getschemeportfoliodetail", function (req, res) {
             res.json(resdata);
             return resdata;
         });
-    } else {
-        transf.aggregate(pipeline3, (err, frankdata) => {
+//     } else {
+//         transf.aggregate(pipeline3, (err, frankdata) => {
 
-            if (frankdata != 0) {
-                resdata = {
-                    status: 200,
-                    message: "Successfull",
-                    data: frankdata
-                }
-            } else {
-                resdata = {
-                    status: 400,
-                    message: "Data not found"
-                }
-            }
-            datacon = frankdata;
-            for (var i = 0; i < datacon.length; i++) {
-                if (datacon[i]['NATURE'] === "Redemption" || datacon[i]['NATURE'] === "RED" ||
-                    datacon[i]['NATURE'] === "SIPR" || datacon[i]['NATURE'] === "Full Redemption" ||
-                    datacon[i]['NATURE'] === "Partial Redemption" || datacon[i]['NATURE'] === "Lateral Shift Out" ||
-                    datacon[i]['NATURE'] === "Switchout" || datacon[i]['NATURE'] === "Transfer-Out" ||
-                    datacon[i]['NATURE'] === "Transmission Out" || datacon[i]['NATURE'] === "Switch Over Out" ||
-                    datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "LTOF" || datacon[i]['NATURE'] === "FULR" ||
-                    datacon[i]['NATURE'] === "Partial Switch Out" || datacon[i]['NATURE'] === "Full Switch Out" ||
-                    datacon[i]['NATURE'] === "IPOR" || datacon[i]['NATURE'] === "FUL" ||
-                    datacon[i]['NATURE'] === "STPO" || datacon[i]['NATURE'] === "SWOF"||
-                    datacon[i]['NATURE'] === "SWD") {
-                    datacon[i]['NATURE'] = "Switch Out";
-                }
-                if (datacon[i]['NATURE'].match(/Systematic Investment.*/) ||
-                    datacon[i]['NATURE'] === "SIN" ||
-                   // datacon[i]['NATURE'].match(/Systematic Withdrawal.*/) ||
-                    datacon[i]['NATURE'].match(/Systematic - Instalment.*/) ||
-                    datacon[i]['NATURE'].match(/Systematic - To.*/) ||
-                    datacon[i]['NATURE'].match(/Systematic-NSE.*/) ||
-                    datacon[i]['NATURE'].match(/Systematic Physical.*/) ||
-                    datacon[i]['NATURE'].match(/Systematic.*/) ||
-                    datacon[i]['NATURE'].match(/Systematic-Normal.*/) ||
-                    datacon[i]['NATURE'].match(/Systematic (ECS).*/)) {
-                    datacon[i]['NATURE'] = "SIP";
-                }
-                if (datacon[i]['NATURE'] === "ADDPUR" || datacon[i]['NATURE'] === "Additional Purchase") {
-                    datacon[i]['NATURE'] = "Purchase";
-                }
-                if (datacon[i]['NATURE'] === "Switch In" || datacon[i]['NATURE'] === "LTIA" || 
-                datacon[i]['NATURE'] === "LTIN") {
-                 datacon[i]['NATURE'] = "Switch In";
-             }
+//             if (frankdata != 0) {
+//                 resdata = {
+//                     status: 200,
+//                     message: "Successfull",
+//                     data: frankdata
+//                 }
+//             } else {
+//                 resdata = {
+//                     status: 400,
+//                     message: "Data not found"
+//                 }
+//             }
+//             datacon = frankdata;
+//             for (var i = 0; i < datacon.length; i++) {
+//                 if (datacon[i]['NATURE'] === "Redemption" || datacon[i]['NATURE'] === "RED" ||
+//                     datacon[i]['NATURE'] === "SIPR" || datacon[i]['NATURE'] === "Full Redemption" ||
+//                     datacon[i]['NATURE'] === "Partial Redemption" || datacon[i]['NATURE'] === "Lateral Shift Out" ||
+//                     datacon[i]['NATURE'] === "Switchout" || datacon[i]['NATURE'] === "Transfer-Out" ||
+//                     datacon[i]['NATURE'] === "Transmission Out" || datacon[i]['NATURE'] === "Switch Over Out" ||
+//                     datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "LTOF" || datacon[i]['NATURE'] === "FULR" ||
+//                     datacon[i]['NATURE'] === "Partial Switch Out" || datacon[i]['NATURE'] === "Full Switch Out" ||
+//                     datacon[i]['NATURE'] === "IPOR" || datacon[i]['NATURE'] === "FUL" ||
+//                     datacon[i]['NATURE'] === "STPO" || datacon[i]['NATURE'] === "SWOF"||
+//                     datacon[i]['NATURE'] === "SWD") {
+//                     datacon[i]['NATURE'] = "Switch Out";
+//                 }
+//                 if (datacon[i]['NATURE'].match(/Systematic Investment.*/) ||
+//                     datacon[i]['NATURE'] === "SIN" ||
+//                    // datacon[i]['NATURE'].match(/Systematic Withdrawal.*/) ||
+//                     datacon[i]['NATURE'].match(/Systematic - Instalment.*/) ||
+//                     datacon[i]['NATURE'].match(/Systematic - To.*/) ||
+//                     datacon[i]['NATURE'].match(/Systematic-NSE.*/) ||
+//                     datacon[i]['NATURE'].match(/Systematic Physical.*/) ||
+//                     datacon[i]['NATURE'].match(/Systematic.*/) ||
+//                     datacon[i]['NATURE'].match(/Systematic-Normal.*/) ||
+//                     datacon[i]['NATURE'].match(/Systematic (ECS).*/)) {
+//                     datacon[i]['NATURE'] = "SIP";
+//                 }
+//                 if (datacon[i]['NATURE'] === "ADDPUR" || datacon[i]['NATURE'] === "Additional Purchase") {
+//                     datacon[i]['NATURE'] = "Purchase";
+//                 }
+//                 if (datacon[i]['NATURE'] === "Switch In" || datacon[i]['NATURE'] === "LTIA" || 
+//                 datacon[i]['NATURE'] === "LTIN") {
+//                  datacon[i]['NATURE'] = "Switch In";
+//              }
             
-            }
-            //   resdata.data = datacon;
-            resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime())
-            res.json(resdata);
-            return resdata;
-        });
+//             }
+//             //   resdata.data = datacon;
+//             resdata.data = datacon.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime())
+//             res.json(resdata);
+//             return resdata;
+//         });
     }
 })
 

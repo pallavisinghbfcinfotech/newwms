@@ -3,12 +3,9 @@ import { Component } from "react";
 import $ from 'jquery';
 import axios from 'axios';
 
-//var createReactClass = require('create-react-class');
-
 class Portfoliodetail extends Component { 
   constructor(props) {
     super(props);
-
     this.state = {
       data1: [],
       data2: [],
@@ -17,20 +14,18 @@ class Portfoliodetail extends Component {
   componentDidMount(){
     document.title = "WMS | Folio Detail"
     const query = new URLSearchParams(this.props.location.search);
-    const scheme = query.get('scheme')
+    const scheme = query.get('scheme');
     const pan = query.get('pan');
     const folio = query.get('folio');
-    //const isin = query.get('isin');
-    axios.post('/api/getschemedetail',{scheme:scheme,pan:pan,folio:folio})
+    axios.post('/api/getschemedetail',{pan:pan,folio:folio,scheme:scheme})
             .then(response => {
-              //console.log(response);
                 this.setState({data1: response.data.data, isFetching: false})
             })
             .catch(e => {
                 console.log(e);
                 this.setState({...this.state, isFetching: false});
             });
-    axios.post('/api/getschemepersonaldetail',{scheme:scheme,pan:pan,folio:folio})
+    axios.post('/api/getschemepersonaldetail',{pan:pan,folio:folio,scheme:scheme})
             .then(resp => {
               //console.log(response);
                 this.setState({data2: resp.data, isFetching: false})
@@ -39,8 +34,6 @@ class Portfoliodetail extends Component {
                 console.log(e);
                 this.setState({...this.state, isFetching: false});
             });
-   
-    
   }
   render(){
    var balance = 0;

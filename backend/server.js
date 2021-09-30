@@ -2122,6 +2122,55 @@ app.get("/api/getfoliolist", function (req, res) {
   });
 })
 
+app.post("/api/getschemepersonaldetail", function (req, res) {
+    try {
+        pipeline1 = [  ///trans_karvy
+            { $match: { FMCODE: req.body.scheme, PAN1: req.body.pan, TD_ACNO: req.body.folio } },
+            { $group: { _id: { PAN1: "$PAN1", INVNAME: "$INVNAME", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO", STATUS: "$STATUS",FMCODE:"$FMCODE" } } },
+            { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
+            { $unwind: "$detail" },
+            { $project: { _id: 0, PAN: "$_id.PAN1", INVNAME: "$_id.INVNAME", FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", STATUS: "$_id.STATUS", ADDRESS: { '$concat': ['$detail.ADD1', ',', '$detail.ADD2', ',', '$detail.ADD3', ' ', '$detail.CITY', ' ', '$detail.COUNTRY'] }, EMAIL: "$detail.EMAIL", MOBILE: "$detail.MOBILE", GUARDIANNAME: "$detail.GUARDIANN0", MODE: "$detail.MODEOFHOLD", NOMINEE: "$detail.NOMINEE", NOMINEE2: "$detail.NOMINEE2", NOMINEE3: "$detail.NOMINEE3", JTNAME1: "$detail.JTNAME1", JTNAME2: "$detail.JTNAME2", BANK: "$detail.BNAME", ACCOUNTNO: "$detail.BNKACNO",PRODCODE:"$_id.FMCODE" } },
+        ]
+      
+        pipeline3 = [  //trans_cams
+            { $match: { PAN: req.body.pan, PRODCODE: req.body.scheme, FOLIO_NO: req.body.folio } },
+            { $group: { _id: { PAN: "$PAN", INV_NAME: "$INV_NAME", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", SCHEME_TYP: "$SCHEME_TYP", AC_NO: "$AC_NO", BANK_NAME: "$BANK_NAME", TAX_STATUS: "$TAX_STATUS" ,PRODCODE:"$PRODCODE"} } },
+            { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+            { $unwind: "$detail" },
+            { $project: { _id: 0, PAN: "$_id.PAN", INVNAME: "$_id.INV_NAME", FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", ACCOUNTNO: "$_id.AC_NO", BANK: "$_id.BANK_NAME", NOMINEE: "$detail.NOM_NAME",PRODCODE:"$_id.PRODCODE" } },
+        ]
+        transc.aggregate(pipeline3, (err, camsdata) => {
+            transk.aggregate(pipeline1, (err, karvydata) => {
+                if (karvydata != 0 || camsdata != 0) {
+                    if (err) {
+                        res.send(err);
+                    }
+                    else {
+                        var datacon = karvydata.concat(camsdata);
+                        var removeduplicates = datacon.map(JSON.stringify)
+                            .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                            .filter(function (item, index, arr) {
+                                return arr.indexOf(item, index + 1) === -1;
+                            }) // check if there is any occurence of the item in whole array
+                            .reverse().map(JSON.parse);
+                        datacon = Array.from(new Set(removeduplicates));
+                        var filtered = datacon.filter(
+                            (temp => a =>
+                                (k => !temp[k] && (temp[k] = true))(a.FOLIO + '|' + a.PRODCODE)
+                            )(Object.create(null))
+                        );
+                        datacon = filtered;
+                        res.send(datacon);
+                        return datacon;
+                    }
+                }
+            });
+        });
+    } catch (err) {
+        console.log(e)
+    }
+})
+
 // app.post("/api/getschemepersonaldetail", function (req, res) {
 //     try {
 //         pipeline1 = [  ///trans_karvy

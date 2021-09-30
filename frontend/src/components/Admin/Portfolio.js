@@ -5,9 +5,6 @@ import $ from 'jquery';
 import axios from 'axios';
 import moment from 'moment';
 
-
-//var createReactClass = require('create-react-class');
-
 class Portfolio extends Component {
   constructor(props) {
     super(props);
@@ -44,24 +41,25 @@ class Portfolio extends Component {
       data: { pan: pan, name: name ,category:catValue},
       success: function (res) {
         for (var i = 0; i < res.length; i++) {
-     //   console.log("first response=",res[i].SCHEME,res[i].FOLIO)
-          $.ajax({
+            $.ajax({
             url: "/api/getschemeportfoliodetail",
             type: "POST",
-            data: { scheme:res[i].SCHEME, pan:res[i].PAN, folio:res[i].FOLIO, name:res[i].NAME,RTA:res[i].RTA },
-            success: function (res2) {
-              
+            data: { scheme:res[i].PRODCODE, pan:res[i].PAN, folio:res[i].FOLIO, RTA:res[i].RTA },
+            success: function (res2) {     
               res2.data = res2.data.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
               fullSchemeHtml += "<tr>"
-              var unit = 0; var balance = 0; var amount = 0; var amt = 0; var cnav = 0; var currentval = 0; var gain = 0; var absreturn = 0; var days = 0; var date1 = ""; var date2 = ""; var totaldays = 0;
+              var unit = 0; var balance = 0; var amount = 0; var amt = 0; var cnav = 0; var currentval = 0;
+               var gain = 0; var absreturn = 0; var days = 0; var date1 = ""; var date2 = ""; var totaldays = 0;
               var t = 0; var cagr = 0; var avgDays = 0; var rootval = 0; var nval = 0; var mathpo = 0;
               var arrunit = []; var arrnav = [];var amtt=0;var arrdays=[];var alldays=[];var sum1=[];
-              var arrpurchase = []; var j = 0;var temp333 =0;var temp222=0;var rowval = 0;var sum2=[];var sum3=[];
-              var temp1, temp2 = 0; var temp3 = 0; var temp4 = 0; var temp33 = 0; var temp22 = 0; var totdays = 0;
+              var arrpurchase = []; var j = 0;var temp333 =0;var temp222=0;var rowval = 0;var sum2=[];
+              var sum3=[];
+              var temp1, temp2 = 0; var temp3 = 0; var temp4 = 0; var temp33 = 0; var temp22 = 0; 
+              var totdays = 0;
               var isin = ""; var newnavdate = "";var daystotal=0;var navrate=0;    
               for (var n = 0; n < res2.data.length; n++) {
-                if(typeof res2.data[0] != "undefined"){
-                if (res2.data[n].SCHEME === res2.data[0].SCHEME) {
+               if(typeof res2.data[n] != "undefined"){
+                if (res2.data[n].PRODCODE === res2.data[0].PRODCODE) {
                   if(Math.sign(res2.data[n].UNITS) != -1) {
                     if(res2.data[n].NATURE === "Switch Out")
                 for (var jj = 0; jj < arrunit.length; jj++) {
@@ -82,7 +80,6 @@ class Portfolio extends Component {
               }
                 
                 if (res2.data[n].NATURE != 'Switch Out' && res2.data[n].UNITS != 0 ) {
-                  
                   unit = res2.data[n].UNITS
                   amount = res2.data[n].AMOUNT;
                   var date = res2.data[n].TD_TRDT;
@@ -93,7 +90,6 @@ class Portfolio extends Component {
                   var mm = d.getMonth() + 1;
                   var yy = d.getFullYear();
                   var newdate = mm + "/" + dd + "/" + yy;
-                  
 
                   var navd = new Date(navdate);
                   var navdd = navd.getDate();
@@ -105,28 +101,29 @@ class Portfolio extends Component {
                   days = moment(date2).diff(moment(date1), 'days');
                   arrunit.push(res2.data[n].UNITS);
                   arrpurchase.push(res2.data[n].UNITS * res2.data[n].TD_NAV);
-                  arrdays.push(parseFloat(days)*res2.data[n].UNITS * parseFloat(res2.data[n].TD_NAV));
-                  alldays.push(parseFloat(days));
                   //sum1(purchase cost*days*cagr)
                   if(days === 0){
                   sum1.push(0);
+                  arrdays.push(0);
+                  alldays.push(0);
+                  sum2.push(0);
                   }else{
+                  arrdays.push(parseFloat(days)*res2.data[n].UNITS * parseFloat(res2.data[n].TD_NAV));
+                  alldays.push(parseFloat(days));
                   sum1.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days)*parseFloat( (parseFloat(Math.pow(parseFloat( (res2.data[n].cnav*res2.data[n].UNITS)/(res2.data[n].UNITS*res2.data[n].TD_NAV)) ,parseFloat(1/parseFloat(days/365)) ) ) -1)*100) ); 
-                  }
                   sum2.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days));
+                }
+                  
                   temp1 = res2.data[n].UNITS;
                   temp2 = temp1 + temp2;
-                  navrate = res2.data[n].TD_NAV;
-                  
+                  navrate = res2.data[n].TD_NAV; 
                 } else {
-                  
                  unit = "-" + res2.data[n].UNITS
                   amount = "-" + res2.data[n].AMOUNT
                       if (temp4 != "") {
                         arrunit.splice(0, 0, temp4);
                       }
-                      temp2 = res2.data[n].UNITS;
-                    
+                      temp2 = res2.data[n].UNITS;  
                       for (var p = 0; p < arrunit.length; p++) {
                         temp3 = arrunit[p];
                         rowval = p;
@@ -141,17 +138,32 @@ class Portfolio extends Component {
                         } else {
                           temp4 = temp3 - temp2;
                           var len = res2.data.length -1;     
-                        
                            if(res2.data[len].NATURE === "SIP" || res2.data[len].NATURE === "Purchase"|| res2.data[len].NATURE === "Switch In"){
                              arrpurchase[p] = temp4 * parseFloat(res2.data[p].TD_NAV);
-                            arrdays[p] = parseFloat(alldays[p])*parseFloat(temp4 )* parseFloat(res2.data[p].TD_NAV);
-                            sum1[p]= parseFloat(temp4 * parseFloat(res2.data[p].TD_NAV))*parseFloat(alldays[p])*parseFloat((parseFloat(Math.pow(parseFloat( (res2.data[p].cnav*temp4)/(temp4 * parseFloat(res2.data[p].TD_NAV))) ,parseFloat(1/parseFloat(alldays[p]/365)) ) ) -1)*100);
+                             if(arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) ){
+                              arrdays[p] = 0;
+                              alldays[p] = 0;
+                              sum1[p] =0;
+                              sum2[p] =0;
+                             }else{
+                              arrdays[p] = parseFloat(alldays[p])*parseFloat(temp4 )* parseFloat(res2.data[p].TD_NAV);
+                             sum1[p]= parseFloat(temp4 * parseFloat(res2.data[p].TD_NAV))*parseFloat(alldays[p])*parseFloat((parseFloat(Math.pow(parseFloat( (res2.data[p].cnav*temp4)/(temp4 * parseFloat(res2.data[p].TD_NAV))) ,parseFloat(1/parseFloat(alldays[p]/365)) ) ) -1)*100);
                             sum2[p]=parseFloat(temp4 * parseFloat(res2.data[p].TD_NAV))*parseFloat(alldays[p]);
+                             }
                           }else{
+                           
                            arrpurchase[p] = temp4 * parseFloat(res2.data[p].TD_NAV);
+                         
+                           if(arrdays[p]=== 0 || arrdays[p] === "undefined" || isNaN(arrdays[p])){
+                            arrdays[p] = 0;
+                            alldays[p] = 0;
+                            sum1[p] =0;
+                            sum2[p] =0;
+                           }else{
                             arrdays[p] = parseFloat(alldays[p])*temp4 * parseFloat(res2.data[p].TD_NAV);
                             sum1[p]=parseFloat(temp4 * parseFloat(res2.data[p].TD_NAV))*parseFloat(alldays[p])*parseFloat((parseFloat(Math.pow(parseFloat( (res2.data[p].cnav*temp4)/(temp4 * parseFloat(res2.data[p].TD_NAV))) ,parseFloat(1/parseFloat(alldays[p]/365)) ) ) -1)*100);
                             sum2[p]=parseFloat(temp4 * parseFloat(res2.data[p].TD_NAV))*parseFloat(alldays[p])
+                           }
                           }
                           break;
                         }
@@ -160,21 +172,29 @@ class Portfolio extends Component {
                   balance = parseFloat(unit) + parseFloat(balance);
                   cnav = res2.data[n].cnav
                   currentval = cnav * balance
-                 
+                  var prodcode = res2.data[n].PRODCODE;
                   var scheme = res2.data[n].SCHEME;
                   var folio = res2.data[n].FOLIO;
                   var isin = res2.data[n].ISIN;
                 }
               }
-           
+             
               }
-              temp22 = 0;           
+              temp22 = 0;      
+             
               for (var k = 0; k < arrpurchase.length; k++) {
                 temp33 = Math.round(arrpurchase[k]);
                 temp22 = temp33 + temp22;
+                if(arrdays[k] === [] || arrdays[k] === [0]){
+                  temp222 = 0;
+                }else{
                 temp222 = Math.round(arrdays[k]) + temp222;
-             
+                }
               }
+             if(temp222 === 0 || temp22 === 0){
+               days =0;
+             }
+
               var sum1all =0;var sum2all=0;
               for (var kk = 0; kk < sum1.length; kk++) {
                 sum1all = sum1[kk] + sum1all;
@@ -184,7 +204,12 @@ class Portfolio extends Component {
                    }
                    cagr=sum1all/sum2all;
               gain = currentval - temp22;
-              absreturn = ((parseFloat(currentval) - parseFloat(temp22)) / parseFloat(temp22)) * 100;
+              if(temp22===0){
+                absreturn = 0;
+              }else{
+                absreturn = ((parseFloat(currentval) - parseFloat(temp22)) / parseFloat(temp22)) * 100;
+              }
+              
               nval = parseFloat(currentval) / parseFloat(temp22);
               t = parseFloat(temp222/temp22) / 365;
              
@@ -196,12 +221,12 @@ class Portfolio extends Component {
              
               var baseurl = window.location.href
               var domain = baseurl.split('/');
-              var scheme_name_data = scheme;
-              var portfoliourl = "http://" + domain[domain.length - 2] + "/Portfoliodetail?scheme=" + scheme_name_data + "&pan=" + pan + "&folio=" + folio;
-             if (balance > 0.01 && balance != 0 && balance != 0.000) {
-                fullSchemeHtml += "<td><a href='" + portfoliourl + "' target='_blank'>" + scheme + "</a></td><td>" + folio + "</td><td>" + balance.toFixed(3) + "</td><td>" + temp22.toLocaleString('en-IN') + "</td><td>" + cnav + "</td><td>" + (Math.round(currentval).toLocaleString('en-IN')) + "</td><td>" + Math.round(gain) + "</td><td>" + Math.round(temp222/temp22) + "</td><td>" + absreturn.toFixed(2) + "</td><td>" + cagr.toFixed(2) + "</td></tr>";
+              var scheme_name_data = prodcode;
+              var portfoliourl = "http://" + domain[domain.length - 2] + "/Portfoliodetail?pan=" + pan + "&folio=" + folio + "&scheme=" + scheme_name_data;
+              if (balance > 0.01 && balance != 0 && balance != 0.000) {
+                fullSchemeHtml += "<td><a href='" + portfoliourl + "' target='_blank'>" + scheme + "</a></td><td>" + folio + "</td><td>" + balance.toFixed(3) + "</td><td>" + temp22.toLocaleString('en-IN') + "</td><td>" + cnav + "</td><td>" + (Math.round(currentval)).toLocaleString('en-IN') + "</td><td>" + Math.round(gain) + "</td><td>" + Math.round(temp222/temp22) + "</td><td>" + absreturn.toFixed(2) + "</td><td>" + cagr.toFixed(2) + "</td></tr>";
                 $(".randerData").html(fullSchemeHtml)
-             }
+           }
             }.bind(this),
             error: function (jqXHR) {
               console.log(jqXHR);
@@ -237,7 +262,6 @@ class Portfolio extends Component {
       data: { name: inputValue },
       success: function (res4) {
         this.setState({ searchname: res4 });
-
       }.bind(this),
       error: function (jqXHR) {
         console.log(jqXHR);

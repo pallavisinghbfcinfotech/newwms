@@ -142,6 +142,12 @@ font-size:14px;
                   <p className="side_p">Data Management</p>
                 </a>
               </li>
+               <li className="nav-item has-treeview">
+                <a href="Transaction_report" className="nav-link">
+                  <i className="nav-icon fa fa-file" />
+                  <p className="side_p">Transaction Report</p>
+                </a>
+              </li>
               {/* <li className="nav-item has-treeview">
                 <a href="" className="nav-link">
                   <i className="nav-icon fas fa-clock" />

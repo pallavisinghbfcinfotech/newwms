@@ -254,6 +254,46 @@ const transfranklin = new Schema({
   var data="";var karvydata="";var camsdata="";var frankdata="";var datacon="";
 var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 
+app.post("/api/getselecteddata", function (req, res) {
+  var userid= req.body.id;
+  var arr1=[];
+   for(var i =0 ;i < userid.length ; i++){
+    arr1.push({_id:ObjectId(userid[i])})
+   }
+   var str1 = { $or:arr1 }
+   pipeline1 = [  //folio_karvy
+    { $match: str1 },
+    { $project: { _id: 1,DATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.LASTUPDAT1" } },INVNAME: "$INVNAME",PAN:"$PANGNO" , ADD1:"$ADD1",ADD2:"$ADD2",ADD3:"$ADD3",GUARDPAN:"$GUARDPANNO",RTA:"FOLIOKARVY" } }
+]
+pipeline2 = [  //folio_cams
+    { $match: str1 },
+    { $project: { _id: 1,DATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.FOLIO_DATE" } },INVNAME: "$INV_NAME",PAN:"$PAN_NO" ,ADD1:"$ADDRESS1",ADD2:"$ADDRESS2",ADD3:"$ADDRESS3",GUARDPAN:"$GUARD_PAN",RTA:"FOLIOCAMS"   } }
+]
+foliok.aggregate(pipeline1, (err, karvydata) => {
+
+    folioc.aggregate(pipeline2, (err, camsdata) => {
+
+        if (camsdata != 0 || karvydata != 0) {
+                var datacon =camsdata.concat(karvydata);
+		resdata = {
+                status: 200,
+                message: 'Successful',
+		data: camsdata,
+            }
+		resdata.data = datacon;
+                res.send(resdata);
+        }else{
+            resdata = {
+                status: 400,
+                message: 'Data not found !',
+            }
+            res.json(resdata);
+           }     
+    });
+});
+})
+
+
 app.post("/api/searchclient", function (req, res) {
     var str1="";var str2="";
     var name = req.body.name;

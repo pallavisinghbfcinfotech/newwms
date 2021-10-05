@@ -254,6 +254,83 @@ const transfranklin = new Schema({
   var data="";var karvydata="";var camsdata="";var frankdata="";var datacon="";
 var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 
+app.post("/api/updatepersonaldetail", function (req, res) {
+    for(var i=0;i<req.body.id.length;i++){
+        var pan  = req.body.id[i].split('/')[0];
+        var name  = req.body.id[i].split('/')[1];
+        folioc.find({INV_NAME:name,PAN_NO:pan}).distinct("FOLIOCHK", function (err, member1) {
+                for(var j=0;j<member1.length;j++){
+                transc.updateMany(
+                        {FOLIO_NO:member1[j] },
+                        {
+                            $set: {
+                                INV_NAME: req.body.updatename,
+                            }
+                        },
+                        {
+                            "upsert": false
+                        },
+                        function (err, object) {
+                            if (err) {
+                                console.warn(err.message);  // returns error if no matching object found
+                            }
+                    })
+                }
+            });  
+            folioc.updateMany(
+                            {PAN_NO: pan,INV_NAME: name },
+                            {
+                                $set: {
+                                    INV_NAME: req.body.updatename,
+                                }
+                            },
+                            {
+                                "upsert": false
+                            },
+                            function (err, object) {
+                                if (err) {
+                                    console.warn(err.message);  // returns error if no matching object found
+                                }
+                        })
+            foliok.find({INVNAME:name,PANGNO:pan}).distinct("ACNO", function (err, member2) {
+                for(var j=0;j<member2.length;j++){
+                    transk.updateMany(
+                            {TD_ACNO: member2[j]},
+                            {
+                                $set: {
+                                    INVNAME: req.body.updatename,
+                                }
+                            },
+                            {
+                                "upsert": false
+                            },
+                            function (err, object) {
+                                if (err) {
+                                    console.warn(err.message);  // returns error if no matching object found
+                                }
+                        })
+                }
+            });
+        foliok.updateMany(
+                { PANGNO: pan, INVNAME:name  },
+                {
+                    $set: {
+                        INVNAME:req.body.updatename,
+                    }
+                },
+                {
+                    "upsert": false
+                },
+                function (err, object) {
+                    if (err) {
+                        console.warn(err.message);  // returns error if no matching object found
+                    }
+            })
+    }
+	var msg="Updated Successfully";
+        res.send(msg);
+  })
+
 app.post("/api/getselecteddata", function (req, res) {
   var userid= req.body.id;
   var arr1=[];

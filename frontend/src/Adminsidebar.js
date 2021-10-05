@@ -143,9 +143,9 @@ font-size:14px;
                 </a>
               </li>
                <li className="nav-item has-treeview">
-                <a href="Transaction_report" className="nav-link">
+                <a href="Client_mapping" className="nav-link">
                   <i className="nav-icon fa fa-file" />
-                  <p className="side_p">Transaction Report</p>
+                  <p className="side_p">Client Mapping</p>
                 </a>
               </li>
               {/* <li className="nav-item has-treeview">

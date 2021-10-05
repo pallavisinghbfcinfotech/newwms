@@ -108,7 +108,8 @@ class Portfolio extends Component {
                   alldays.push(0);
                   sum2.push(0);
                   }else{
-                  arrdays.push(parseFloat(days)*res2.data[n].UNITS * parseFloat(res2.data[n].TD_NAV));
+                  arrdays.push(parseFloat(days)*res2.data[n].AMOUNT);
+                  //arrdays.push(parseFloat(days)*res2.data[n].UNITS * parseFloat(res2.data[n].TD_NAV));
                   alldays.push(parseFloat(days));
 //                   sum1.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days)*parseFloat( (parseFloat(Math.pow(parseFloat( (res2.data[n].cnav*res2.data[n].UNITS)/(res2.data[n].UNITS*res2.data[n].TD_NAV)) ,parseFloat(1/parseFloat(days/365)) ) ) -1)*100) ); 
 //                   sum2.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days));

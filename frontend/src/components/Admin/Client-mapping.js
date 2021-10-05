@@ -12,54 +12,19 @@ class Trans_Report extends Component {
     constructor(props) {
         super(props);
          this.selectdata = this.selectdata.bind(this);
-        // this.selectRow = this.selectRow.bind(this);
-        //  this.toggleCheckbox = this.toggleCheckbox.bind(this);
-        //  this.updateData = this.updateData.bind(this);
+         this.selectRow = this.selectRow.bind(this);
+         this.toggleCheckbox = this.toggleCheckbox.bind(this);
+         this.updateData = this.updateData.bind(this);
         
         this.state = {
-         // searchname: [],
           searchdata: [],
-          // searchscheme:[],
-          // folio:[],
           amclist:[],
-          // msg:[],
           checkedBoxes: [],
           searchuserid: [],
           searchid: [],
         }
       }
-     
-    //   selectfolio = (e) => {
-    //     var selectedvalue = $(".searchscheme").val();
-    //     this.setState({scheme:selectedvalue})
-    //         $.ajax({
-    //             url: "http://localhost:3001/api/getschemewisefolio",
-    //             type: "POST",
-    //             data: { scheme: selectedvalue,pan:this.state.pan },
-    //             success: function (res) {
-    //               this.setState({ folio: res});
-    //             }.bind(this),
-    //             error: function (jqXHR) {
-    //               console.log(jqXHR);
-    //             }
-    //           });
-    //   }
 
-    // selectfund = (e) => {
-    //     var inputValue = $(".searchfund").val();
-    //     this.setState({fund:inputValue})
-    //         $.ajax({
-    //             url: "http://localhost:3001/api/getschemename",
-    //             type: "POST",
-    //             data: { name: inputValue},
-    //             success: function (res) {
-    //               this.setState({ searchscheme: res});
-    //             }.bind(this),
-    //             error: function (jqXHR) {
-    //               console.log(jqXHR);
-    //             }
-    //           });
-    //   }
     selectdata = (e)=> {
       var inputValue = $(".searchname").val();
       if(inputValue === ""){
@@ -72,7 +37,7 @@ class Trans_Report extends Component {
         $(".loader").css("display", "block");
         $("#datasection").css("display", "none");
           $.ajax({
-            url: "http://localhost:3001/api/searchclient",
+            url: "/api/searchclient",
             type: "POST",
             data: { name: inputValue,fromdate:fromdate,todate:todate},
             success: function (res) {
@@ -86,30 +51,6 @@ class Trans_Report extends Component {
           });
       }
     }
-
-    // suggestionBox = (e) => {
-    //     $(".inputdata").show();
-    //     var inputValue = $(".searchname").val();
-    //     $.ajax({
-    //       url: "http://localhost:3001/api/getsearchname",
-    //       type: "POST",
-    //       data: { name: inputValue },
-    //       success: function (res1) {
-    //         this.setState({ searchname: res1 });
-    
-    //       }.bind(this),
-    //       error: function (jqXHR) {
-    //         console.log(jqXHR);
-    //       }
-    //     });
-    //   }
-    
-    // changeApplicant = (e) => {
-    //     var selectedvalue = e.target.innerText;
-    //     $(".searchname").val(selectedvalue);
-    //      var inputValue = selectedvalue.split(' ');
-    //     $(".inputdata").hide();    
-    //   }
 
       checkAll() {
         var checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -147,7 +88,7 @@ class Trans_Report extends Component {
         }).get();
 
         $.ajax({
-          url: "http://localhost:3001/api/getselecteddata",
+          url: "/api/getselecteddata",
           type: "POST",
           data: { id: ids },
           success: function (res1) {
@@ -173,7 +114,7 @@ class Trans_Report extends Component {
       var name = selectedValue.split('/')[1];
      // var gpan = selectedValue.split('/')[2];
       $.ajax({
-        url: "http://localhost:3001/api/updatepersonaldetail",
+        url: "/api/updatepersonaldetail",
         type: "POST",
         data: { pan:pan,updatename:name,id:ids},
         success: function (res1) { 
@@ -186,7 +127,7 @@ class Trans_Report extends Component {
     componentDidMount() {
         document.title = "WMS | Mapping Detail"
         $.ajax({
-          url: "http://localhost:3001/api/searchamc",
+          url: "/api/searchamc",
           type: "POST",
          success: function (res) {
             this.setState({ amclist: res.amc});
@@ -205,7 +146,6 @@ class Trans_Report extends Component {
       todate : today.getFullYear() + '-' + (today.getMonth() + 1) + '-0' + today.getDate()
       
 }
-//alert(values.todate)
     const data = {
         columns: [
           {
@@ -237,7 +177,6 @@ class Trans_Report extends Component {
          
         ],
         rows:this.state.searchdata.map(item => {      
-          // console.log("id=",item._id)  
           return{
             CHECK:<input type="checkbox" id={item._id} class={item.RTA} value={item.PAN+"/"+item.INVNAME} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
             INVNAME: <input type="text" value={item.INVNAME} class="removeFromInput" disabled/>,

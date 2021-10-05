@@ -110,8 +110,10 @@ class Portfolio extends Component {
                   }else{
                   arrdays.push(parseFloat(days)*res2.data[n].UNITS * parseFloat(res2.data[n].TD_NAV));
                   alldays.push(parseFloat(days));
-                  sum1.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days)*parseFloat( (parseFloat(Math.pow(parseFloat( (res2.data[n].cnav*res2.data[n].UNITS)/(res2.data[n].UNITS*res2.data[n].TD_NAV)) ,parseFloat(1/parseFloat(days/365)) ) ) -1)*100) ); 
-                  sum2.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days));
+//                   sum1.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days)*parseFloat( (parseFloat(Math.pow(parseFloat( (res2.data[n].cnav*res2.data[n].UNITS)/(res2.data[n].UNITS*res2.data[n].TD_NAV)) ,parseFloat(1/parseFloat(days/365)) ) ) -1)*100) ); 
+//                   sum2.push(parseFloat(res2.data[n].UNITS*res2.data[n].TD_NAV)*parseFloat(days));
+                     sum1.push(parseFloat(res2.data[n].AMOUNT)*parseFloat(days)*parseFloat( (parseFloat(Math.pow(parseFloat( (res2.data[n].cnav*res2.data[n].UNITS)/(res2.data[n].AMOUNT)) ,parseFloat(1/parseFloat(days/365)) ) ) -1)*100) ); 
+                     sum2.push(parseFloat(res2.data[n].AMOUNT)*parseFloat(days));
                 }
                   
                   temp1 = res2.data[n].UNITS;

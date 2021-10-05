@@ -8,6 +8,7 @@ import Sipstp from "./components/Admin/Sipstp";
 import Portfolio from "./components/Admin/Portfolio";
 import Datamanagement from "./components/Admin/Datamanagement";
 import Portfoliodetail from "./components/Admin/Portfoliodetail";
+import Clientmapping from "./components/Admin/Client-mapping";
 import Foliofiles from "./components/Admin/Foliofiles";
 import Dividend from "./components/Admin/Dividend";
 import Nav from "./components/Admin/Nav";
@@ -30,6 +31,7 @@ const App = () => {
         <Route exact path="/Adminprofile" component={Adminprofile} />
         <Route exact path="/Datamanagement" component={Datamanagement} />
         <Route exact path="/Foliodetail" component={Foliodetail} />
+        <Route exact path="/Client_mapping" component={Clientmapping} />
         <Route exact path="/Transaction" component={Transaction} />
         <Route exact path="/Sipstp" component={Sipstp} />
         <Route exact path="/Portfolio" component={Portfolio} />

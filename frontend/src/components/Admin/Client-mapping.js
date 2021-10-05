@@ -13,6 +13,7 @@ class Trans_Report extends Component {
         super(props);
          this.selectdata = this.selectdata.bind(this);
          this.selectRow = this.selectRow.bind(this);
+         this.checkAll = this.checkAll.bind(this);
          this.toggleCheckbox = this.toggleCheckbox.bind(this);
          this.updateData = this.updateData.bind(this);
         

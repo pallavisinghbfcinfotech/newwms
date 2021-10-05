@@ -1,10 +1,6 @@
-import React from "react";
+import React,{ Component } from "react";
 import $ from "jquery";
-import { dateFormat } from 'dateformat';
-import { Component } from "react"; 
 import {  MDBDataTableV5 } from 'mdbreact';
-import { Link } from 'react-router-dom';
-import moment from 'moment';
 import Loader from './loader';
 
 class Trans_Report extends Component {

@@ -352,7 +352,7 @@ foliok.aggregate(pipeline1, (err, karvydata) => {
 
         if (camsdata != 0 || karvydata != 0) {
                 var datacon =camsdata.concat(karvydata);
-		
+		console.log(datacon)
                 res.send(datacon);
         }else{
             resdata = {

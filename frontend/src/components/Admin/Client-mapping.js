@@ -8,9 +8,9 @@ class Trans_Report extends Component {
     constructor(props) {
         super(props);
          this.selectdata = this.selectdata.bind(this);
-         this.selectRow = this.selectRow.bind(this);
          this.checkAll = this.checkAll.bind(this);
          this.toggleCheckbox = this.toggleCheckbox.bind(this);
+         this.selectRow = this.selectRow.bind(this);
          this.updateData = this.updateData.bind(this);
         
         this.state = {
@@ -21,7 +21,7 @@ class Trans_Report extends Component {
           searchid: [],
         }
       }
-
+     
     selectdata = (e)=> {
       var inputValue = $(".searchname").val();
       if(inputValue === ""){
@@ -107,9 +107,8 @@ class Trans_Report extends Component {
       }).get();
       var pan = selectedValue.split('/')[0];
       var name = selectedValue.split('/')[1];
-     // var gpan = selectedValue.split('/')[2];
       $.ajax({
-        url: "/api/updatepersonaldetail",
+        url: "http://localhost:3001/api/updatepersonaldetail",
         type: "POST",
         data: { pan:pan,updatename:name,id:ids},
         success: function (res1) { 
@@ -151,13 +150,12 @@ class Trans_Report extends Component {
           {
             label: 'APPLICANT',
             field: 'INVNAME',
-            type: "html",
-            width: 100
+            width: 50
           },
           {
             label: 'ADDRESS',
             field: 'ADDRESS',
-            width: 250
+            width: 100
           },
           {
             label: 'CREATEDATE',
@@ -167,13 +165,13 @@ class Trans_Report extends Component {
           {
             label: 'PAN',
             field: 'PAN',
-            width: 100
+            width: 50
           },
          
         ],
         rows:this.state.searchdata.map(item => {      
           return{
-            CHECK:<input type="checkbox" id={item._id} class={item.RTA} value={item.PAN+"/"+item.INVNAME} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
+            CHECK:<input type="checkbox" id={item._id} class={item.RTA} value={item.PAN+"/"+item.INVNAME+"/"+item.GPAN} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
             INVNAME: <input type="text" value={item.INVNAME} class="removeFromInput" disabled/>,
             ADDRESS:item.ADDRESS,
             NAVDATE:item.NAVDATE,          

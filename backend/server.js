@@ -378,13 +378,13 @@ app.post("/api/searchclient", function (req, res) {
      str2 = { $and: arr2, INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } 
     pipeline1 = [  //folio_cams
         { $match: str1},
-        { $project: { _id:1, PAN: "$PAN_NO", INVNAME: "$INV_NAME", FOLIO: "$FOLIOCHK",   NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$FOLIO_DATE" } }, RTA: "CAMS", ADDRESS: { '$concat':['$ADDRESS1', ',', '$ADDRESS2', ',', '$ADDRESS3'] } } },
+        { $project: { _id:1, PAN: "$PAN_NO",GPAN:"$GUARD_PAN", INVNAME: "$INV_NAME", FOLIO: "$FOLIOCHK",   NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$FOLIO_DATE" } }, RTA: "CAMS", ADDRESS: { '$concat':['$ADDRESS1', ',', '$ADDRESS2', ',', '$ADDRESS3'] } } },
         { $sort: { INVNAME: 1 } }
     ]
 
     pipeline2 = [  //folio_karvy
         { $match: str2},
-        { $project: { _id: 1, PAN: "$PANGNO", INVNAME: "$INVNAME", FOLIO: "$ACNO", NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$LASTUPDAT1" } },RTA: "KARVY", ADDRESS: { '$concat':['$ADD1', ',', '$ADD2', ',', '$ADD3'] } } },
+        { $project: { _id: 1, PAN: "$PANGNO",GPAN:"$GUARDPANNO", INVNAME: "$INVNAME", FOLIO: "$ACNO", NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$LASTUPDAT1" } },RTA: "KARVY", ADDRESS: { '$concat':['$ADD1', ',', '$ADD2', ',', '$ADD3'] } } },
         { $sort: { INVNAME: 1 } }
     ]
     

@@ -83,7 +83,6 @@ class Trans_Report extends Component {
         var ids = $(':checkbox:checked').map(function() {
           return this.id;
         }).get();
-alert(ids);
         $.ajax({
           url: "/api/getselecteddata",
           type: "POST",
@@ -93,7 +92,6 @@ alert(ids);
             {res1.map((item, index) => (
               foliodetail += "<option value='"+item.PAN+"/"+item.INVNAME+"/"+item.GUARDPAN+"/"+item._id+"'>"+item.INVNAME+"  "+item.PAN+"  "+item.ADD1+"  "+item.ADD2+"  "+item.ADD3+"</pre></option>"   
             ))}
-            console.log("foliodetail",foliodetail);
             $("#resdata").html(foliodetail);
           }.bind(this)
         });

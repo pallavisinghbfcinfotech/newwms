@@ -83,7 +83,7 @@ class Trans_Report extends Component {
         var ids = $(':checkbox:checked').map(function() {
           return this.id;
         }).get();
-
+alert(ids);
         $.ajax({
           url: "/api/getselecteddata",
           type: "POST",

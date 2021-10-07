@@ -108,7 +108,7 @@ class Trans_Report extends Component {
       var pan = selectedValue.split('/')[0];
       var name = selectedValue.split('/')[1];
       $.ajax({
-        url: "http://localhost:3001/api/updatepersonaldetail",
+        url: "/api/updatepersonaldetail",
         type: "POST",
         data: { pan:pan,updatename:name,id:ids},
         success: function (res1) { 

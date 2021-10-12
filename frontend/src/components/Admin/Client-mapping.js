@@ -137,7 +137,7 @@ class Trans_Report extends Component {
    var today = new Date();
    const values = {
       fromdate: "2019-01-01",
-      todate : today.getFullYear() + '-' + (today.getMonth() + 1) + '-0' + today.getDate()
+      todate : today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
       
 }
     const data = {

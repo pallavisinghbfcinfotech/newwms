@@ -90,6 +90,7 @@ class Trans_Report extends Component {
           var inc = 0;
           if(idval.length === 1){
             alert("Please merge min two data.");
+            return false;
           }
          for(var i=0;i< idval.length; i++){
           if(idval[0] != idval[i]){

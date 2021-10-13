@@ -597,51 +597,105 @@ foliok.aggregate(pipeline1, (err, karvydata) => {
 })
 
 
+// app.post("/api/searchclient", function (req, res) {
+//     var str1="";var str2="";
+//     var name = req.body.name;
+//     var arr1 = []; var arr2 = [];
+//      arr1.push({FOLIO_DATE:{ $gte: new Date(moment(req.body.fromdate).format("YYYY-MM-DD")), $lt: new Date(moment(req.body.todate).format("YYYY-MM-DD")) }})
+//      arr2.push({LASTUPDAT1:{ $gte: new Date(moment(req.body.fromdate).format("YYYY-MM-DD")), $lt: new Date(moment(req.body.todate).format("YYYY-MM-DD")) }})
+//      str1 = { $and: arr1, INV_NAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } 
+//      str2 = { $and: arr2, INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } 
+//     pipeline1 = [  //folio_cams
+//         { $match: str1},
+//         { $project: { _id:1, PAN: "$PAN_NO",GPAN:"$GUARD_PAN", INVNAME: "$INV_NAME", FOLIO: "$FOLIOCHK",   NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$FOLIO_DATE" } }, RTA: "CAMS", ADDRESS: { '$concat':['$ADDRESS1', ',', '$ADDRESS2', ',', '$ADDRESS3'] } } },
+//         { $sort: { INVNAME: 1 } }
+//     ]
+
+//     pipeline2 = [  //folio_karvy
+//         { $match: str2},
+//         { $project: { _id: 1, PAN: "$PANGNO",GPAN:"$GUARDPANNO", INVNAME: "$INVNAME", FOLIO: "$ACNO", NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$LASTUPDAT1" } },RTA: "KARVY", ADDRESS: { '$concat':['$ADD1', ',', '$ADD2', ',', '$ADD3'] } } },
+//         { $sort: { INVNAME: 1 } }
+//     ]
+    
+//     foliok.aggregate(pipeline2, (err, karvydata) => {
+//         folioc.aggregate(pipeline1, (err, camsdata) => {
+//             if (camsdata != 0 || karvydata != 0) {
+//                 resdata = {
+//                     status: 200,
+//                     message: 'Successful',
+//                     data: karvydata,
+//                 }
+//                 var datacon = camsdata.concat(karvydata);
+//                 var removeduplicates = datacon.map(JSON.stringify)
+//                     .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+//                     .filter(function (item, index, arr) {
+//                         return arr.indexOf(item, index + 1) === -1;
+//                     }) // check if there is any occurence of the item in whole array
+//                     .reverse()
+//                     .map(JSON.parse);
+//                 datacon = Array.from(new Set(removeduplicates));
+//                 datacon = datacon.filter(
+//                     (temp => a =>
+//                         (k => !temp[k] && (temp[k] = true))(a.INVNAME + '|' + a.PAN)
+//                     )(Object.create(null))
+//                 );
+               
+//                 resdata.data = datacon.sort((a, b) => (a.INVNAME > b.INVNAME) ? 1 : -1);
+                
+//                 res.json(resdata);
+//                 return resdata;
+
+//             } else {
+//                 resdata = {
+//                     status: 400,
+//                     message: 'Data not found !',
+//                 }
+//                 res.send(resdata);
+//                 return resdata;
+//             }
+//         });
+//     });
+// })
+
 app.post("/api/searchclient", function (req, res) {
-    var str1="";var str2="";
-    var name = req.body.name;
-    var arr1 = []; var arr2 = [];
+
+    var amccode = "";var str1="";var str2="";
+    var arr1 = []; var arr2 = [];var arr3 = []; var arr4 = [];
      arr1.push({FOLIO_DATE:{ $gte: new Date(moment(req.body.fromdate).format("YYYY-MM-DD")), $lt: new Date(moment(req.body.todate).format("YYYY-MM-DD")) }})
      arr2.push({LASTUPDAT1:{ $gte: new Date(moment(req.body.fromdate).format("YYYY-MM-DD")), $lt: new Date(moment(req.body.todate).format("YYYY-MM-DD")) }})
-     str1 = { $and: arr1, INV_NAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } 
-     str2 = { $and: arr2, INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } 
+ 
+    str1 = { $and: arr1, INV_NAME: { $regex: req.body.name, $options: 'i' } } 
+    str2 = { $and: arr2,INVNAME: { $regex: req.body.name, $options: 'i' } } 
     pipeline1 = [  //folio_cams
         { $match: str1},
-        { $project: { _id:1, PAN: "$PAN_NO",GPAN:"$GUARD_PAN", INVNAME: "$INV_NAME", FOLIO: "$FOLIOCHK",   NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$FOLIO_DATE" } }, RTA: "CAMS", ADDRESS: { '$concat':['$ADDRESS1', ',', '$ADDRESS2', ',', '$ADDRESS3'] } } },
+        { $project: { _id:1, PAN: "$PAN_NO",GPAN:"$GUARD_PAN", INVNAME: "$INV_NAME", FOLIO: "$FOLIOCHK",   NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$FOLIO_DATE" } }, ADD1:"$ADDRESS1" ,ADD2:"$ADDRESS2", ADD3:"$ADDRESS3"    } },
         { $sort: { INVNAME: 1 } }
     ]
 
     pipeline2 = [  //folio_karvy
         { $match: str2},
-        { $project: { _id: 1, PAN: "$PANGNO",GPAN:"$GUARDPANNO", INVNAME: "$INVNAME", FOLIO: "$ACNO", NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$LASTUPDAT1" } },RTA: "KARVY", ADDRESS: { '$concat':['$ADD1', ',', '$ADD2', ',', '$ADD3'] } } },
+        { $project: { _id: 1, PAN: "$PANGNO",GPAN:"$GUARDPANNO", INVNAME: "$INVNAME", FOLIO: "$ACNO", NAVDATE: { $dateToString: { format: "%d/%m/%Y", date: "$LASTUPDAT1" } }, ADD1:"$ADD1",ADD2:"$ADD2", ADD3:"$ADD3" } },
         { $sort: { INVNAME: 1 } }
     ]
-    
+ 
     foliok.aggregate(pipeline2, (err, karvydata) => {
         folioc.aggregate(pipeline1, (err, camsdata) => {
-            if (camsdata != 0 || karvydata != 0) {
-                resdata = {
-                    status: 200,
-                    message: 'Successful',
-                    data: karvydata,
-                }
-                var datacon = camsdata.concat(karvydata);
-                var removeduplicates = datacon.map(JSON.stringify)
-                    .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                    .filter(function (item, index, arr) {
-                        return arr.indexOf(item, index + 1) === -1;
-                    }) // check if there is any occurence of the item in whole array
-                    .reverse()
-                    .map(JSON.parse);
-                datacon = Array.from(new Set(removeduplicates));
+         
+            if (camsdata != 0 || karvydata != 0 ) {
+                    resdata = {
+                        status: 200,
+                        message: 'Successful',
+                        data: karvydata,
+                    }
+                    var datacon = camsdata.concat(karvydata);
+                  
                 datacon = datacon.filter(
                     (temp => a =>
-                        (k => !temp[k] && (temp[k] = true))(a.INVNAME + '|' + a.PAN)
+                        (k => !temp[k] && (temp[k] = true))(a.INVNAME + '|' + a.PAN + '|' + a.ADD1)
                     )(Object.create(null))
                 );
                
                 resdata.data = datacon.sort((a, b) => (a.INVNAME > b.INVNAME) ? 1 : -1);
-                
                 res.json(resdata);
                 return resdata;
 
@@ -653,8 +707,8 @@ app.post("/api/searchclient", function (req, res) {
                 res.send(resdata);
                 return resdata;
             }
-        });
-    });
+         });
+       });
 })
 
 app.get("/api/gettranscams", function (req, res) {

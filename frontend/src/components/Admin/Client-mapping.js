@@ -2,6 +2,8 @@ import React,{ Component } from "react";
 import $ from "jquery";
 import {  MDBDataTableV5 } from 'mdbreact';
 import Loader from './loader';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 class Trans_Report extends Component {
   
@@ -48,7 +50,6 @@ class Trans_Report extends Component {
           });
       }
     }
-
       checkAll() {
         var checkboxes = document.querySelectorAll('input[type="checkbox"]');
         var selectchecked = document.getElementById('check');       
@@ -83,18 +84,69 @@ class Trans_Report extends Component {
         var ids = $(':checkbox:checked').map(function() {
           return this.id;
         }).get();
-        $.ajax({
-          url: "/api/getselecteddata",
-          type: "POST",
-          data: { id: ids },
-          success: function (res1) {
-            var foliodetail = "<option value=''>Select Data.</option>";
-            {res1.map((item, index) => (
-              foliodetail += "<option value='"+item.PAN+"/"+item.INVNAME+"/"+item.GUARDPAN+"/"+item._id+"'>"+item.INVNAME+"  "+item.PAN+"  "+item.ADD1+"  "+item.ADD2+"  "+item.ADD3+"</pre></option>"   
-            ))}
-            $("#resdata").html(foliodetail);
-          }.bind(this)
-        });
+        var idval = $(':checkbox:checked').map(function() {
+          return this.name;
+        }).get();
+          var inc = 0;
+          if(idval.length === 1){
+            alert("Please merge min two data.");
+          }
+         for(var i=0;i< idval.length; i++){
+          if(idval[0] != idval[i]){
+            inc = inc+i;
+          }
+          else{
+            inc= -1;
+          }
+         }
+         if(inc > 0){
+          confirmAlert({
+            title: 'Confirm to submit',
+            message: 'Are you sure want to merge two different pan.',
+            buttons: [
+              {
+                label: 'Yes',
+                onClick: () => {
+                  $.ajax({
+                    url: "/api/getselecteddata",
+                    type: "POST",
+                    data: { id: ids },
+                    success: function (res1) {
+                      var foliodetail = "<option value=''>Select Data.</option>";
+                      {res1.map((item, index) => (
+                        foliodetail += "<option value='"+item.PAN+"/"+item.INVNAME+"/"+item.GUARDPAN+"/"+item.ADD1+"/"+item.ADD2+"/"+item.ADD3+"'>"+item.INVNAME+"  "+item.PAN+"  "+item.ADD1+"  "+item.ADD2+"  "+item.ADD3+"</pre></option>"   
+                      ))}
+                      console.log("foliodetail",foliodetail);
+                      $("#resdata").html(foliodetail);
+                    }.bind(this)
+                  });
+                }
+              },
+              {
+                label: 'No',
+                onClick: () =>{ return false;}
+              }
+            ]
+          });
+        
+          return false;
+        }
+        if(inc < 0){
+          $.ajax({
+                url: "/api/getselecteddata",
+                type: "POST",
+                data: { id: ids },
+                success: function (res1) {
+                  var foliodetail = "<option value=''>Select Data.</option>";
+                  {res1.map((item, index) => (
+                    foliodetail += "<option value='"+item.PAN+"/"+item.INVNAME+"/"+item.GUARDPAN+"/"+item.ADD1+"/"+item.ADD2+"/"+item.ADD3+"'>"+item.INVNAME+"  "+item.PAN+"  "+item.ADD1+"  "+item.ADD2+"  "+item.ADD3+"</pre></option>"   
+                  ))}
+                  console.log("foliodetail",foliodetail);
+                  $("#resdata").html(foliodetail);
+                }.bind(this)
+              });
+        }
+       
     }
     
     updateData = ()=> {		
@@ -107,10 +159,14 @@ class Trans_Report extends Component {
       }).get();
       var pan = selectedValue.split('/')[0];
       var name = selectedValue.split('/')[1];
+     // var gpan = selectedValue.split('/')[2];
+      var add1 = selectedValue.split('/')[3];
+      var add2 = selectedValue.split('/')[4];
+      var add3 = selectedValue.split('/')[5];
       $.ajax({
         url: "/api/updatepersonaldetail",
         type: "POST",
-        data: { pan:pan,updatename:name,id:ids},
+        data: { updatepan:pan,updatename:name,updateadd1:add1,updateadd2:add2,updateadd3:add3,id:ids},
         success: function (res1) { 
           window.location.reload();
         }.bind(this)       
@@ -140,6 +196,7 @@ class Trans_Report extends Component {
       todate : today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
       
 }
+
     const data = {
         columns: [
           {
@@ -154,7 +211,7 @@ class Trans_Report extends Component {
           },
           {
             label: 'ADDRESS',
-            field: 'ADDRESS',
+            field: 'ADD1',
             width: 100
           },
           {
@@ -171,9 +228,9 @@ class Trans_Report extends Component {
         ],
         rows:this.state.searchdata.map(item => {      
           return{
-            CHECK:<input type="checkbox" id={item._id} class={item.RTA} value={item.PAN+"/"+item.INVNAME+"/"+item.GPAN} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
-            INVNAME: <input type="text" value={item.INVNAME} class="removeFromInput" disabled/>,
-            ADDRESS:item.ADDRESS,
+            CHECK:<input type="checkbox" id={item._id} name={item.PAN} value={item.PAN+"/"+item.INVNAME+"/"+item.GPAN+"/"+item.ADD1+"/"+item.ADD2+"/"+item.ADD3} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
+            INVNAME: <input type="text" value={item.INVNAME} class="removeFromInput" style={{width:"auto"}} disabled />,
+            ADD1:item.ADD1+item.ADD2+item.ADD3,
             NAVDATE:item.NAVDATE,          
             PAN:item.PAN,  
            }

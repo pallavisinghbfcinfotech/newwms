@@ -408,12 +408,12 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 app.post("/api/updatepersonaldetail", function (req, res) {
   var pan="";var name = "";var gpan ="";var add1 ="";var add2="";var add3="";
   for(var i=0;i<req.body.id.length;i++){
-         pan  = req.body.id[i].split('/')[0];
-         name  = req.body.id[i].split('/')[1];
-         gpan  = req.body.id[i].split('/')[2];
-         add1  = req.body.id[i].split('/')[3];
-         add2  = req.body.id[i].split('/')[4];
-         add3  = req.body.id[i].split('/')[5];
+         pan  = req.body.id[i].split('_')[0];
+         name  = req.body.id[i].split('_')[1];
+         gpan  = req.body.id[i].split('_')[2];
+         add1  = req.body.id[i].split('_')[3];
+         add2  = req.body.id[i].split('_')[4];
+         add3  = req.body.id[i].split('_')[5];
         if(gpan===""){
             
         folioc.find({INV_NAME:name,PAN_NO:pan}).distinct("FOLIOCHK", function (err, member1) {

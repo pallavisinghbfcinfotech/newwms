@@ -13,7 +13,7 @@ class Trans_Report extends Component {
          this.checkAll = this.checkAll.bind(this);
          this.toggleCheckbox = this.toggleCheckbox.bind(this);
          this.selectRow = this.selectRow.bind(this);
-        //  this.updateData = this.updateData.bind(this);
+         this.updateData = this.updateData.bind(this);
         
         this.state = {
           searchdata: [],
@@ -163,7 +163,7 @@ class Trans_Report extends Component {
       }).get();
       var pan = selectedValue.split('_')[0];
       var name = selectedValue.split('_')[1];
-     // var gpan = selectedValue.split('/')[2];
+      var gpan = selectedValue.split('_')[2];
       var add1 = selectedValue.split('_')[3];
       var add2 = selectedValue.split('_')[4];
       var add3 = selectedValue.split('_')[5];

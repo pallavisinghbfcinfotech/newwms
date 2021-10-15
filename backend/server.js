@@ -406,7 +406,7 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 //   })
 
 app.post("/api/updatepersonaldetail", function (req, res) {
-  var pan="";var name = "";var gpan ="";var add1 ="";var add2="";var add3="";
+   var pan="";var name = "";var gpan ="";var add1 ="";var add2="";var add3="";
   for(var i=0;i<req.body.id.length;i++){
          pan  = req.body.id[i].split('_')[0];
          name  = req.body.id[i].split('_')[1];

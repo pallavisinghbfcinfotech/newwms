@@ -23,7 +23,7 @@ class Trans_Report extends Component {
           searchid: [],
         }
       }
-     
+  
     selectdata = (e)=> {
       var inputValue = $(".searchname").val();
       if(inputValue === ""){
@@ -50,6 +50,7 @@ class Trans_Report extends Component {
           });
       }
     }
+
       checkAll() {
         var checkboxes = document.querySelectorAll('input[type="checkbox"]');
         var selectchecked = document.getElementById('check');       
@@ -90,14 +91,14 @@ class Trans_Report extends Component {
           var inc = 0;
           if(idval.length === 1){
             alert("Please merge min two data.");
-            return false;
-          }
+           return false ;
+         }
          for(var i=0;i< idval.length; i++){
           if(idval[0] != idval[i]){
             inc = inc+i;
           }
           else{
-            inc= -1;
+            inc = inc-i;
           }
          }
          if(inc > 0){
@@ -197,7 +198,6 @@ class Trans_Report extends Component {
       todate : today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
       
 }
-
     const data = {
         columns: [
           {

@@ -13,7 +13,7 @@ class Trans_Report extends Component {
          this.checkAll = this.checkAll.bind(this);
          this.toggleCheckbox = this.toggleCheckbox.bind(this);
          this.selectRow = this.selectRow.bind(this);
-         this.updateData = this.updateData.bind(this);
+        //  this.updateData = this.updateData.bind(this);
         
         this.state = {
           searchdata: [],
@@ -23,7 +23,8 @@ class Trans_Report extends Component {
           searchid: [],
         }
       }
-  
+     
+    
     selectdata = (e)=> {
       var inputValue = $(".searchname").val();
       if(inputValue === ""){
@@ -92,7 +93,8 @@ class Trans_Report extends Component {
           if(idval.length === 1){
             alert("Please merge min two data.");
            return false ;
-         }
+      
+          }
          for(var i=0;i< idval.length; i++){
           if(idval[0] != idval[i]){
             inc = inc+i;
@@ -116,7 +118,7 @@ class Trans_Report extends Component {
                     success: function (res1) {
                       var foliodetail = "<option value=''>Select Data.</option>";
                       {res1.map((item, index) => (
-                        foliodetail += "<option value='"+item.PAN+"/"+item.INVNAME+"/"+item.GUARDPAN+"/"+item.ADD1+"/"+item.ADD2+"/"+item.ADD3+"'>"+item.INVNAME+"  "+item.PAN+"  "+item.ADD1+"  "+item.ADD2+"  "+item.ADD3+"</pre></option>"   
+                        foliodetail += "<option value='"+item.PAN+"_"+item.INVNAME+"_"+item.GUARDPAN+"_"+item.ADD1+"_"+item.ADD2+"_"+item.ADD3+"'>"+item.INVNAME+"  "+item.PAN+"  "+item.ADD1+"  "+item.ADD2+"  "+item.ADD3+"</pre></option>"   
                       ))}
                       console.log("foliodetail",foliodetail);
                       $("#resdata").html(foliodetail);
@@ -141,7 +143,7 @@ class Trans_Report extends Component {
                 success: function (res1) {
                   var foliodetail = "<option value=''>Select Data.</option>";
                   {res1.map((item, index) => (
-                    foliodetail += "<option value='"+item.PAN+"/"+item.INVNAME+"/"+item.GUARDPAN+"/"+item.ADD1+"/"+item.ADD2+"/"+item.ADD3+"'>"+item.INVNAME+"  "+item.PAN+"  "+item.ADD1+"  "+item.ADD2+"  "+item.ADD3+"</pre></option>"   
+                    foliodetail += "<option value='"+item.PAN+"_"+item.INVNAME+"_"+item.GUARDPAN+"_"+item.ADD1+"_"+item.ADD2+"_"+item.ADD3+"'>"+item.INVNAME+"  "+item.PAN+"  "+item.ADD1+"  "+item.ADD2+"  "+item.ADD3+"</pre></option>"   
                   ))}
                   console.log("foliodetail",foliodetail);
                   $("#resdata").html(foliodetail);
@@ -159,12 +161,12 @@ class Trans_Report extends Component {
       var ids = $(':checkbox:checked').map(function() {
         return this.value;
       }).get();
-      var pan = selectedValue.split('/')[0];
-      var name = selectedValue.split('/')[1];
+      var pan = selectedValue.split('_')[0];
+      var name = selectedValue.split('_')[1];
      // var gpan = selectedValue.split('/')[2];
-      var add1 = selectedValue.split('/')[3];
-      var add2 = selectedValue.split('/')[4];
-      var add3 = selectedValue.split('/')[5];
+      var add1 = selectedValue.split('_')[3];
+      var add2 = selectedValue.split('_')[4];
+      var add3 = selectedValue.split('_')[5];
       $.ajax({
         url: "/api/updatepersonaldetail",
         type: "POST",
@@ -198,6 +200,7 @@ class Trans_Report extends Component {
       todate : today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
       
 }
+
     const data = {
         columns: [
           {
@@ -228,8 +231,9 @@ class Trans_Report extends Component {
          
         ],
         rows:this.state.searchdata.map(item => {      
+   
           return{
-            CHECK:<input type="checkbox" id={item._id} name={item.PAN} value={item.PAN+"/"+item.INVNAME+"/"+item.GPAN+"/"+item.ADD1+"/"+item.ADD2+"/"+item.ADD3} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
+            CHECK:<input type="checkbox" id={item._id} name={item.PAN} value={item.PAN+"_"+item.INVNAME+"_"+item.GPAN+"_"+item.ADD1+"_"+item.ADD2+"_"+item.ADD3} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
             INVNAME: <input type="text" value={item.INVNAME} class="removeFromInput" style={{width:"auto"}} disabled />,
             ADD1:item.ADD1+item.ADD2+item.ADD3,
             NAVDATE:item.NAVDATE,          

@@ -407,6 +407,7 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 
 app.post("/api/updatepersonaldetail", function (req, res) {
    var pan="";var name = "";var gpan ="";var add1 ="";var add2="";var add3="";
+	  console.log("loop=",req.body.updatepan",",req.body.updatename",",gpan",",req.body.updateadd1",",req.body.updateadd2",",req.body.updateadd3)
   for(var i=0;i<req.body.id.length;i++){
          pan  = req.body.id[i].split('_')[0];
          name  = req.body.id[i].split('_')[1];
@@ -414,6 +415,7 @@ app.post("/api/updatepersonaldetail", function (req, res) {
          add1  = req.body.id[i].split('_')[3];
          add2  = req.body.id[i].split('_')[4];
          add3  = req.body.id[i].split('_')[5];
+	  console.log("for loop=",pan",",name",",gpan",",add1",",add2",",add3)
         if(gpan===""){
             
         folioc.find({INV_NAME:name,PAN_NO:pan}).distinct("FOLIOCHK", function (err, member1) {

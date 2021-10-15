@@ -439,7 +439,7 @@ app.post("/api/updatepersonaldetail", function (req, res) {
                 }
             });  
             folioc.updateMany(
-                {INV_NAME:name,PAN_NO:pan},
+                {INV_NAME:name,PAN_NO:pan,ADDRESS1:add1,ADDRESS2:add2,ADDRESS3:add3},
                 {
                     $set: {
                         INV_NAME: req.body.updatename,PAN_NO:req.body.updatepan,ADDRESS1:req.body.updateadd1,ADDRESS2:req.body.updateadd2,ADDRESS3:req.body.updateadd3
@@ -474,7 +474,7 @@ app.post("/api/updatepersonaldetail", function (req, res) {
                 }
             });
             foliok.updateMany(
-                {INVNAME: name ,PANGNO:pan},
+                {INVNAME: name ,PANGNO:pan,ADD1:add1,ADD2:add2,ADD3:add3},
                 {
                     $set: {
                         INVNAME:req.body.updatename,PANGNO:req.body.updatepan,ADD1:req.body.updateadd1,ADD2:req.body.updateadd2,ADD3:req.body.updateadd3,

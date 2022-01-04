@@ -301,7 +301,7 @@ const transfranklin = new Schema({
   var resdata="";
   var data="";var karvydata="";var camsdata="";var frankdata="";var datacon="";
 var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
-
+var pipeline4="";
 
 // app.post("/api/updatepersonaldetail", function (req, res) {
 //    var pan="";var name = "";var gpan ="";var add1 ="";var add2="";var add3="";
@@ -769,6 +769,7 @@ app.post("/api/getselecteddata", function (req, res) {
 // })
 
 app.post("/api/searchclient", function (req, res) {
+	console.log(req.body.pan,req.body.name)
     var str1 = ""; var str2 = "";var str3 = ""; var str4 = "";
     var arr1 = []; var arr2 = []; var arr3 = []; var arr4 = [];
     arr1.push({ FOLIO_DATE: { $gte: new Date(moment(req.body.fromdate).format("YYYY-MM-DD")), $lt: new Date(moment(req.body.todate).format("YYYY-MM-DD")) } })//folio_cams

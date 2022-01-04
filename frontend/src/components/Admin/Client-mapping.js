@@ -204,17 +204,17 @@ class Trans_Report extends Component {
     componentDidMount() {
       $("#datasection1").css("display", "none");
         document.title = "WMS | Mapping Detail"
-        $.ajax({
-          url: "/api/searchamc",
-          type: "POST",
-         success: function (res) {
-            this.setState({ amclist: res.amc});
+//         $.ajax({
+//           url: "/api/searchamc",
+//           type: "POST",
+//          success: function (res) {
+//             this.setState({ amclist: res.amc});
     
-          }.bind(this),
-          error: function (jqXHR) {
-            console.log(jqXHR);
-          }
-        });
+//           }.bind(this),
+//           error: function (jqXHR) {
+//             console.log(jqXHR);
+//           }
+//         });
        
       }
   render() {

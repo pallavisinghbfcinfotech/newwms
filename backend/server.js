@@ -302,19 +302,27 @@ const transfranklin = new Schema({
   var data="";var karvydata="";var camsdata="";var frankdata="";var datacon="";
 var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 
+
 // app.post("/api/updatepersonaldetail", function (req, res) {
-//     for(var i=0;i<req.body.id.length;i++){
-//         var pan  = req.body.id[i].split('/')[0];
-//         var name  = req.body.id[i].split('/')[1];
-//         var gpan  = req.body.id[i].split('/')[2];
+//    var pan="";var name = "";var gpan ="";var add1 ="";var add2="";var add3="";
+// 	  console.log("loop=",req.body.updatepan,req.body.updatename,gpan,req.body.updateadd1,req.body.updateadd2,req.body.updateadd3)
+//   for(var i=0;i<req.body.id.length;i++){
+//          pan  = req.body.id[i].split('_')[0];
+//          name  = req.body.id[i].split('_')[1];
+//          gpan  = req.body.id[i].split('_')[2];
+//          add1  = req.body.id[i].split('_')[3];
+//          add2  = req.body.id[i].split('_')[4];
+//          add3  = req.body.id[i].split('_')[5];
+// 	  console.log("for loop=",pan,name,gpan,add1,add2,add3)
 //         if(gpan===""){
+            
 //         folioc.find({INV_NAME:name,PAN_NO:pan}).distinct("FOLIOCHK", function (err, member1) {
 //                 for(var j=0;j<member1.length;j++){
 //                 transc.updateMany(
 //                         {FOLIO_NO:member1[j] },
 //                         {
 //                             $set: {
-//                                 INV_NAME: req.body.updatename,
+//                                 INV_NAME: req.body.updatename,PAN:req.body.updatepan
 //                             }
 //                         },
 //                         {
@@ -325,47 +333,14 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 //                                 console.warn(err.message);  // returns error if no matching object found
 //                             }
 //                     })
+                   
 //                 }
 //             });  
 //             folioc.updateMany(
-//                             {PAN_NO: pan,INV_NAME: name },
-//                             {
-//                                 $set: {
-//                                     INV_NAME: req.body.updatename,
-//                                 }
-//                             },
-//                             {
-//                                 "upsert": false
-//                             },
-//                             function (err, object) {
-//                                 if (err) {
-//                                     console.warn(err.message);  // returns error if no matching object found
-//                                 }
-//                         })
-//             foliok.find({INVNAME:name,PANGNO:pan}).distinct("ACNO", function (err, member2) {
-//                 for(var j=0;j<member2.length;j++){
-//                     transk.updateMany(
-//                             {TD_ACNO: member2[j]},
-//                             {
-//                                 $set: {
-//                                     INVNAME: req.body.updatename,
-//                                 }
-//                             },
-//                             {
-//                                 "upsert": false
-//                             },
-//                             function (err, object) {
-//                                 if (err) {
-//                                     console.warn(err.message);  // returns error if no matching object found
-//                                 }
-//                         })
-//                 }
-//             });
-//         foliok.updateMany(
-//                 { PANGNO: pan, INVNAME:name  },
+//                 {INV_NAME:name,PAN_NO:pan,ADDRESS1:add1,ADDRESS2:add2,ADDRESS3:add3},
 //                 {
 //                     $set: {
-//                         INVNAME:req.body.updatename,
+//                         INV_NAME: req.body.updatename,PAN_NO:req.body.updatepan,ADDRESS1:req.body.updateadd1,ADDRESS2:req.body.updateadd2,ADDRESS3:req.body.updateadd3
 //                     }
 //                 },
 //                 {
@@ -376,6 +351,42 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 //                         console.warn(err.message);  // returns error if no matching object found
 //                     }
 //             })
+//             foliok.find({INVNAME: name ,PANGNO:pan}).distinct("ACNO", function (err, member2) {
+//                 for(var j=0;j<member2.length;j++){
+//                     transk.updateMany(
+//                             {TD_ACNO: member2[j]},
+//                             {
+//                                 $set: {
+//                                     INVNAME: req.body.updatename,PAN1:req.body.updatepan
+//                                 }
+//                             },
+//                             {
+//                                 "upsert": false
+//                             },
+//                             function (err, object) {
+//                                 if (err) {
+//                                     console.warn(err.message);  // returns error if no matching object found
+//                                 }
+//                         })
+                       
+//                 }
+//             });
+//             foliok.updateMany(
+//                 {INVNAME: name ,PANGNO:pan,ADD1:add1,ADD2:add2,ADD3:add3},
+//                 {
+//                     $set: {
+//                         INVNAME:req.body.updatename,PANGNO:req.body.updatepan,ADD1:req.body.updateadd1,ADD2:req.body.updateadd2,ADD3:req.body.updateadd3,
+//                     }
+//                 },
+//                 {
+//                     "upsert": false
+//                 },
+//                 function (err, object) {
+//                     if (err) {
+//                         console.warn(err.message);  // returns error if no matching object found
+//                     }
+//             })
+      
 //         }else{
 //             folioc.find({INV_NAME:name,GUARD_PAN:pan}).distinct("FOLIOCHK", function (err, member1) {
 //                 for(var j=0;j<member1.length;j++){
@@ -383,7 +394,7 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 //                         {FOLIO_NO:member1[j] },
 //                         {
 //                             $set: {
-//                                 INV_NAME: req.body.updatename,
+//                                 INV_NAME: req.body.updatename,PAN:req.body.updatepan
 //                             }
 //                         },
 //                         {
@@ -400,7 +411,7 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 //                             {GUARD_PAN: pan,INV_NAME: name },
 //                             {
 //                                 $set: {
-//                                     INV_NAME: req.body.updatename,
+//                                     INV_NAME: req.body.updatename,PAN_NO:req.body.updatepan
 //                                 }
 //                             },
 //                             {
@@ -417,7 +428,7 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 //                             {TD_ACNO: member2[j]},
 //                             {
 //                                 $set: {
-//                                     INVNAME: req.body.updatename,
+//                                     INVNAME: req.body.updatename,PANGNO:req.body.updatepan
 //                                 }
 //                             },
 //                             {
@@ -434,7 +445,7 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 //                 { GUARDPANNO: pan, INVNAME:name  },
 //                 {
 //                     $set: {
-//                         INVNAME:req.body.updatename,
+//                         INVNAME:req.body.updatename,PANGNO:req.body.updatepan
 //                     }
 //                 },
 //                 {
@@ -452,25 +463,23 @@ var i=0;var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 //   })
 
 app.post("/api/updatepersonaldetail", function (req, res) {
-   var pan="";var name = "";var gpan ="";var add1 ="";var add2="";var add3="";
-	  console.log("loop=",req.body.updatepan,req.body.updatename,gpan,req.body.updateadd1,req.body.updateadd2,req.body.updateadd3)
-  for(var i=0;i<req.body.id.length;i++){
-         pan  = req.body.id[i].split('_')[0];
-         name  = req.body.id[i].split('_')[1];
-         gpan  = req.body.id[i].split('_')[2];
-         add1  = req.body.id[i].split('_')[3];
-         add2  = req.body.id[i].split('_')[4];
-         add3  = req.body.id[i].split('_')[5];
-	  console.log("for loop=",pan,name,gpan,add1,add2,add3)
-        if(gpan===""){
-            
-        folioc.find({INV_NAME:name,PAN_NO:pan}).distinct("FOLIOCHK", function (err, member1) {
-                for(var j=0;j<member1.length;j++){
-                transc.updateMany(
-                        {FOLIO_NO:member1[j] },
+    var pan = ""; var name = ""; var gpan = ""; var add1 = ""; var add2 = ""; var add3 = "";
+    for (var i = 0; i < req.body.id.length; i++) {
+        pan = req.body.id[i].split('_')[0];
+        name = req.body.id[i].split('_')[1];
+        gpan = req.body.id[i].split('_')[2];
+        add1 = req.body.id[i].split('_')[3];
+        add2 = req.body.id[i].split('_')[4];
+        add3 = req.body.id[i].split('_')[5];
+       // console.log(gpan)
+        if (gpan === "") {
+            folioc.find({ INV_NAME: name, PAN_NO: pan }).distinct("FOLIOCHK", function (err, member1) {
+                for (var j = 0; j < member1.length; j++) {
+                    transc.updateMany(
+                        { FOLIO_NO: member1[j] },
                         {
                             $set: {
-                                INV_NAME: req.body.updatename,PAN:req.body.updatepan
+                                INV_NAME: req.body.updatename, PAN: req.body.updatepan
                             }
                         },
                         {
@@ -480,15 +489,15 @@ app.post("/api/updatepersonaldetail", function (req, res) {
                             if (err) {
                                 console.warn(err.message);  // returns error if no matching object found
                             }
-                    })
-                   
+                        })
+
                 }
-            });  
+            });
             folioc.updateMany(
-                {INV_NAME:name,PAN_NO:pan,ADDRESS1:add1,ADDRESS2:add2,ADDRESS3:add3},
+                { INV_NAME: name,  PAN_NO: pan },
                 {
                     $set: {
-                        INV_NAME: req.body.updatename,PAN_NO:req.body.updatepan,ADDRESS1:req.body.updateadd1,ADDRESS2:req.body.updateadd2,ADDRESS3:req.body.updateadd3
+                        INV_NAME: req.body.updatename, PAN_NO: req.body.updatepan, ADDRESS1: req.body.updateadd1, ADDRESS2: req.body.updateadd2, ADDRESS3: req.body.updateadd3
                     }
                 },
                 {
@@ -498,32 +507,32 @@ app.post("/api/updatepersonaldetail", function (req, res) {
                     if (err) {
                         console.warn(err.message);  // returns error if no matching object found
                     }
-            })
-            foliok.find({INVNAME: name ,PANGNO:pan}).distinct("ACNO", function (err, member2) {
-                for(var j=0;j<member2.length;j++){
+                })
+            foliok.find({ INVNAME: name, PANGNO: pan }).distinct("ACNO", function (err, member2) {
+                for (var j = 0; j < member2.length; j++) {
                     transk.updateMany(
-                            {TD_ACNO: member2[j]},
-                            {
-                                $set: {
-                                    INVNAME: req.body.updatename,PAN1:req.body.updatepan
-                                }
-                            },
-                            {
-                                "upsert": false
-                            },
-                            function (err, object) {
-                                if (err) {
-                                    console.warn(err.message);  // returns error if no matching object found
-                                }
+                        { TD_ACNO: member2[j] },
+                        {
+                            $set: {
+                                INVNAME: req.body.updatename, PAN1: req.body.updatepan
+                            }
+                        },
+                        {
+                            "upsert": false
+                        },
+                        function (err, object) {
+                            if (err) {
+                                console.warn(err.message);  // returns error if no matching object found
+                            }
                         })
-                       
+
                 }
             });
             foliok.updateMany(
-                {INVNAME: name ,PANGNO:pan,ADD1:add1,ADD2:add2,ADD3:add3},
+                { INVNAME: name, PANGNO: pan },
                 {
                     $set: {
-                        INVNAME:req.body.updatename,PANGNO:req.body.updatepan,ADD1:req.body.updateadd1,ADD2:req.body.updateadd2,ADD3:req.body.updateadd3,
+                        INVNAME: req.body.updatename, PANGNO: req.body.updatepan, ADD1: req.body.updateadd1, ADD2: req.body.updateadd2, ADD3: req.body.updateadd3,
                     }
                 },
                 {
@@ -533,16 +542,16 @@ app.post("/api/updatepersonaldetail", function (req, res) {
                     if (err) {
                         console.warn(err.message);  // returns error if no matching object found
                     }
-            })
-      
-        }else{
-            folioc.find({INV_NAME:name,GUARD_PAN:pan}).distinct("FOLIOCHK", function (err, member1) {
-                for(var j=0;j<member1.length;j++){
-                transc.updateMany(
-                        {FOLIO_NO:member1[j] },
+                })
+
+        } else {
+            folioc.find({ INV_NAME: name, GUARD_PAN: gpan }).distinct("FOLIOCHK", function (err, member1) {
+                for (var j = 0; j < member1.length; j++) {
+                    transc.updateMany(
+                        { FOLIO_NO: member1[j] },
                         {
                             $set: {
-                                INV_NAME: req.body.updatename,PAN:req.body.updatepan
+                                INV_NAME: req.body.updatename, PAN: req.body.updatepan
                             }
                         },
                         {
@@ -552,48 +561,15 @@ app.post("/api/updatepersonaldetail", function (req, res) {
                             if (err) {
                                 console.warn(err.message);  // returns error if no matching object found
                             }
-                    })
-                }
-            });  
-            folioc.updateMany(
-                            {GUARD_PAN: pan,INV_NAME: name },
-                            {
-                                $set: {
-                                    INV_NAME: req.body.updatename,PAN_NO:req.body.updatepan
-                                }
-                            },
-                            {
-                                "upsert": false
-                            },
-                            function (err, object) {
-                                if (err) {
-                                    console.warn(err.message);  // returns error if no matching object found
-                                }
-                        })
-            foliok.find({INVNAME:name,GUARDPANNO:pan}).distinct("ACNO", function (err, member2) {
-                for(var j=0;j<member2.length;j++){
-                    transk.updateMany(
-                            {TD_ACNO: member2[j]},
-                            {
-                                $set: {
-                                    INVNAME: req.body.updatename,PANGNO:req.body.updatepan
-                                }
-                            },
-                            {
-                                "upsert": false
-                            },
-                            function (err, object) {
-                                if (err) {
-                                    console.warn(err.message);  // returns error if no matching object found
-                                }
                         })
                 }
             });
-        foliok.updateMany(
-                { GUARDPANNO: pan, INVNAME:name  },
+            folioc.updateMany(
+                { GUARD_PAN: gpan, INV_NAME:name },
                 {
                     $set: {
-                        INVNAME:req.body.updatename,PANGNO:req.body.updatepan
+                        // INV_NAME: req.body.updatename,PAN_NO:req.body.updatepan
+                        INV_NAME: req.body.updatename, PAN_NO: req.body.updatepan, ADDRESS1: req.body.updateadd1, ADDRESS2: req.body.updateadd2, ADDRESS3: req.body.updateadd3
                     }
                 },
                 {
@@ -603,12 +579,47 @@ app.post("/api/updatepersonaldetail", function (req, res) {
                     if (err) {
                         console.warn(err.message);  // returns error if no matching object found
                     }
-            })
+                })
+            foliok.find({ INVNAME: name, GUARDPANNO: gpan }).distinct("ACNO", function (err, member2) {
+                for (var j = 0; j < member2.length; j++) {
+                    transk.updateMany(
+                        { TD_ACNO: member2[j] },
+                        {
+                            $set: {
+                                INVNAME: req.body.updatename, PANGNO: req.body.updatepan
+                            }
+                        },
+                        {
+                            "upsert": false
+                        },
+                        function (err, object) {
+                            if (err) {
+                                console.warn(err.message);  // returns error if no matching object found
+                            }
+                        })
+                }
+            });
+            foliok.updateMany(
+                { GUARDPANNO: gpan, INVNAME: name },
+                {
+                    $set: {
+                        //INVNAME:req.body.updatename,PANGNO:req.body.updatepan
+                        INVNAME: req.body.updatename, PANGNO: req.body.updatepan, ADD1: req.body.updateadd1, ADD2: req.body.updateadd2, ADD3: req.body.updateadd3
+                    }
+                },
+                {
+                    "upsert": false
+                },
+                function (err, object) {
+                    if (err) {
+                        console.warn(err.message);  // returns error if no matching object found
+                    }
+                })
         }
     }
-    var msg="Updated Successfully";
+    var msg = "Updated Successfully";
     res.send(msg);
-  })
+})
 
 // app.post("/api/getselecteddata", function (req, res) {
 //   var userid= req.body.id;

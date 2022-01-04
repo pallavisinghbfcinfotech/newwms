@@ -610,41 +610,98 @@ app.post("/api/updatepersonaldetail", function (req, res) {
     res.send(msg);
   })
 
+// app.post("/api/getselecteddata", function (req, res) {
+//   var userid= req.body.id;
+//   var arr1=[];
+//    for(var i =0 ;i < userid.length ; i++){
+//     arr1.push({_id:ObjectId(userid[i])})
+//    }
+//    var str1 = { $or:arr1 }
+//    pipeline1 = [  //folio_karvy
+//     { $match: str1 },
+//     { $project: { _id: 1,DATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.LASTUPDAT1" } },INVNAME: "$INVNAME",PAN:"$PANGNO" , ADD1:"$ADD1",ADD2:"$ADD2",ADD3:"$ADD3",GUARDPAN:"$GUARDPANNO",RTA:"FOLIOKARVY" } }
+// ]
+// pipeline2 = [  //folio_cams
+//     { $match: str1 },
+//     { $project: { _id: 1,DATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.FOLIO_DATE" } },INVNAME: "$INV_NAME",PAN:"$PAN_NO" ,ADD1:"$ADDRESS1",ADD2:"$ADDRESS2",ADD3:"$ADDRESS3",GUARDPAN:"$GUARD_PAN",RTA:"FOLIOCAMS"   } }
+// ]
+// foliok.aggregate(pipeline1, (err, karvydata) => {
+
+//     folioc.aggregate(pipeline2, (err, camsdata) => {
+
+//         if (camsdata != 0 || karvydata != 0) {
+//                 var datacon =camsdata.concat(karvydata);
+// 		console.log(datacon)
+//                 res.send(datacon);
+//         }else{
+//             resdata = {
+//                 status: 400,
+//                 message: 'Data not found !',
+//             }
+//             res.json(resdata);
+//            }     
+//     });
+// });
+// })
+
 app.post("/api/getselecteddata", function (req, res) {
-  var userid= req.body.id;
-  var arr1=[];
-   for(var i =0 ;i < userid.length ; i++){
-    arr1.push({_id:ObjectId(userid[i])})
-   }
-   var str1 = { $or:arr1 }
-   pipeline1 = [  //folio_karvy
-    { $match: str1 },
-    { $project: { _id: 1,DATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.LASTUPDAT1" } },INVNAME: "$INVNAME",PAN:"$PANGNO" , ADD1:"$ADD1",ADD2:"$ADD2",ADD3:"$ADD3",GUARDPAN:"$GUARDPANNO",RTA:"FOLIOKARVY" } }
-]
-pipeline2 = [  //folio_cams
-    { $match: str1 },
-    { $project: { _id: 1,DATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.FOLIO_DATE" } },INVNAME: "$INV_NAME",PAN:"$PAN_NO" ,ADD1:"$ADDRESS1",ADD2:"$ADDRESS2",ADD3:"$ADDRESS3",GUARDPAN:"$GUARD_PAN",RTA:"FOLIOCAMS"   } }
-]
-foliok.aggregate(pipeline1, (err, karvydata) => {
+    var userid = req.body.id;
+    var arr1 = [];
+    for (var i = 0; i < userid.length; i++) {
+        arr1.push({ _id: ObjectId(userid[i]) })
+    }
+    var str1 = { $or: arr1 }
+    pipeline1 = [  //folio_karvy
+        { $match: str1 },
+        { $project: { _id: 1, DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.LASTUPDAT1" } }, INVNAME: "$INVNAME", PAN: "$PANGNO", ADD1: "$ADD1", ADD2: "$ADD2", ADD3: "$ADD3", GUARDPAN: "$GUARDPANNO", RTA: "FOLIOKARVY" } }
+    ]
+    pipeline2 = [  //folio_cams
+        { $match: str1 },
+        { $project: { _id: 1, DATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.FOLIO_DATE" } }, INVNAME: "$INV_NAME", PAN: "$PAN_NO", ADD1: "$ADDRESS1", ADD2: "$ADDRESS2", ADD3: "$ADDRESS3", GUARDPAN: "$GUARD_PAN", RTA: "FOLIOCAMS" } }
+    ]
+    pipeline3 = [  //trans_cams
+        { $match: str1 },
+        { $project: {  _id:1, FOLIO_NO:"$FOLIO_NO", INV_NAME: "$INV_NAME", TRADDATE: "$TRADDATE"   } },
+        { $lookup:{ from:'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+        { $unwind: "$detail" },
+        { $project: { _id:1, PAN: "$detail.PAN_NO", GUARDPAN: "$detail.GUARD_PAN", INVNAME: "$INV_NAME", FOLIO: "$FOLIO_NO",DATE: { $dateToString: { format: "%d/%m/%Y", date: "$TRADDATE" } }, ADD1: "$detail.ADDRESS1", ADD2: "$detail.ADDRESS2", ADD3: "$detail.ADDRESS3",RTA: "TRANSCAMS"  } },
+        { $sort: { INVNAME: 1 } }
+    ]
 
-    folioc.aggregate(pipeline2, (err, camsdata) => {
+    pipeline4 = [  //trans_karvy
+        { $match: str1 },
+        { $project: {  _id:1, TD_ACNO:"$TD_ACNO", INVNAME: "$INVNAME", TD_TRDT: "$TD_TRDT"   } },
+        { $lookup: { from: 'folio_karvy', localField: 'TD_ACNO', foreignField:'ACNO', as:'detail'} },
+        { $unwind: "$detail" },
+        { $project: { _id:1, PAN: "$detail.PANGNO", GUARDPAN: "$detail.GUARDPANNO", INVNAME: "$INVNAME", FOLIO: "$TD_ACNO",DATE: { $dateToString: { format: "%d/%m/%Y", date: "$TD_TRDT" } }, ADD1: "$detail.ADD1", ADD2: "$detail.ADD2", ADD3: "$detail.ADD3" ,RTA: "TRANSKARVY" } },
+        { $sort: { INVNAME: 1 } }
+    ]
+    foliok.aggregate(pipeline1, (err, karvydata) => {
+        folioc.aggregate(pipeline2, (err, camsdata) => {
+            transc.aggregate(pipeline3, (err, transcams) => {
+                transk.aggregate(pipeline4, (err, transkarvy) => {
+            if (transkarvy !=0 || transcams !=0 || camsdata != 0 || karvydata != 0) {
+                var datacon = transkarvy.concat(transcams.concat(camsdata.concat(karvydata)));
+                datacon = datacon.filter(
+                    (temp => a =>
+                        (k => !temp[k] && (temp[k] = true))(a.INVNAME + '|' + a.PAN + '|' + a.ADD1)
+                    )(Object.create(null))
+                );
 
-        if (camsdata != 0 || karvydata != 0) {
-                var datacon =camsdata.concat(karvydata);
-		console.log(datacon)
+                resdata.data = datacon.sort((a, b) => (a.INVNAME > b.INVNAME) ? 1 : -1);
                 res.send(datacon);
-        }else{
-            resdata = {
-                status: 400,
-                message: 'Data not found !',
+            } else {
+                resdata = {
+                    status: 400,
+                    message: 'Data not found !',
+                }
+                res.json(resdata);
             }
-            res.json(resdata);
-           }     
+        });
+      });
     });
-});
+  });
 })
-
-
 
 // app.post("/api/searchclient", function (req, res) {
 

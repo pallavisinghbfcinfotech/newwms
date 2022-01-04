@@ -13,7 +13,6 @@ class Trans_Report extends Component {
          this.checkAll = this.checkAll.bind(this);
          this.toggleCheckbox = this.toggleCheckbox.bind(this);
          this.selectRow = this.selectRow.bind(this);
-         this.updateData = this.updateData.bind(this);
         
         this.state = {
           searchdata: [],
@@ -24,34 +23,38 @@ class Trans_Report extends Component {
         }
       }
      
-    
+  
     selectdata = (e)=> {
-      var inputValue = $(".searchname").val();
-      if(inputValue === ""){
-        alert("please enter name");
-        $(".searchname").focus();
-      }else{
+      var inputName = $(".searchname").val();
+      var inputPan = $(".searchpan").val();
+      var regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
       var fromdate = $("#from").val();
-       var todate = $("#to").val();
+      var todate = $("#to").val();
        
         $(".loader").css("display", "block");
         $("#datasection").css("display", "none");
+        $("#datasection1").css("display", "none");
           $.ajax({
             url: "/api/searchclient",
             type: "POST",
-            data: { name: inputValue,fromdate:fromdate,todate:todate},
+            data: { pan:inputPan,name: inputName,fromdate:fromdate,todate:todate},
             success: function (res) {
+              if(res.message === "Data not found !"){
+                $(".loader").css("display", "none");
+                $("#datasection1").css("display", "block");
+              }else{
               this.setState({ searchdata: res.data});      
                 $(".loader").css("display", "none");
                 $("#datasection").css("display", "block");
+              }
             }.bind(this),
             error: function (jqXHR) {
               console.log(jqXHR);
             }
           });
-      }
+      //}
     }
-
+    
       checkAll() {
         var checkboxes = document.querySelectorAll('input[type="checkbox"]');
         var selectchecked = document.getElementById('check');       
@@ -178,7 +181,28 @@ class Trans_Report extends Component {
     }
   }
 
+  componentDidUpdate() {
+    // var inputValue = $(".searchname").val();
+    // var fromdate = $("#from").val();
+    //  var todate = $("#to").val();
+    //       $.ajax({
+    //         url: "http://localhost:3001/api/searchclient",
+    //         type: "POST",
+    //         data: { name: inputValue,fromdate:fromdate,todate:todate},
+    //         success: function (res) {
+    //           this.setState({ searchdata: res.data});      
+    //             $(".loader").css("display", "none");
+    //             $("#datasection").css("display", "block");
+    //         }.bind(this),
+    //         error: function (jqXHR) {
+    //           console.log(jqXHR);
+    //         }
+    //       });
+
+  }
+
     componentDidMount() {
+      $("#datasection1").css("display", "none");
         document.title = "WMS | Mapping Detail"
         $.ajax({
           url: "/api/searchamc",
@@ -195,12 +219,21 @@ class Trans_Report extends Component {
       }
   render() {
    var today = new Date();
+  //  var d = new Date();
+  //  var month = d.getMonth()+1;
+  //  var day = d.getDate();
+  //  var output = d.getFullYear() + '/' +
+  //      ((''+month).length<2 ? '0' : '') + month + '/' +
+  //      ((''+day).length<2 ? '0' : '') + day;
+
+
+
    const values = {
-      fromdate: "2019-01-01",
-      todate : today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
+      fromdate: "2017-01-01",
+      todate : today.getFullYear() + '-' + (("0" + (today.getMonth() + 1)).slice(-2)) + '-' + ("0" + today.getDate()).slice(-2)
       
 }
-
+//alert(values.todate)
     const data = {
         columns: [
           {
@@ -231,7 +264,7 @@ class Trans_Report extends Component {
          
         ],
         rows:this.state.searchdata.map(item => {      
-   
+          // console.log("id=",item._id)  
           return{
             CHECK:<input type="checkbox" id={item._id} name={item.PAN} value={item.PAN+"_"+item.INVNAME+"_"+item.GPAN+"_"+item.ADD1+"_"+item.ADD2+"_"+item.ADD3} checked={this.state.checkedBoxes.find((p) => p.id === item._id)} onChange={(e) => this.toggleCheckbox(e, item)}/>,
             INVNAME: <input type="text" value={item.INVNAME} class="removeFromInput" style={{width:"auto"}} disabled />,
@@ -320,18 +353,13 @@ class Trans_Report extends Component {
                             </div>                    */}
                             </div>
                         </div>
-                        {/* <div className="col-lg-3">
+                         <div className="col-lg-3">
                             <div className="form-group">
-                                <label>Fund :</label>
-                                <select className="form-control searchfund" onChange={this.selectfund} >
-                                <option value="">Select Fund</option>
-                                {this.state.amclist.map((item, index) => (
-                                  <option value={item.AMCCODE}>{item.amcname}</option>
-                                ))}
-                                </select>                    
+                                <label>PAN :</label>
+                                <input type="text" name="searchpan" className="form-control searchpan" />                
                             </div>
                         </div>
-                        <div className="col-lg-3">
+                       {/* <div className="col-lg-3">
                             <div className="form-group">
                                 <label>Scheme :</label>
                                 <select id="searchscheme" className="form-control searchscheme" >
@@ -382,6 +410,9 @@ class Trans_Report extends Component {
                     </div>
                 </div>
                 <Loader/>
+                <div id="datasection1">
+                <label style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>Data not found</label>
+                </div>
                 <div id="datasection">
                 <div  className="card">
                     <div className="card-body">

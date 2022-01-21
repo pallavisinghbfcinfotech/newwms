@@ -74,6 +74,26 @@ function Nav() {
     };
     reader.readAsBinaryString(file);
   }
+  const uploaddata = e =>{
+  Axios.post(`https://www.amfiindia.com/spages/NAVAll.txt`,
+  {mode: 'cors'},
+    {headers:
+      { 'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Methods': 'POST',
+        'Access-Control-Allow-Credentials' : 'true',
+        'Access-Control-Max-Age' :'3000',
+        'Access-Control-Allow-Headers' : ' Origin, Content-Type, X-Auth-Token, Accept, X-Requested-With',
+        'Content-Type': 'application/json, charset=utf-8',
+        //'Content-Type':'application/x-www-form-urlencoded',
+      }
+    }).then(( data ) => {
+      console.log("dataaaaa=",data)
+   // alert(data)
+    // this.setState({
+    //   userDetails: data
+    // });
+  });
+}
 
   return (  
     <>
@@ -140,6 +160,8 @@ function Nav() {
                                         </div>
                                         
                                     </div>
+   <button type="submit" className="btn btn-primary" onClick={uploaddata}  >
+                      Register</button>
                                 </div>
                             </div>
                         </div>
